@@ -6,6 +6,9 @@
 
 import { useEffect, useState } from "react";
 import { Heart, Calculator, ArrowRight, Info } from "lucide-react";
+import { useLeadContext } from "@/contexts/LeadContext";
+import { submitLeadToSheetsViaAppsScript } from "@/lib/sheetsService";
+import { calculateLeadScore } from "@/lib/quizData";
 
 const COLD_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/thank-you-cold-WfFUvnA2xi544eNPSPX6aP.webp";
@@ -14,12 +17,32 @@ const COLD_IMG =
 const SIMULADOR_URL = "https://simulador.exemplo.com.br";
 
 export default function ResultadoFrio() {
+  const { leadData, quizAnswers } = useLeadContext();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
+
+  // Enviar dados para Google Sheets
+  useEffect(() => {
+    if (leadData && quizAnswers) {
+      const score = calculateLeadScore(quizAnswers);
+      const submission = {
+        leadData,
+        quizAnswers,
+        score,
+        timestamp: new Date().toLocaleString("pt-BR"),
+      };
+      submitLeadToSheetsViaAppsScript(submission).catch((error) => {
+        console.error("Erro ao enviar para Sheets:", error);
+      });
+    }
+  }, [leadData, quizAnswers]);
+
+  // Exibir nome do lead se disponível
+  const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
 
   return (
     <div
@@ -109,7 +132,7 @@ export default function ResultadoFrio() {
             className="text-2xl md:text-3xl font-bold text-white leading-tight"
             style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
-            Obrigado pelas respostas! 😊
+            Obrigado pelas respostas{leadName ? `, ${leadName}` : ""}! 😊
           </h1>
 
           <p
@@ -119,6 +142,14 @@ export default function ResultadoFrio() {
             Preparamos uma{" "}
             <strong className="text-white/85">simulação gratuita e personalizada</strong> com os
             melhores planos disponíveis para o seu perfil. Veja os valores agora mesmo!
+            {leadData && (
+              <>
+                <br />
+                <span className="text-xs text-white/40 mt-2 block">
+                  Seus dados foram registrados: {leadData.email}
+                </span>
+              </>
+            )}
           </p>
         </div>
 
@@ -178,7 +209,7 @@ export default function ResultadoFrio() {
           className="text-xs text-white/25 mt-4"
           style={{ fontFamily: "DM Sans, sans-serif" }}
         >
-          Gratuito • Sem cadastro • Resultado imediato
+          Gratuito • Sem cadastro • Resultado imediato • Dados registrados
         </p>
       </div>
 

@@ -6,6 +6,9 @@
 
 import { useEffect, useState } from "react";
 import { Heart, MessageCircle, CheckCircle, Star } from "lucide-react";
+import { useLeadContext } from "@/contexts/LeadContext";
+import { submitLeadToSheetsViaAppsScript } from "@/lib/sheetsService";
+import { calculateLeadScore } from "@/lib/quizData";
 
 const THANK_YOU_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/thank-you-warm-giqk29yEYFxKNcSRMhRrie.webp";
@@ -18,12 +21,32 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 
 export default function Obrigado() {
+  const { leadData, quizAnswers } = useLeadContext();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
+
+  // Enviar dados para Google Sheets
+  useEffect(() => {
+    if (leadData && quizAnswers) {
+      const score = calculateLeadScore(quizAnswers);
+      const submission = {
+        leadData,
+        quizAnswers,
+        score,
+        timestamp: new Date().toLocaleString("pt-BR"),
+      };
+      submitLeadToSheetsViaAppsScript(submission).catch((error) => {
+        console.error("Erro ao enviar para Sheets:", error);
+      });
+    }
+  }, [leadData, quizAnswers]);
+
+  // Exibir nome do lead se disponível
+  const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
 
   return (
     <div
@@ -113,7 +136,7 @@ export default function Obrigado() {
             className="text-2xl md:text-3xl font-bold text-white leading-tight"
             style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
-            Ótimas notícias! 🎉
+            Ótimas notícias{leadName ? `, ${leadName}` : ""}! 🎉
           </h1>
 
           <p
@@ -123,6 +146,14 @@ export default function Obrigado() {
             Com base nas suas respostas, identificamos{" "}
             <strong className="text-white/85">ótimas opções de plano</strong> para o seu perfil.
             Um de nossos consultores especializados está pronto para te atender agora.
+            {leadData && (
+              <>
+                <br />
+                <span className="text-xs text-white/40 mt-2 block">
+                  Seus dados foram registrados: {leadData.email}
+                </span>
+              </>
+            )}
           </p>
         </div>
 
@@ -174,7 +205,7 @@ export default function Obrigado() {
           className="text-xs text-white/25 mt-4"
           style={{ fontFamily: "DM Sans, sans-serif" }}
         >
-          Atendimento gratuito • Sem compromisso
+          Atendimento gratuito • Sem compromisso • Dados registrados
         </p>
       </div>
 
