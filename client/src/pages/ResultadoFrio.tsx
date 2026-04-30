@@ -57,21 +57,21 @@ export default function ResultadoFrio() {
   return (
     <div
       className="min-h-screen relative flex flex-col items-center justify-center overflow-hidden px-4"
-      style={{ background: "#0F172A" }}
+      style={{ background: "linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)" }}
     >
       {/* Background */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-15"
+        className="absolute inset-0 bg-cover bg-center opacity-5"
         style={{
           backgroundImage: `url(https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hero-health-bg-igbSPaoZJKBqYM9KqjBYjP.webp)`,
         }}
       />
-      <div className="absolute inset-0 dot-pattern opacity-30" />
+      <div className="absolute inset-0 dot-pattern opacity-10" />
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at center, rgba(6, 182, 212, 0.07) 0%, transparent 70%)",
+            "radial-gradient(ellipse at center, rgba(231, 76, 60, 0.05) 0%, transparent 70%)",
         }}
       />
 
@@ -79,7 +79,7 @@ export default function ResultadoFrio() {
       <div className="absolute top-6 left-6 flex items-center gap-2 z-10">
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: "linear-gradient(135deg, #06B6D4, #10B981)" }}
+          style={{ background: "linear-gradient(135deg, #E74C3C, #FF6B35)" }}
         >
           <Heart className="w-4 h-4 text-white fill-white" />
         </div>
@@ -97,10 +97,10 @@ export default function ResultadoFrio() {
           visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
         style={{
-          background: "rgba(22, 33, 62, 0.90)",
-          border: "1px solid rgba(6, 182, 212, 0.2)",
+          background: "rgba(255, 255, 255, 0.95)",
+          border: "1px solid rgba(231, 76, 60, 0.2)",
           boxShadow:
-            "0 0 0 1px rgba(6, 182, 212, 0.1), 0 20px 60px rgba(0,0,0,0.5), 0 0 80px rgba(6, 182, 212, 0.06)",
+            "0 0 0 1px rgba(231, 76, 60, 0.1), 0 20px 60px rgba(0,0,0,0.08), 0 0 80px rgba(231, 76, 60, 0.05)",
         }}
       >
         {/* Image */}
@@ -111,12 +111,12 @@ export default function ResultadoFrio() {
               alt="Simulador"
               className="w-28 h-28 rounded-full object-cover"
               style={{
-                boxShadow: "0 0 0 3px rgba(6, 182, 212, 0.3), 0 0 30px rgba(6, 182, 212, 0.2)",
+                boxShadow: "0 0 0 3px rgba(231, 76, 60, 0.2), 0 0 30px rgba(231, 76, 60, 0.1)",
               }}
             />
             <div
               className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #06B6D4, #0284C7)" }}
+              style={{ background: "linear-gradient(135deg, #E74C3C, #FF6B35)" }}
             >
               <Calculator className="w-4 h-4 text-white" />
             </div>
@@ -128,9 +128,9 @@ export default function ResultadoFrio() {
           <div
             className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium"
             style={{
-              background: "rgba(6, 182, 212, 0.15)",
-              border: "1px solid rgba(6, 182, 212, 0.3)",
-              color: "#06B6D4",
+              background: "rgba(231, 76, 60, 0.1)",
+              border: "1px solid rgba(231, 76, 60, 0.2)",
+              color: "#E74C3C",
               fontFamily: "DM Sans, sans-serif",
             }}
           >
@@ -139,23 +139,23 @@ export default function ResultadoFrio() {
           </div>
 
           <h1
-            className="text-2xl md:text-3xl font-bold text-white leading-tight"
+            className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
             style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
             Obrigado pelas respostas{leadName ? `, ${leadName}` : ""}! 😊
           </h1>
 
           <p
-            className="text-white/60 text-sm leading-relaxed"
+            className="text-gray-600 text-sm leading-relaxed"
             style={{ fontFamily: "DM Sans, sans-serif" }}
           >
             Preparamos uma{" "}
-            <strong className="text-white/85">simulação gratuita e personalizada</strong> com os
+            <strong className="text-gray-900">simulação gratóita e personalizada</strong> com os
             melhores planos disponíveis para o seu perfil. Veja os valores agora mesmo!
             {leadData && (
               <>
                 <br />
-                <span className="text-xs text-white/40 mt-2 block">
+                <span className="text-xs text-gray-500 mt-2 block">
                   Seus dados foram registrados: {leadData.email}
                 </span>
               </>
@@ -175,19 +175,19 @@ export default function ResultadoFrio() {
               key={item.title}
               className="rounded-xl p-3 text-left"
               style={{
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid rgba(255,255,255,0.07)",
+                background: "rgba(231, 76, 60, 0.05)",
+                border: "1px solid rgba(231, 76, 60, 0.1)",
               }}
             >
               <div className="text-lg mb-1">{item.icon}</div>
               <div
-                className="text-xs font-semibold text-white/80 mb-0.5"
+                className="text-xs font-semibold text-gray-800 mb-0.5"
                 style={{ fontFamily: "Space Grotesk, sans-serif" }}
               >
                 {item.title}
               </div>
               <div
-                className="text-xs text-white/40"
+                className="text-xs text-gray-600"
                 style={{ fontFamily: "DM Sans, sans-serif" }}
               >
                 {item.desc}
@@ -204,9 +204,9 @@ export default function ResultadoFrio() {
           className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           style={{
             fontFamily: "Space Grotesk, sans-serif",
-            background: "linear-gradient(135deg, #06B6D4, #0284C7)",
+            background: "linear-gradient(135deg, #E74C3C, #FF6B35)",
             color: "#fff",
-            boxShadow: "0 4px 20px rgba(6, 182, 212, 0.35)",
+            boxShadow: "0 4px 20px rgba(231, 76, 60, 0.35)",
             textDecoration: "none",
           }}
         >
@@ -216,7 +216,7 @@ export default function ResultadoFrio() {
         </a>
 
         <p
-          className="text-xs text-white/25 mt-4"
+          className="text-xs text-gray-500 mt-4"
           style={{ fontFamily: "DM Sans, sans-serif" }}
         >
           Gratuito • Sem cadastro • Resultado imediato • Dados registrados
@@ -225,7 +225,7 @@ export default function ResultadoFrio() {
 
       {/* Footer */}
       <p
-        className="relative z-10 text-xs text-white/20 mt-6"
+        className="relative z-10 text-xs text-gray-500 mt-6"
         style={{ fontFamily: "DM Sans, sans-serif" }}
       >
         Suas informações são confidenciais e protegidas
