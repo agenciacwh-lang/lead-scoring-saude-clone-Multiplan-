@@ -330,7 +330,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                 className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/30 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
                 style={{ fontFamily: "DM Sans, sans-serif" }}
               >
-                {submitting ? "Carregando..." : "Começar o quiz →"}
+                {submitting ? "Carregando..." : "Responder perguntas →"}
               </button>
             </form>
 

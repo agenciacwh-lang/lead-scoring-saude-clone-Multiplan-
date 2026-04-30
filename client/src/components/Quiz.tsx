@@ -1,7 +1,7 @@
 /**
- * Quiz Component – HealthTech Premium
- * Full-screen step-by-step quiz with lead scoring
- * Design: Dark Navy + Teal/Cyan + Emerald Green
+ * Perguntas Component – Hapvida
+ * Full-screen step-by-step perguntas com lead scoring
+ * Design: Hapvida Orange + Blue
  * Fonts: Space Grotesk (display) + DM Sans (body)
  */
 
@@ -100,35 +100,35 @@ export default function Quiz() {
   return (
     <div
       className="min-h-screen relative flex flex-col overflow-hidden"
-      style={{ background: "#0F172A" }}
+      style={{ background: "linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)" }}
     >
       {/* Background image */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-20"
+        className="absolute inset-0 bg-cover bg-center opacity-5"
         style={{ backgroundImage: `url(${HERO_BG})` }}
       />
       {/* Dot pattern overlay */}
-      <div className="absolute inset-0 dot-pattern opacity-40" />
+      <div className="absolute inset-0 dot-pattern opacity-10" />
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0F172A]/60 to-[#0F172A]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/40 to-white" />
 
       {/* Progress bar */}
-      <div className="relative z-10 w-full h-1 bg-white/10">
+      <div className="relative z-10 w-full h-1 bg-orange-100">
         <div
           className="h-full transition-all duration-500 ease-out"
           style={{
             width: `${progress}%`,
-            background: "linear-gradient(90deg, #06B6D4, #10B981)",
+            background: "linear-gradient(90deg, #E74C3C, #FF6B35)",
           }}
         />
       </div>
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4">
+      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-orange-100">
         <div className="flex items-center gap-2">
           <div
             className="w-8 h-8 rounded-full flex items-center justify-center animate-pulse-ring"
-            style={{ background: "linear-gradient(135deg, #06B6D4, #10B981)" }}
+            style={{ background: "linear-gradient(135deg, #E74C3C, #FF6B35)" }}
           >
             <Heart className="w-4 h-4 text-white fill-white" />
           </div>
@@ -141,13 +141,13 @@ export default function Quiz() {
         </div>
 
         <div className="flex items-center gap-4">
-          <span className="text-xs text-white/40" style={{ fontFamily: "DM Sans, sans-serif" }}>
+          <span className="text-xs text-gray-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
             {currentStep} de {totalSteps}
           </span>
           {currentStep > 1 && (
             <button
               onClick={goBack}
-              className="flex items-center gap-1 text-xs text-white/50 hover:text-white/80 transition-colors"
+              className="flex items-center gap-1 text-xs text-gray-600 hover:text-gray-900 transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               Voltar
@@ -164,7 +164,7 @@ export default function Quiz() {
             className="absolute -top-4 left-1/2 -translate-x-1/2 text-[120px] font-black select-none pointer-events-none"
             style={{
               fontFamily: "Space Grotesk, sans-serif",
-              color: "rgba(6, 182, 212, 0.04)",
+              color: "rgba(231, 76, 60, 0.08)",
               lineHeight: 1,
             }}
           >
@@ -181,9 +181,9 @@ export default function Quiz() {
               ${!animating ? "animate-fade-up" : ""}
             `}
             style={{
-              background: "rgba(22, 33, 62, 0.85)",
+              background: "rgba(255, 255, 255, 0.95)",
               boxShadow:
-                "0 0 0 1px rgba(6, 182, 212, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(6, 182, 212, 0.05)",
+                "0 0 0 1px rgba(231, 76, 60, 0.1), 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 80px rgba(231, 76, 60, 0.05)",
             }}
           >
             {currentQuestion ? (
@@ -202,8 +202,8 @@ export default function Quiz() {
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 text-center py-4 px-4">
-        <p className="text-xs text-white/20" style={{ fontFamily: "DM Sans, sans-serif" }}>
+      <footer className="relative z-10 text-center py-4 px-4 border-t border-orange-100">
+        <p className="text-xs text-gray-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
           Suas informações são confidenciais e protegidas
         </p>
       </footer>
@@ -237,14 +237,14 @@ function QuestionContent({
       <div className="space-y-2">
         <div className="text-3xl">{question.icon}</div>
         <h2
-          className="text-xl md:text-2xl font-bold text-white leading-snug"
+          className="text-xl md:text-2xl font-bold text-gray-900 leading-snug"
           style={{ fontFamily: "Space Grotesk, sans-serif" }}
         >
           {question.title}
         </h2>
         {question.subtitle && (
           <p
-            className="text-sm text-white/50 leading-relaxed"
+            className="text-sm text-gray-600 leading-relaxed"
             style={{ fontFamily: "DM Sans, sans-serif" }}
           >
             {question.subtitle}
@@ -260,19 +260,19 @@ function QuestionContent({
             value={textInput}
             onChange={(e) => onTextChange(e.target.value)}
             placeholder="Ex: 35, 32, 8"
-            className="w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none transition-all duration-200"
+            className="w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200"
             style={{
               fontFamily: "DM Sans, sans-serif",
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              background: "rgba(255,255,255,0.8)",
+              border: "1px solid rgba(231, 76, 60, 0.2)",
               fontSize: "16px",
             }}
             onFocus={(e) => {
-              e.currentTarget.style.borderColor = "rgba(6, 182, 212, 0.5)";
-              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(6, 182, 212, 0.1)";
+              e.currentTarget.style.borderColor = "rgba(231, 76, 60, 0.5)";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(231, 76, 60, 0.1)";
             }}
             onBlur={(e) => {
-              e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+              e.currentTarget.style.borderColor = "rgba(231, 76, 60, 0.2)";
               e.currentTarget.style.boxShadow = "none";
             }}
             onKeyDown={(e) => {
@@ -286,11 +286,11 @@ function QuestionContent({
             style={{
               fontFamily: "Space Grotesk, sans-serif",
               background: textInput.trim()
-                ? "linear-gradient(135deg, #06B6D4, #10B981)"
-                : "rgba(255,255,255,0.1)",
-              color: textInput.trim() ? "#0F172A" : "rgba(255,255,255,0.4)",
+                ? "linear-gradient(135deg, #E74C3C, #FF6B35)"
+                : "rgba(231, 76, 60, 0.1)",
+              color: textInput.trim() ? "#ffffff" : "rgba(231, 76, 60, 0.4)",
               boxShadow: textInput.trim()
-                ? "0 4px 16px rgba(6, 182, 212, 0.3)"
+                ? "0 4px 16px rgba(231, 76, 60, 0.3)"
                 : "none",
             }}
           >
@@ -311,7 +311,7 @@ function QuestionContent({
                 <span className="text-xl flex-shrink-0">{option.emoji}</span>
               )}
               <span
-                className="text-sm font-medium text-white/85"
+                className="text-sm font-medium text-gray-800"
                 style={{ fontFamily: "DM Sans, sans-serif" }}
               >
                 {option.text}
