@@ -1,6 +1,6 @@
 /**
  * LeadForm – Formulário inicial de captura de dados
- * Design: HealthTech Premium – Dark Navy + Teal/Green
+ * Design: Hapvida – Orange + Blue + Clean
  * Campos: Nome, Telefone, E-mail, Cidade
  */
 
@@ -8,9 +8,6 @@ import { useState } from "react";
 import { Heart, Mail, Phone, MapPin, User } from "lucide-react";
 import { useLeadContext } from "@/contexts/LeadContext";
 import { LeadData } from "@/lib/types";
-
-const HERO_BG =
-  "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hero-health-bg-igbSPaoZJKBqYM9KqjBYjP.webp";
 
 interface LeadFormProps {
   onSubmit: (data: LeadData) => void;
@@ -27,6 +24,8 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [visible, setVisible] = useState(false);
+
+  const hapvidaLogoUrl = "/manus-storage/hapvida-logo_487cd512.png";
 
   // Trigger animation on mount
   useState(() => {
@@ -64,7 +63,6 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -74,7 +72,6 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
     let value = e.target.value.replace(/\D/g, "");
     if (value.length > 11) value = value.slice(0, 11);
     
-    // Format: (XX) XXXXX-XXXX or (XX) XXXX-XXXX
     if (value.length > 0) {
       if (value.length <= 2) {
         value = `(${value}`;
@@ -97,8 +94,6 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
     if (!validateForm()) return;
 
     setSubmitting(true);
-
-    // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     setLeadData(formData);
@@ -108,62 +103,54 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   };
 
   return (
-    <div
-      className="min-h-screen relative flex flex-col overflow-hidden"
-      style={{ background: "#0F172A" }}
-    >
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-20"
-        style={{ backgroundImage: `url(${HERO_BG})` }}
-      />
-      <div className="absolute inset-0 dot-pattern opacity-40" />
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0F172A]/60 to-[#0F172A]" />
+    <div className="min-h-screen relative flex flex-col overflow-hidden bg-gradient-to-br from-white via-gray-50 to-white">
+      {/* Subtle background pattern */}
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 dot-pattern" />
+      </div>
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4">
+      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-orange-100">
         <div className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center animate-pulse-ring"
-            style={{ background: "linear-gradient(135deg, #06B6D4, #10B981)" }}
-          >
+          <div className="w-8 h-8 rounded-full flex items-center justify-center animate-pulse-ring bg-gradient-to-r from-orange-500 to-orange-600">
             <Heart className="w-4 h-4 text-white fill-white" />
           </div>
-          <span
-            className="font-bold text-sm tracking-wide"
-            style={{ fontFamily: "Space Grotesk, sans-serif", color: "#06B6D4" }}
-          >
-            SaúdePlan
+          <span className="font-bold text-sm tracking-wide text-gray-900" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
+            Hapvida
           </span>
         </div>
       </header>
 
       {/* Main content */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-lg">
+        <div className="w-full max-w-md">
+          {/* Logo */}
+          <div className="flex justify-center mb-8">
+            <img src={hapvidaLogoUrl} alt="Hapvida" className="h-16 object-contain" />
+          </div>
+
           {/* Card */}
           <div
             className={`
-              relative rounded-2xl border border-white/10 backdrop-blur-md p-6 md:p-8
-              transition-all duration-700
+              relative rounded-2xl border border-orange-200 backdrop-blur-md p-6 md:p-8
+              transition-all duration-700 shadow-lg
               ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
             `}
             style={{
-              background: "rgba(22, 33, 62, 0.85)",
-              boxShadow:
-                "0 0 0 1px rgba(6, 182, 212, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(6, 182, 212, 0.05)",
+              background: "rgba(255, 255, 255, 0.95)",
+              boxShadow: "0 0 0 1px rgba(229, 76, 60, 0.1), 0 20px 60px rgba(0, 0, 0, 0.08)",
             }}
           >
             {/* Title */}
             <div className="space-y-2 mb-6">
               <h1
-                className="text-2xl md:text-3xl font-bold text-white leading-tight"
+                className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
                 style={{ fontFamily: "Space Grotesk, sans-serif" }}
               >
                 Vamos começar! 👋
               </h1>
               <p
-                className="text-white/60 text-sm"
+                className="text-gray-600 text-sm"
                 style={{ fontFamily: "DM Sans, sans-serif" }}
               >
                 Precisamos de alguns dados para personalizar sua experiência
@@ -176,10 +163,10 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
               <div className="space-y-1.5">
                 <label
                   htmlFor="nome"
-                  className="flex items-center gap-2 text-xs font-semibold text-white/70"
+                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
                   style={{ fontFamily: "DM Sans, sans-serif" }}
                 >
-                  <User className="w-3.5 h-3.5" style={{ color: "#06B6D4" }} />
+                  <User className="w-3.5 h-3.5 text-orange-500" />
                   Seu nome completo
                 </label>
                 <input
@@ -189,32 +176,25 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                   value={formData.nome}
                   onChange={handleChange}
                   placeholder="João Silva"
-                  className={`w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none transition-all duration-200 ${
-                    errors.nome ? "border-red-500/50" : "border-white/10"
+                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
+                    errors.nome ? "border-red-500/50" : "border-orange-200"
                   }`}
                   style={{
                     fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255,255,255,0.06)",
-                    border: `1px solid ${errors.nome ? "rgba(239, 68, 68, 0.5)" : "rgba(255,255,255,0.12)"}`,
+                    background: "rgba(255, 255, 255, 0.8)",
                     fontSize: "16px",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = errors.nome
-                      ? "rgba(239, 68, 68, 0.7)"
-                      : "rgba(6, 182, 212, 0.5)";
-                    e.target.style.boxShadow = errors.nome
-                      ? "0 0 0 3px rgba(239, 68, 68, 0.1)"
-                      : "0 0 0 3px rgba(6, 182, 212, 0.1)";
+                    e.target.style.borderColor = errors.nome ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
+                    e.target.style.boxShadow = errors.nome ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.nome
-                      ? "rgba(239, 68, 68, 0.5)"
-                      : "rgba(255,255,255,0.12)";
+                    e.target.style.borderColor = errors.nome ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
                     e.target.style.boxShadow = "none";
                   }}
                 />
                 {errors.nome && (
-                  <p className="text-xs text-red-400" style={{ fontFamily: "DM Sans, sans-serif" }}>
+                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
                     {errors.nome}
                   </p>
                 )}
@@ -224,10 +204,10 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
               <div className="space-y-1.5">
                 <label
                   htmlFor="telefone"
-                  className="flex items-center gap-2 text-xs font-semibold text-white/70"
+                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
                   style={{ fontFamily: "DM Sans, sans-serif" }}
                 >
-                  <Phone className="w-3.5 h-3.5" style={{ color: "#06B6D4" }} />
+                  <Phone className="w-3.5 h-3.5 text-orange-500" />
                   Telefone com WhatsApp
                 </label>
                 <input
@@ -237,32 +217,25 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                   value={formData.telefone}
                   onChange={handlePhoneChange}
                   placeholder="(11) 99999-9999"
-                  className={`w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none transition-all duration-200 ${
-                    errors.telefone ? "border-red-500/50" : "border-white/10"
+                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
+                    errors.telefone ? "border-red-500/50" : "border-orange-200"
                   }`}
                   style={{
                     fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255,255,255,0.06)",
-                    border: `1px solid ${errors.telefone ? "rgba(239, 68, 68, 0.5)" : "rgba(255,255,255,0.12)"}`,
+                    background: "rgba(255, 255, 255, 0.8)",
                     fontSize: "16px",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = errors.telefone
-                      ? "rgba(239, 68, 68, 0.7)"
-                      : "rgba(6, 182, 212, 0.5)";
-                    e.target.style.boxShadow = errors.telefone
-                      ? "0 0 0 3px rgba(239, 68, 68, 0.1)"
-                      : "0 0 0 3px rgba(6, 182, 212, 0.1)";
+                    e.target.style.borderColor = errors.telefone ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
+                    e.target.style.boxShadow = errors.telefone ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.telefone
-                      ? "rgba(239, 68, 68, 0.5)"
-                      : "rgba(255,255,255,0.12)";
+                    e.target.style.borderColor = errors.telefone ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
                     e.target.style.boxShadow = "none";
                   }}
                 />
                 {errors.telefone && (
-                  <p className="text-xs text-red-400" style={{ fontFamily: "DM Sans, sans-serif" }}>
+                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
                     {errors.telefone}
                   </p>
                 )}
@@ -272,10 +245,10 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
               <div className="space-y-1.5">
                 <label
                   htmlFor="email"
-                  className="flex items-center gap-2 text-xs font-semibold text-white/70"
+                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
                   style={{ fontFamily: "DM Sans, sans-serif" }}
                 >
-                  <Mail className="w-3.5 h-3.5" style={{ color: "#06B6D4" }} />
+                  <Mail className="w-3.5 h-3.5 text-orange-500" />
                   E-mail
                 </label>
                 <input
@@ -285,32 +258,25 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="seu@email.com"
-                  className={`w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none transition-all duration-200 ${
-                    errors.email ? "border-red-500/50" : "border-white/10"
+                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
+                    errors.email ? "border-red-500/50" : "border-orange-200"
                   }`}
                   style={{
                     fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255,255,255,0.06)",
-                    border: `1px solid ${errors.email ? "rgba(239, 68, 68, 0.5)" : "rgba(255,255,255,0.12)"}`,
+                    background: "rgba(255, 255, 255, 0.8)",
                     fontSize: "16px",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = errors.email
-                      ? "rgba(239, 68, 68, 0.7)"
-                      : "rgba(6, 182, 212, 0.5)";
-                    e.target.style.boxShadow = errors.email
-                      ? "0 0 0 3px rgba(239, 68, 68, 0.1)"
-                      : "0 0 0 3px rgba(6, 182, 212, 0.1)";
+                    e.target.style.borderColor = errors.email ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
+                    e.target.style.boxShadow = errors.email ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.email
-                      ? "rgba(239, 68, 68, 0.5)"
-                      : "rgba(255,255,255,0.12)";
+                    e.target.style.borderColor = errors.email ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
                     e.target.style.boxShadow = "none";
                   }}
                 />
                 {errors.email && (
-                  <p className="text-xs text-red-400" style={{ fontFamily: "DM Sans, sans-serif" }}>
+                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
                     {errors.email}
                   </p>
                 )}
@@ -320,10 +286,10 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
               <div className="space-y-1.5">
                 <label
                   htmlFor="cidade"
-                  className="flex items-center gap-2 text-xs font-semibold text-white/70"
+                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
                   style={{ fontFamily: "DM Sans, sans-serif" }}
                 >
-                  <MapPin className="w-3.5 h-3.5" style={{ color: "#06B6D4" }} />
+                  <MapPin className="w-3.5 h-3.5 text-orange-500" />
                   Cidade
                 </label>
                 <input
@@ -333,32 +299,25 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                   value={formData.cidade}
                   onChange={handleChange}
                   placeholder="São Paulo"
-                  className={`w-full rounded-xl px-4 py-3 text-white placeholder-white/30 outline-none transition-all duration-200 ${
-                    errors.cidade ? "border-red-500/50" : "border-white/10"
+                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
+                    errors.cidade ? "border-red-500/50" : "border-orange-200"
                   }`}
                   style={{
                     fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255,255,255,0.06)",
-                    border: `1px solid ${errors.cidade ? "rgba(239, 68, 68, 0.5)" : "rgba(255,255,255,0.12)"}`,
+                    background: "rgba(255, 255, 255, 0.8)",
                     fontSize: "16px",
                   }}
                   onFocus={(e) => {
-                    e.target.style.borderColor = errors.cidade
-                      ? "rgba(239, 68, 68, 0.7)"
-                      : "rgba(6, 182, 212, 0.5)";
-                    e.target.style.boxShadow = errors.cidade
-                      ? "0 0 0 3px rgba(239, 68, 68, 0.1)"
-                      : "0 0 0 3px rgba(6, 182, 212, 0.1)";
+                    e.target.style.borderColor = errors.cidade ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
+                    e.target.style.boxShadow = errors.cidade ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
                   }}
                   onBlur={(e) => {
-                    e.target.style.borderColor = errors.cidade
-                      ? "rgba(239, 68, 68, 0.5)"
-                      : "rgba(255,255,255,0.12)";
+                    e.target.style.borderColor = errors.cidade ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
                     e.target.style.boxShadow = "none";
                   }}
                 />
                 {errors.cidade && (
-                  <p className="text-xs text-red-400" style={{ fontFamily: "DM Sans, sans-serif" }}>
+                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
                     {errors.cidade}
                   </p>
                 )}
@@ -368,36 +327,20 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed mt-6"
-                style={{
-                  fontFamily: "Space Grotesk, sans-serif",
-                  background: submitting
-                    ? "linear-gradient(135deg, #06B6D4, #10B981)"
-                    : "linear-gradient(135deg, #06B6D4, #10B981)",
-                  color: "#0F172A",
-                  boxShadow: "0 4px 20px rgba(6, 182, 212, 0.35)",
-                }}
+                className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/30 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                style={{ fontFamily: "DM Sans, sans-serif" }}
               >
                 {submitting ? "Carregando..." : "Começar o quiz →"}
               </button>
             </form>
 
-            <p
-              className="text-xs text-white/25 text-center mt-4"
-              style={{ fontFamily: "DM Sans, sans-serif" }}
-            >
+            {/* Footer */}
+            <p className="text-center text-xs text-gray-500 mt-6" style={{ fontFamily: "DM Sans, sans-serif" }}>
               Seus dados são confidenciais e protegidos
             </p>
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="relative z-10 text-center py-4 px-4">
-        <p className="text-xs text-white/20" style={{ fontFamily: "DM Sans, sans-serif" }}>
-          Leva menos de 2 minutos
-        </p>
-      </footer>
     </div>
   );
 }
