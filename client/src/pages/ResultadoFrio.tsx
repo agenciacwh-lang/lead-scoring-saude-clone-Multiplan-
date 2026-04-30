@@ -85,9 +85,9 @@ export default function ResultadoFrio() {
         </div>
         <span
           className="font-bold text-sm"
-          style={{ fontFamily: "Space Grotesk, sans-serif", color: "#06B6D4" }}
+          style={{ fontFamily: "Space Grotesk, sans-serif", color: "#E74C3C" }}
         >
-          SaúdePlan
+          Hapvida
         </span>
       </div>
 

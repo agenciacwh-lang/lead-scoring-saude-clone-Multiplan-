@@ -134,9 +134,9 @@ export default function Quiz() {
           </div>
           <span
             className="font-bold text-sm tracking-wide"
-            style={{ fontFamily: "Space Grotesk, sans-serif", color: "#06B6D4" }}
+            style={{ fontFamily: "Space Grotesk, sans-serif", color: "#E74C3C" }}
           >
-            SaúdePlan
+            Hapvida
           </span>
         </div>
 
