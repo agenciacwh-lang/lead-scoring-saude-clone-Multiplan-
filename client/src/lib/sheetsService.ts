@@ -12,7 +12,7 @@ import { LeadData } from "./types";
 import { calculateLeadScore } from "./quizData";
 
 // ⚠️ SUBSTITUIR PELA URL REAL DO WEBHOOK
-const WEBHOOK_URL = "https://docs.google.com/forms/d/e/YOUR_FORM_ID/formResponse";
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbygyPf_s6pUQ5G321m-d4QiGk5nQe3fGDn-_-ohxt1XRh50yAztxFkV5dNuuw9e1haL3w/exec";
 
 export interface LeadSubmission {
   leadData: LeadData;
@@ -157,8 +157,8 @@ export async function submitLeadToSheetsViaAppsScript(
       data_hora: submission.timestamp,
     };
 
-    // ⚠️ SUBSTITUIR PELA URL REAL DO GOOGLE APPS SCRIPT
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/d/YOUR_SCRIPT_ID/usercache";
+    // Google Apps Script URL
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbygyPf_s6pUQ5G321m-d4QiGk5nQe3fGDn-_-ohxt1XRh50yAztxFkV5dNuuw9e1haL3w/exec";
 
     const response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
