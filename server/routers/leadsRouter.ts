@@ -1,0 +1,110 @@
+/**
+ * Router tRPC para gerenciar leads
+ */
+
+import { publicProcedure, router } from "../_core/trpc";
+import { z } from "zod";
+import { eq } from "drizzle-orm";
+import { saveLead, getDb } from "../db";
+import { leads } from "../../drizzle/schema";
+import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
+
+export const leadsRouter = router({
+  /**
+   * Submeter um novo lead
+   */
+  submit: publicProcedure
+    .input(
+      z.object({
+        nome: z.string(),
+        telefone: z.string(),
+        email: z.string(),
+        cidade: z.string(),
+        tempo_compra: z.string(),
+        situacao_atual: z.string(),
+        renda: z.string(),
+        criterio_escolha: z.string(),
+        cnpj_mei: z.string(),
+        idades: z.string(),
+        pontuacao: z.number(),
+        temperatura: z.enum(["frio", "morno", "quente"]),
+        prioridade: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Salvar no banco de dados
+        const result = await saveLead(input);
+
+        // Enviar para Google Sheets
+        const sheetsSent = await sendLeadToSheets(input);
+
+        return {
+          success: true,
+          message: "Lead salvo com sucesso",
+          result,
+          sheetsSent,
+        };
+      } catch (error) {
+        console.error("Erro ao salvar lead:", error);
+        return { success: false, message: "Erro ao salvar lead" };
+      }
+    }),
+
+  /**
+   * Obter todos os leads
+   */
+  getAll: publicProcedure.query(async () => {
+    const db = await getDb();
+    if (!db) {
+      return [];
+    }
+
+    try {
+      const allLeads = await db.select().from(leads);
+      return allLeads;
+    } catch (error) {
+      console.error("Erro ao buscar leads:", error);
+      return [];
+    }
+  }),
+
+  /**
+   * Obter estatísticas dos leads
+   */
+  getStats: publicProcedure.query(async () => {
+    return await getLeadsStats();
+  }),
+
+  /**
+   * Sincronizar um lead específico com Google Sheets
+   */
+  syncToSheets: publicProcedure
+    .input(z.object({ leadId: z.number() }))
+    .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) {
+        return { success: false, message: "Database não disponível" };
+      }
+
+      try {
+        // Buscar o lead
+        const leadData = await db.select().from(leads).where(eq(leads.id, input.leadId));
+
+        if (leadData.length === 0) {
+          return { success: false, message: "Lead não encontrado" };
+        }
+
+        // Enviar para Google Sheets
+        const success = await sendLeadToSheets(leadData[0]);
+
+        return {
+          success,
+          message: success ? "Lead sincronizado com sucesso" : "Erro ao sincronizar",
+        };
+      } catch (error) {
+        console.error("Erro ao sincronizar lead:", error);
+        return { success: false, message: "Erro ao sincronizar" };
+      }
+    }),
+});

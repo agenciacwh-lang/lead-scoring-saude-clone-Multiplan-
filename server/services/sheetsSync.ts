@@ -1,0 +1,130 @@
+/**
+ * Serviço de sincronização de leads com Google Sheets
+ * Sincroniza os leads do banco de dados com uma planilha Google Sheets via webhook
+ */
+
+import { getDb } from "../db";
+import { leads } from "../../drizzle/schema";
+
+// URL do Google Apps Script que você configurou
+const GOOGLE_SHEETS_WEBHOOK_URL = process.env.GOOGLE_SHEETS_WEBHOOK_URL || "";
+
+/**
+ * Formata um lead para envio ao Google Sheets
+ */
+function formatLeadForSheets(lead: any) {
+  return {
+    data_hora: new Date(lead.createdAt).toLocaleString("pt-BR"),
+    nome: lead.nome,
+    telefone: lead.telefone,
+    email: lead.email,
+    cidade: lead.cidade,
+    tempo_compra: lead.tempo_compra,
+    situacao_atual: lead.situacao_atual,
+    renda: lead.renda,
+    criterio_escolha: lead.criterio_escolha,
+    cnpj_mei: lead.cnpj_mei,
+    idades: lead.idades,
+    pontuacao: lead.pontuacao,
+    temperatura: lead.temperatura.toUpperCase(),
+    prioridade: lead.prioridade,
+  };
+}
+
+/**
+ * Envia um lead para o Google Sheets
+ */
+export async function sendLeadToSheets(lead: any): Promise<boolean> {
+  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || GOOGLE_SHEETS_WEBHOOK_URL;
+  if (!webhookUrl) {
+    console.warn("[Sheets Sync] GOOGLE_SHEETS_WEBHOOK_URL não configurada");
+    return false;
+  }
+
+  try {
+    const payload = formatLeadForSheets(lead);
+
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    console.log("[Sheets Sync] Lead enviado para Google Sheets:", lead.email);
+    return true;
+  } catch (error) {
+    console.error("[Sheets Sync] Erro ao enviar lead para Google Sheets:", error);
+    return false;
+  }
+}
+
+/**
+ * Sincroniza todos os leads não sincronizados com Google Sheets
+ * Esta função pode ser chamada periodicamente via scheduled task
+ */
+export async function syncAllLeadsToSheets(): Promise<{ synced: number; failed: number }> {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Sheets Sync] Database não disponível");
+    return { synced: 0, failed: 0 };
+  }
+
+  try {
+    // Buscar todos os leads
+    const allLeads = await db.select().from(leads);
+
+    let synced = 0;
+    let failed = 0;
+
+    // Enviar cada lead para Google Sheets
+    for (const lead of allLeads) {
+      const success = await sendLeadToSheets(lead);
+      if (success) {
+        synced++;
+      } else {
+        failed++;
+      }
+      // Pequeno delay para evitar rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+
+    console.log(
+      `[Sheets Sync] Sincronização completa: ${synced} sincronizados, ${failed} falhados`
+    );
+    return { synced, failed };
+  } catch (error) {
+    console.error("[Sheets Sync] Erro ao sincronizar leads:", error);
+    return { synced: 0, failed: 0 };
+  }
+}
+
+/**
+ * Obtém estatísticas dos leads
+ */
+export async function getLeadsStats() {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Sheets Sync] Database não disponível");
+    return null;
+  }
+
+  try {
+    const allLeads = await db.select().from(leads);
+
+    const stats = {
+      total: allLeads.length,
+      frios: allLeads.filter((l) => l.temperatura === "frio").length,
+      mornos: allLeads.filter((l) => l.temperatura === "morno").length,
+      quentes: allLeads.filter((l) => l.temperatura === "quente").length,
+      prioridade: allLeads.filter((l) => l.prioridade === "Sim").length,
+    };
+
+    return stats;
+  } catch (error) {
+    console.error("[Sheets Sync] Erro ao obter estatísticas:", error);
+    return null;
+  }
+}
