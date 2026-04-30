@@ -8,6 +8,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { QUIZ_QUESTIONS, calculateLeadScore } from "@/lib/quizData";
+import { useLeadContext } from "@/contexts/LeadContext";
 import { ChevronLeft, Heart } from "lucide-react";
 
 const HERO_BG =
@@ -15,8 +16,8 @@ const HERO_BG =
 
 export default function Quiz() {
   const [, navigate] = useLocation();
-  const [currentStep, setCurrentStep] = useState(0); // 0 = intro, 1-6 = questions
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const { quizAnswers, addAnswer } = useLeadContext();
+  const [currentStep, setCurrentStep] = useState(1); // 1-6 = questions
   const [textInput, setTextInput] = useState("");
   const [animating, setAnimating] = useState(false);
   const [animDir, setAnimDir] = useState<"in" | "out">("in");
@@ -24,10 +25,9 @@ export default function Quiz() {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const totalSteps = QUIZ_QUESTIONS.length;
-  const isIntro = currentStep === 0;
   const questionIndex = currentStep - 1;
-  const currentQuestion = !isIntro ? QUIZ_QUESTIONS[questionIndex] : null;
-  const progress = isIntro ? 0 : (currentStep / totalSteps) * 100;
+  const currentQuestion = QUIZ_QUESTIONS[questionIndex] || null;
+  const progress = (currentStep / totalSteps) * 100;
 
   // Reset selected option when step changes
   useEffect(() => {
@@ -41,14 +41,10 @@ export default function Quiz() {
 
       // Save answer
       if (currentQuestion && answerId) {
-        setAnswers((prev) => ({ ...prev, [currentQuestion.key]: answerId }));
+        addAnswer(currentQuestion.key, answerId);
       }
       if (currentQuestion?.isTextInput && currentQuestion) {
-        const key = currentQuestion.key;
-        setAnswers((prev) => ({
-          ...prev,
-          [key]: textInput,
-        }));
+        addAnswer(currentQuestion.key, textInput);
       }
 
       setAnimating(true);
@@ -58,10 +54,10 @@ export default function Quiz() {
         if (currentStep >= totalSteps) {
           // Calculate score and navigate
           const finalAnswers = currentQuestion?.isTextInput && currentQuestion
-            ? { ...answers, [currentQuestion.key]: textInput }
+            ? { ...quizAnswers, [currentQuestion.key]: textInput }
             : answerId && currentQuestion
-            ? { ...answers, [currentQuestion.key]: answerId }
-            : answers;
+            ? { ...quizAnswers, [currentQuestion.key]: answerId }
+            : quizAnswers;
 
           const score = calculateLeadScore(finalAnswers);
 
@@ -78,15 +74,15 @@ export default function Quiz() {
         setAnimating(false);
       }, 280);
     },
-    [animating, currentQuestion, currentStep, totalSteps, answers, textInput, navigate]
+    [animating, currentQuestion, currentStep, totalSteps, quizAnswers, textInput, navigate, addAnswer]
   );
 
   const goBack = useCallback(() => {
-    if (animating || currentStep === 0) return;
+    if (animating || currentStep === 1) return;
     setAnimating(true);
     setAnimDir("out");
     setTimeout(() => {
-      setCurrentStep((s) => Math.max(0, s - 1));
+      setCurrentStep((s) => Math.max(1, s - 1));
       setAnimDir("in");
       setAnimating(false);
     }, 280);
@@ -117,17 +113,15 @@ export default function Quiz() {
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#0F172A]/60 to-[#0F172A]" />
 
       {/* Progress bar */}
-      {!isIntro && (
-        <div className="relative z-10 w-full h-1 bg-white/10">
-          <div
-            className="h-full transition-all duration-500 ease-out"
-            style={{
-              width: `${progress}%`,
-              background: "linear-gradient(90deg, #06B6D4, #10B981)",
-            }}
-          />
-        </div>
-      )}
+      <div className="relative z-10 w-full h-1 bg-white/10">
+        <div
+          className="h-full transition-all duration-500 ease-out"
+          style={{
+            width: `${progress}%`,
+            background: "linear-gradient(90deg, #06B6D4, #10B981)",
+          }}
+        />
+      </div>
 
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 py-4">
@@ -146,40 +140,36 @@ export default function Quiz() {
           </span>
         </div>
 
-        {!isIntro && (
-          <div className="flex items-center gap-4">
-            <span className="text-xs text-white/40" style={{ fontFamily: "DM Sans, sans-serif" }}>
-              {currentStep} de {totalSteps}
-            </span>
-            {currentStep > 1 && (
-              <button
-                onClick={goBack}
-                className="flex items-center gap-1 text-xs text-white/50 hover:text-white/80 transition-colors"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                Voltar
-              </button>
-            )}
-          </div>
-        )}
+        <div className="flex items-center gap-4">
+          <span className="text-xs text-white/40" style={{ fontFamily: "DM Sans, sans-serif" }}>
+            {currentStep} de {totalSteps}
+          </span>
+          {currentStep > 1 && (
+            <button
+              onClick={goBack}
+              className="flex items-center gap-1 text-xs text-white/50 hover:text-white/80 transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Voltar
+            </button>
+          )}
+        </div>
       </header>
 
       {/* Main content */}
       <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-lg">
           {/* Step number ghost text */}
-          {!isIntro && (
-            <div
-              className="absolute -top-4 left-1/2 -translate-x-1/2 text-[120px] font-black select-none pointer-events-none"
-              style={{
-                fontFamily: "Space Grotesk, sans-serif",
-                color: "rgba(6, 182, 212, 0.04)",
-                lineHeight: 1,
-              }}
-            >
-              {currentStep}
-            </div>
-          )}
+          <div
+            className="absolute -top-4 left-1/2 -translate-x-1/2 text-[120px] font-black select-none pointer-events-none"
+            style={{
+              fontFamily: "Space Grotesk, sans-serif",
+              color: "rgba(6, 182, 212, 0.04)",
+              lineHeight: 1,
+            }}
+          >
+            {currentStep}
+          </div>
 
           {/* Card */}
           <div
@@ -196,9 +186,7 @@ export default function Quiz() {
                 "0 0 0 1px rgba(6, 182, 212, 0.1), 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 80px rgba(6, 182, 212, 0.05)",
             }}
           >
-            {isIntro ? (
-              <IntroContent onStart={() => goNext()} />
-            ) : currentQuestion ? (
+            {currentQuestion ? (
               <QuestionContent
                 question={currentQuestion}
                 selectedOption={selectedOption}
@@ -219,94 +207,6 @@ export default function Quiz() {
           Suas informações são confidenciais e protegidas
         </p>
       </footer>
-    </div>
-  );
-}
-
-/* ─── Intro Screen ─────────────────────────────────────────── */
-function IntroContent({ onStart }: { onStart: () => void }) {
-  return (
-    <div className="text-center space-y-6">
-      <div className="space-y-2">
-        <div
-          className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium mb-4"
-          style={{
-            background: "rgba(6, 182, 212, 0.15)",
-            border: "1px solid rgba(6, 182, 212, 0.3)",
-            color: "#06B6D4",
-            fontFamily: "DM Sans, sans-serif",
-          }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-          Sistema Inteligente de Qualificação
-        </div>
-
-        <h1
-          className="text-3xl md:text-4xl font-bold text-white leading-tight"
-          style={{ fontFamily: "Space Grotesk, sans-serif" }}
-        >
-          Encontre o plano de saúde{" "}
-          <span
-            style={{
-              background: "linear-gradient(90deg, #06B6D4, #10B981)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
-          >
-            ideal para você
-          </span>
-        </h1>
-
-        <p
-          className="text-white/60 text-base leading-relaxed mt-3"
-          style={{ fontFamily: "DM Sans, sans-serif" }}
-        >
-          Responda <strong className="text-white/80">6 perguntas rápidas</strong> e receba uma
-          indicação personalizada em menos de 2 minutos.
-        </p>
-      </div>
-
-      <div className="grid grid-cols-3 gap-3 py-2">
-        {[
-          { icon: "⚡", label: "2 minutos" },
-          { icon: "🎯", label: "100% personalizado" },
-          { icon: "🔒", label: "Dados seguros" },
-        ].map((item) => (
-          <div
-            key={item.label}
-            className="rounded-xl p-3 text-center"
-            style={{
-              background: "rgba(255,255,255,0.04)",
-              border: "1px solid rgba(255,255,255,0.08)",
-            }}
-          >
-            <div className="text-xl mb-1">{item.icon}</div>
-            <div
-              className="text-xs text-white/50"
-              style={{ fontFamily: "DM Sans, sans-serif" }}
-            >
-              {item.label}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <button
-        onClick={onStart}
-        className="w-full py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-        style={{
-          fontFamily: "Space Grotesk, sans-serif",
-          background: "linear-gradient(135deg, #06B6D4, #10B981)",
-          color: "#0F172A",
-          boxShadow: "0 4px 20px rgba(6, 182, 212, 0.35)",
-        }}
-      >
-        Começar agora →
-      </button>
-
-      <p className="text-xs text-white/25" style={{ fontFamily: "DM Sans, sans-serif" }}>
-        Sem compromisso • Gratuito • Resultado imediato
-      </p>
     </div>
   );
 }
@@ -368,12 +268,12 @@ function QuestionContent({
               fontSize: "16px",
             }}
             onFocus={(e) => {
-              e.target.style.borderColor = "rgba(6, 182, 212, 0.5)";
-              e.target.style.boxShadow = "0 0 0 3px rgba(6, 182, 212, 0.1)";
+              e.currentTarget.style.borderColor = "rgba(6, 182, 212, 0.5)";
+              e.currentTarget.style.boxShadow = "0 0 0 3px rgba(6, 182, 212, 0.1)";
             }}
             onBlur={(e) => {
-              e.target.style.borderColor = "rgba(255,255,255,0.12)";
-              e.target.style.boxShadow = "none";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+              e.currentTarget.style.boxShadow = "none";
             }}
             onKeyDown={(e) => {
               if (e.key === "Enter" && textInput.trim()) onTextSubmit();

@@ -2,7 +2,7 @@
  * App.tsx – Lead Scoring Quiz
  * Design: HealthTech Premium – Dark Navy + Teal/Green
  * Routes:
- *   /             → Quiz (intro + 6 questions)
+ *   /             → Lead Form (captura de dados) + Quiz (6 questions)
  *   /obrigado     → Thank you page (leads quentes/mornos → WhatsApp)
  *   /resultado-frio → Cold lead page (leads frios → Simulador)
  */
@@ -13,6 +13,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { LeadProvider } from "./contexts/LeadContext";
 import Home from "./pages/Home";
 import Obrigado from "./pages/Obrigado";
 import ResultadoFrio from "./pages/ResultadoFrio";
@@ -33,10 +34,12 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <LeadProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </LeadProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
