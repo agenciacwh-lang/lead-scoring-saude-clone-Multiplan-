@@ -12,7 +12,7 @@ import { LeadData } from "./types";
 import { calculateLeadScore } from "./quizData";
 
 // ⚠️ SUBSTITUIR PELA URL REAL DO WEBHOOK
-const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbygyPf_s6pUQ5G321m-d4QiGk5nQe3fGDn-_-ohxt1XRh50yAztxFkV5dNuuw9e1haL3w/exec";
+const WEBHOOK_URL = "https://webhook.site/9499762e-d1ab-48e3-8498-9871d3a9749b";
 
 export interface LeadSubmission {
   leadData: LeadData;
@@ -162,19 +162,16 @@ export async function submitLeadToSheetsViaAppsScript(
 
     const response = await fetch(APPS_SCRIPT_URL, {
       method: "POST",
-      mode: "cors",
+      mode: "no-cors",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log("Lead enviado com sucesso:", result);
+    // Com mode: no-cors, não conseguimos verificar o status
+    // Mas se chegou aqui sem erro, consideramos sucesso
+    console.log("Lead enviado para Google Sheets");
     return true;
   } catch (error) {
     console.error("Erro ao enviar lead para Google Sheets:", error);

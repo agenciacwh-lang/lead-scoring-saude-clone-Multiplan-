@@ -7,8 +7,8 @@
 import { useEffect, useState } from "react";
 import { Heart, MessageCircle, CheckCircle, Star } from "lucide-react";
 import { useLeadContext } from "@/contexts/LeadContext";
-import { submitLeadToSheetsViaAppsScript } from "@/lib/sheetsService";
 import { calculateLeadScore } from "@/lib/quizData";
+import { trpc } from "@/lib/trpc";
 
 const THANK_YOU_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/thank-you-warm-giqk29yEYFxKNcSRMhRrie.webp";
@@ -29,24 +29,34 @@ export default function Obrigado() {
     return () => clearTimeout(t);
   }, []);
 
-  // Enviar dados para Google Sheets
+  // Enviar dados para o backend
+  const submitLead = trpc.leads.submit.useMutation();
+
   useEffect(() => {
     if (leadData && quizAnswers) {
       const score = calculateLeadScore(quizAnswers);
-      const submission = {
-        leadData,
-        quizAnswers,
-        score,
-        timestamp: new Date().toLocaleString("pt-BR"),
+      const leadPayload = {
+        nome: leadData.nome,
+        telefone: leadData.telefone,
+        email: leadData.email,
+        cidade: leadData.cidade,
+        tempo_compra: quizAnswers.tempo_compra || "",
+        situacao_atual: quizAnswers.situacao_atual || "",
+        renda: quizAnswers.renda || "",
+        criterio_escolha: quizAnswers.criterio_escolha || "",
+        cnpj_mei: quizAnswers.cnpj_mei || "",
+        idades: quizAnswers.idades || "",
+        pontuacao: score.total,
+        temperatura: score.temperature as "frio" | "morno" | "quente",
+        prioridade: score.isPriority ? "Sim" : "Não",
       };
-      submitLeadToSheetsViaAppsScript(submission).catch((error) => {
-        console.error("Erro ao enviar para Sheets:", error);
-      });
+      submitLead.mutate(leadPayload);
     }
-  }, [leadData, quizAnswers]);
+  }, [leadData, quizAnswers, submitLead]);
 
   // Exibir nome do lead se disponível
   const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
+  const isSending = submitLead.isPending;
 
   return (
     <div
