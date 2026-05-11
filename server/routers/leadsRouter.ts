@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import { saveLead, getDb } from "../db";
 import { leads } from "../../drizzle/schema";
 import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
+import { sendLeadToBotConversa } from "../services/botconversaService";
 
 export const leadsRouter = router({
   /**
@@ -39,11 +40,30 @@ export const leadsRouter = router({
         // Enviar para Google Sheets
         const sheetsSent = await sendLeadToSheets(input);
 
+        // Enviar para BotConversa
+        const botconversaSent = await sendLeadToBotConversa({
+          nome: input.nome,
+          email: input.email,
+          telefone: input.telefone,
+          cidade: input.cidade,
+          pontuacao: input.pontuacao,
+          temperatura: input.temperatura === "quente" ? "Quente" : input.temperatura === "morno" ? "Morno" : "Frio",
+          respostas: {
+            tempo_compra: input.tempo_compra,
+            situacao_atual: input.situacao_atual,
+            renda: input.renda,
+            criterio_escolha: input.criterio_escolha,
+            cnpj_mei: input.cnpj_mei,
+            idades: input.idades,
+          },
+        });
+
         return {
           success: true,
           message: "Lead salvo com sucesso",
           result,
           sheetsSent,
+          botconversaSent,
         };
       } catch (error) {
         console.error("Erro ao salvar lead:", error);
