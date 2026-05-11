@@ -2,8 +2,8 @@
 
 ## Mudanças Solicitadas
 
-- [x] Criar página de confirmação para leads frios (em vez de redirecionar para simulador)
-- [x] Modificar fluxo de leads frios para enviar para automação após confirmação
+- [x] REMOVER página de confirmação para leads frios
+- [x] Modificar fluxo de leads frios para enviar direto para automação sem confirmação
 - [ ] Implementar sistema de inatividade (timeout) para detectar leads que preenchem formulário mas não completam quiz
 - [ ] Enviar leads incompletos para automação com descrição "lead incompleto"
 - [x] Garantir que todos os leads (quentes, mornos, frios e incompletos) sejam enviados para BotConversa

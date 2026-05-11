@@ -1,13 +1,14 @@
 /**
  * Resultado Frio Page – Leads Frios
  * Design: Hapvida – Laranja + Branco
- * Redirect: Página de Confirmação
+ * Redirect: Automação (BotConversa)
  */
 
 import { useEffect, useState } from "react";
-import { Heart, CheckCircle, ArrowRight } from "lucide-react";
+import { Heart, CheckCircle } from "lucide-react";
 import { useLeadContext } from "@/contexts/LeadContext";
 import { calculateLeadScore } from "@/lib/quizData";
+import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
 
 const COLD_IMG =
@@ -17,13 +18,31 @@ export default function ResultadoFrio() {
   const { leadData, quizAnswers } = useLeadContext();
   const [, navigate] = useLocation();
   const [visible, setVisible] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  // Salvar dados do lead no sessionStorage e redirecionar para confirmação
+  // Enviar dados do lead para automação
+  const submitLead = trpc.leads.submit.useMutation({
+    onSuccess: () => {
+      setIsSubmitting(false);
+      setHasError(false);
+      // Redirecionar para home após 3 segundos
+      setTimeout(() => {
+        navigate("/");
+      }, 3000);
+    },
+    onError: (error) => {
+      console.error("Erro ao enviar lead:", error);
+      setIsSubmitting(false);
+      setHasError(true);
+    },
+  });
+
   useEffect(() => {
     if (leadData && quizAnswers) {
       const score = calculateLeadScore(quizAnswers);
@@ -39,20 +58,14 @@ export default function ResultadoFrio() {
         cnpj_mei: quizAnswers.cnpj_mei || "",
         idades: quizAnswers.idades || "",
         pontuacao: score.total,
-        temperatura: score.temperature,
+        temperatura: "frio" as const,
+        prioridade: "Não",
       };
 
-      // Salvar no sessionStorage para a página de confirmação
-      sessionStorage.setItem("leadData", JSON.stringify(leadPayload));
-
-      // Redirecionar para confirmação em 2 segundos
-      const timer = setTimeout(() => {
-        navigate("/confirmacao-frio");
-      }, 2000);
-
-      return () => clearTimeout(timer);
+      // Enviar para automação
+      submitLead.mutate(leadPayload);
     }
-  }, [leadData, quizAnswers, navigate]);
+  }, [leadData, quizAnswers, submitLead]);
 
   // Exibir nome do lead se disponível
   const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
@@ -111,7 +124,7 @@ export default function ResultadoFrio() {
           <div className="relative">
             <img
               src={COLD_IMG}
-              alt="Confirmação"
+              alt="Sucesso"
               className="w-28 h-28 rounded-full object-cover"
               style={{
                 boxShadow: "0 0 0 3px rgba(231, 76, 60, 0.2), 0 0 30px rgba(231, 76, 60, 0.1)",
@@ -144,14 +157,14 @@ export default function ResultadoFrio() {
             className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
             style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
-            Quase pronto{leadName ? `, ${leadName}` : ""}! 🎉
+            Obrigado{leadName ? `, ${leadName}` : ""}! 🎉
           </h1>
 
           <p
             className="text-gray-600 text-sm leading-relaxed"
             style={{ fontFamily: "DM Sans, sans-serif" }}
           >
-            Identificamos que você é um <strong className="text-gray-900">lead em potencial</strong> para os planos da Hapvida. Nossa equipe de especialistas entrará em contato em breve com as melhores opções para você.
+            Seus dados foram recebidos com sucesso! Nossa equipe de especialistas da Hapvida entrará em contato em breve com as melhores opções de planos para você.
             {leadData && (
               <>
                 <br />
@@ -204,13 +217,37 @@ export default function ResultadoFrio() {
             border: "1px solid rgba(231, 76, 60, 0.2)",
           }}
         >
-          <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
-          <span
-            className="text-sm font-medium text-gray-700"
-            style={{ fontFamily: "DM Sans, sans-serif" }}
-          >
-            Redirecionando para confirmação...
-          </span>
+          {isSubmitting ? (
+            <>
+              <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+              <span
+                className="text-sm font-medium text-gray-700"
+                style={{ fontFamily: "DM Sans, sans-serif" }}
+              >
+                Processando seus dados...
+              </span>
+            </>
+          ) : hasError ? (
+            <>
+              <span className="text-lg">⚠️</span>
+              <span
+                className="text-sm font-medium text-red-700"
+                style={{ fontFamily: "DM Sans, sans-serif" }}
+              >
+                Erro ao enviar. Tente novamente.
+              </span>
+            </>
+          ) : (
+            <>
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span
+                className="text-sm font-medium text-green-700"
+                style={{ fontFamily: "DM Sans, sans-serif" }}
+              >
+                Dados enviados com sucesso!
+              </span>
+            </>
+          )}
         </div>
 
         <p
