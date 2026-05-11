@@ -1,0 +1,1 @@
+ALTER TABLE `leads` ADD `status` enum('completo','incompleto','confirmado') DEFAULT 'incompleto' NOT NULL;

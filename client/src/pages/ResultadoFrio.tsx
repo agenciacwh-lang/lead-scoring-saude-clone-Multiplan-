@@ -1,23 +1,21 @@
 /**
  * Resultado Frio Page – Leads Frios
- * Design: HealthTech Premium – Dark Navy + Teal/Cyan
- * Redirect: Simulador Online
+ * Design: Hapvida – Laranja + Branco
+ * Redirect: Página de Confirmação
  */
 
 import { useEffect, useState } from "react";
-import { Heart, Calculator, ArrowRight, Info } from "lucide-react";
+import { Heart, CheckCircle, ArrowRight } from "lucide-react";
 import { useLeadContext } from "@/contexts/LeadContext";
 import { calculateLeadScore } from "@/lib/quizData";
-import { trpc } from "@/lib/trpc";
+import { useLocation } from "wouter";
 
 const COLD_IMG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/thank-you-cold-WfFUvnA2xi544eNPSPX6aP.webp";
 
-// ⚠️ Substitua pela URL real do simulador
-const SIMULADOR_URL = "https://simulador.exemplo.com.br";
-
 export default function ResultadoFrio() {
   const { leadData, quizAnswers } = useLeadContext();
+  const [, navigate] = useLocation();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -25,9 +23,7 @@ export default function ResultadoFrio() {
     return () => clearTimeout(t);
   }, []);
 
-  // Enviar dados para o backend
-  const submitLead = trpc.leads.submit.useMutation();
-
+  // Salvar dados do lead no sessionStorage e redirecionar para confirmação
   useEffect(() => {
     if (leadData && quizAnswers) {
       const score = calculateLeadScore(quizAnswers);
@@ -43,16 +39,23 @@ export default function ResultadoFrio() {
         cnpj_mei: quizAnswers.cnpj_mei || "",
         idades: quizAnswers.idades || "",
         pontuacao: score.total,
-        temperatura: score.temperature as "frio" | "morno" | "quente",
-        prioridade: score.isPriority ? "Sim" : "Não",
+        temperatura: score.temperature,
       };
-      submitLead.mutate(leadPayload);
+
+      // Salvar no sessionStorage para a página de confirmação
+      sessionStorage.setItem("leadData", JSON.stringify(leadPayload));
+
+      // Redirecionar para confirmação em 2 segundos
+      const timer = setTimeout(() => {
+        navigate("/confirmacao-frio");
+      }, 2000);
+
+      return () => clearTimeout(timer);
     }
-  }, [leadData, quizAnswers, submitLead]);
+  }, [leadData, quizAnswers, navigate]);
 
   // Exibir nome do lead se disponível
   const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
-  const isSending = submitLead.isPending;
 
   return (
     <div
@@ -108,7 +111,7 @@ export default function ResultadoFrio() {
           <div className="relative">
             <img
               src={COLD_IMG}
-              alt="Simulador"
+              alt="Confirmação"
               className="w-28 h-28 rounded-full object-cover"
               style={{
                 boxShadow: "0 0 0 3px rgba(231, 76, 60, 0.2), 0 0 30px rgba(231, 76, 60, 0.1)",
@@ -118,7 +121,7 @@ export default function ResultadoFrio() {
               className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center"
               style={{ background: "linear-gradient(135deg, #E74C3C, #FF6B35)" }}
             >
-              <Calculator className="w-4 h-4 text-white" />
+              <CheckCircle className="w-4 h-4 text-white" />
             </div>
           </div>
         </div>
@@ -134,29 +137,26 @@ export default function ResultadoFrio() {
               fontFamily: "DM Sans, sans-serif",
             }}
           >
-            <Info className="w-3 h-3" />
-            Simulação personalizada disponível
+            ✓ Análise concluída
           </div>
 
           <h1
             className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
             style={{ fontFamily: "Space Grotesk, sans-serif" }}
           >
-            Obrigado pelas respostas{leadName ? `, ${leadName}` : ""}! 😊
+            Quase pronto{leadName ? `, ${leadName}` : ""}! 🎉
           </h1>
 
           <p
             className="text-gray-600 text-sm leading-relaxed"
             style={{ fontFamily: "DM Sans, sans-serif" }}
           >
-            Preparamos uma{" "}
-            <strong className="text-gray-900">simulação gratóita e personalizada</strong> com os
-            melhores planos disponíveis para o seu perfil. Veja os valores agora mesmo!
+            Identificamos que você é um <strong className="text-gray-900">lead em potencial</strong> para os planos da Hapvida. Nossa equipe de especialistas entrará em contato em breve com as melhores opções para você.
             {leadData && (
               <>
                 <br />
                 <span className="text-xs text-gray-500 mt-2 block">
-                  Seus dados foram registrados: {leadData.email}
+                  Confirmando: {leadData.email}
                 </span>
               </>
             )}
@@ -166,10 +166,10 @@ export default function ResultadoFrio() {
         {/* Info boxes */}
         <div className="grid grid-cols-2 gap-2.5 mb-6">
           {[
-            { icon: "🔍", title: "Compare planos", desc: "Veja opções lado a lado" },
-            { icon: "💰", title: "Valores reais", desc: "Sem surpresas na hora de contratar" },
-            { icon: "⚡", title: "Resultado rápido", desc: "Simulação em segundos" },
-            { icon: "🎯", title: "Personalizado", desc: "Baseado no seu perfil" },
+            { icon: "📞", title: "Contato rápido", desc: "Ligamos em breve" },
+            { icon: "💼", title: "Consultoria", desc: "Especialista dedicado" },
+            { icon: "🎯", title: "Personalizado", desc: "Plano para seu perfil" },
+            { icon: "✓", title: "Sem compromisso", desc: "Conheça as opções" },
           ].map((item) => (
             <div
               key={item.title}
@@ -196,30 +196,28 @@ export default function ResultadoFrio() {
           ))}
         </div>
 
-        {/* Simulator CTA */}
-        <a
-          href={SIMULADOR_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+        {/* Loading message */}
+        <div
+          className="flex items-center justify-center gap-2 py-4 rounded-xl"
           style={{
-            fontFamily: "Space Grotesk, sans-serif",
-            background: "linear-gradient(135deg, #E74C3C, #FF6B35)",
-            color: "#fff",
-            boxShadow: "0 4px 20px rgba(231, 76, 60, 0.35)",
-            textDecoration: "none",
+            background: "rgba(231, 76, 60, 0.1)",
+            border: "1px solid rgba(231, 76, 60, 0.2)",
           }}
         >
-          <Calculator className="w-5 h-5" />
-          Acessar simulador gratuito
-          <ArrowRight className="w-4 h-4" />
-        </a>
+          <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse" />
+          <span
+            className="text-sm font-medium text-gray-700"
+            style={{ fontFamily: "DM Sans, sans-serif" }}
+          >
+            Redirecionando para confirmação...
+          </span>
+        </div>
 
         <p
           className="text-xs text-gray-500 mt-4"
           style={{ fontFamily: "DM Sans, sans-serif" }}
         >
-          Gratuito • Sem cadastro • Resultado imediato • Dados registrados
+          Seus dados foram registrados com segurança
         </p>
       </div>
 

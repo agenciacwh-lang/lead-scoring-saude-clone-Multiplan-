@@ -17,6 +17,7 @@ import { LeadProvider } from "./contexts/LeadContext";
 import Home from "./pages/Home";
 import Obrigado from "./pages/Obrigado";
 import ResultadoFrio from "./pages/ResultadoFrio";
+import ConfirmacaoFrio from "./pages/ConfirmacaoFrio";
 import Dashboard from "./pages/Dashboard";
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/obrigado" component={Obrigado} />
       <Route path="/resultado-frio" component={ResultadoFrio} />
+      <Route path="/confirmacao-frio" component={ConfirmacaoFrio} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />

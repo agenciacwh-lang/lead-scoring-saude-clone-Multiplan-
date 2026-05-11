@@ -48,6 +48,9 @@ export const leads = mysqlTable("leads", {
   temperatura: mysqlEnum("temperatura", ["frio", "morno", "quente"]).notNull(),
   prioridade: varchar("prioridade", { length: 3 }).notNull(), // "Sim" ou "Não"
   
+  // Status do lead
+  status: mysqlEnum("status", ["completo", "incompleto", "confirmado"]).default("incompleto").notNull(),
+  
   // Timestamp
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
