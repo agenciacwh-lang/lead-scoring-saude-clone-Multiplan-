@@ -4,11 +4,11 @@
 
 import { publicProcedure, router } from "../_core/trpc";
 import { z } from "zod";
+import { sendLeadToBotConversa } from "../services/botconversaService";
 import { eq } from "drizzle-orm";
 import { saveLead, getDb } from "../db";
 import { leads } from "../../drizzle/schema";
 import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
-import { sendLeadToBotConversa } from "../services/botconversaService";
 
 export const leadsRouter = router({
   /**
@@ -95,6 +95,48 @@ export const leadsRouter = router({
   getStats: publicProcedure.query(async () => {
     return await getLeadsStats();
   }),
+
+  /**
+   * Teste de integração com BotConversa
+   */
+  testBotConversa: publicProcedure
+    .input(
+      z.object({
+        nome: z.string().optional().default("Teste Lead"),
+        email: z.string().optional().default("teste@example.com"),
+        telefone: z.string().optional().default("11999999999"),
+        cidade: z.string().optional().default("São Paulo"),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        const result = await sendLeadToBotConversa({
+          nome: input.nome,
+          email: input.email,
+          telefone: input.telefone,
+          cidade: input.cidade,
+          pontuacao: 7,
+          temperatura: "Morno",
+          respostas: {
+            teste: "true",
+            timestamp: new Date().toISOString(),
+          },
+        });
+
+        return {
+          success: result,
+          message: result
+            ? "Lead de teste enviado com sucesso para BotConversa!"
+            : "Erro ao enviar lead de teste. Verifique se a URL do webhook está configurada.",
+        };
+      } catch (error) {
+        console.error("Erro ao testar BotConversa:", error);
+        return {
+          success: false,
+          message: `Erro ao testar integração: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
+        };
+      }
+    }),
 
   /**
    * Sincronizar um lead específico com Google Sheets
