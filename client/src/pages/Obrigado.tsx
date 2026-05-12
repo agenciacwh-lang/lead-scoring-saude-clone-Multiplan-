@@ -34,6 +34,17 @@ export default function Obrigado() {
   const submitLead = trpc.leads.submit.useMutation({
     onSuccess: () => {
       clearLeadData();
+      // Redirecionar para home após 3 segundos
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 3000);
+    },
+    onError: (error) => {
+      console.error("Erro ao enviar lead:", error);
+      // Mesmo com erro, redirecionar após 3 segundos
+      setTimeout(() => {
+        window.location.href = "/";
+      }, 3000);
     },
   });
 
@@ -55,6 +66,8 @@ export default function Obrigado() {
         temperatura: score.temperature as "frio" | "morno" | "quente",
         prioridade: score.isPriority ? "Sim" : "Não",
       };
+      // Enviar para automação
+      console.log("[Lead] Enviando lead para automação:", leadPayload);
       submitLead.mutate(leadPayload);
     }
   }, [leadData, quizAnswers, submitLead, clearLeadData]);

@@ -61,11 +61,8 @@ export default function Quiz() {
 
           const score = calculateLeadScore(finalAnswers);
 
-          if (score.temperature === "frio") {
-            navigate("/resultado-frio");
-          } else {
-            navigate("/obrigado");
-          }
+          // Todos os leads vão para /obrigado (página de agradecimento e envio para automação)
+          navigate("/obrigado");
           return;
         }
 
