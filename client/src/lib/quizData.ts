@@ -60,10 +60,10 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     subtitle: "Isso me ajuda a indicar opções de plano mais confortáveis para o seu orçamento 😊",
     icon: "💰",
     options: [
-      { id: "ate_1500", text: "Até R$ 1.500", points: 0, emoji: "💵" },
-      { id: "1500_3000", text: "R$ 1.500 a R$ 3.000", points: 1, emoji: "💵" },
-      { id: "3000_6000", text: "R$ 3.000 a R$ 6.000", points: 2, emoji: "💰" },
-      { id: "acima_6000", text: "Acima de R$ 6.000", points: 3, emoji: "💎" },
+      { id: "ate_1500", text: "Até R$ 1.500", points: 0 },
+      { id: "1500_3000", text: "R$ 1.500 a R$ 3.000", points: 1 },
+      { id: "3000_6000", text: "R$ 3.000 a R$ 6.000", points: 2 },
+      { id: "acima_6000", text: "Acima de R$ 6.000", points: 3 },
     ],
   },
   {
