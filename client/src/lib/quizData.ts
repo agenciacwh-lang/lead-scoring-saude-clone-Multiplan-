@@ -56,8 +56,8 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
   {
     id: 3,
     key: "renda",
-    title: "Qual faixa de renda melhor te representa?",
-    subtitle: "Para indicar algo que realmente caiba no seu bolso sem pesar.",
+    title: "Qual dessas faixas combina mais com a sua realidade hoje?",
+    subtitle: "Isso me ajuda a indicar opções de plano mais confortáveis para o seu orçamento 😊",
     icon: "💰",
     options: [
       { id: "ate_1500", text: "Até R$ 1.500", points: 0, emoji: "💵" },
