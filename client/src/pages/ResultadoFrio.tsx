@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { Heart, CheckCircle } from "lucide-react";
-import { useLeadContext } from "@/contexts/LeadContext";
+import { useLeadContext, useClearLeadDataAfterSubmit } from "@/contexts/LeadContext";
 import { calculateLeadScore } from "@/lib/quizData";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
@@ -16,6 +16,7 @@ const COLD_IMG =
 
 export default function ResultadoFrio() {
   const { leadData, quizAnswers } = useLeadContext();
+  const clearLeadData = useClearLeadDataAfterSubmit();
   const [, navigate] = useLocation();
   const [visible, setVisible] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(true);
@@ -31,6 +32,8 @@ export default function ResultadoFrio() {
     onSuccess: () => {
       setIsSubmitting(false);
       setHasError(false);
+      // Limpar dados após envio bem-sucedido
+      clearLeadData();
       // Redirecionar para home após 3 segundos
       setTimeout(() => {
         navigate("/");

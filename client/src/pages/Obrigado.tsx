@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { Heart, MessageCircle, CheckCircle, Star } from "lucide-react";
-import { useLeadContext } from "@/contexts/LeadContext";
+import { useLeadContext, useClearLeadDataAfterSubmit } from "@/contexts/LeadContext";
 import { calculateLeadScore } from "@/lib/quizData";
 import { trpc } from "@/lib/trpc";
 
@@ -22,6 +22,7 @@ const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`
 
 export default function Obrigado() {
   const { leadData, quizAnswers } = useLeadContext();
+  const clearLeadData = useClearLeadDataAfterSubmit();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -30,7 +31,11 @@ export default function Obrigado() {
   }, []);
 
   // Enviar dados para o backend
-  const submitLead = trpc.leads.submit.useMutation();
+  const submitLead = trpc.leads.submit.useMutation({
+    onSuccess: () => {
+      clearLeadData();
+    },
+  });
 
   useEffect(() => {
     if (leadData && quizAnswers) {
@@ -52,7 +57,7 @@ export default function Obrigado() {
       };
       submitLead.mutate(leadPayload);
     }
-  }, [leadData, quizAnswers, submitLead]);
+  }, [leadData, quizAnswers, submitLead, clearLeadData]);
 
   // Exibir nome do lead se disponível
   const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
