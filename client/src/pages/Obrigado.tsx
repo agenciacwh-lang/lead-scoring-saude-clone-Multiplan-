@@ -39,10 +39,7 @@ export default function Obrigado() {
     onSuccess: () => {
       console.log("[Lead] Lead enviado com sucesso para automação");
       clearLeadData();
-      // Redirecionar para home após 3 segundos
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 3000);
+      // Não redirecionar - manter na página de Obrigado
     },
     onError: (error) => {
       console.error("[Lead] Erro ao enviar lead:", error);
@@ -203,9 +200,11 @@ export default function Obrigado() {
             </div>
 
             {/* Footer Message */}
-            <p className="text-center text-sm text-slate-500 mt-6">
-              Você será redirecionado automaticamente em alguns segundos...
-            </p>
+            {!isSending && !submitError && (
+              <p className="text-center text-sm text-slate-500 mt-6">
+                Obrigado por preencher o formulário! Você pode fechar esta página ou entrar em contato conosco.
+              </p>
+            )}
           </div>
         </div>
       </div>
