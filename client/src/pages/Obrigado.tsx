@@ -4,7 +4,7 @@
  * Redirect: WhatsApp (Closer / Follow-up)
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Heart, MessageCircle, CheckCircle, Star } from "lucide-react";
 import { useLeadContext, useClearLeadDataAfterSubmit } from "@/contexts/LeadContext";
 import { calculateLeadScore } from "@/lib/quizData";
@@ -24,6 +24,10 @@ export default function Obrigado() {
   const { leadData, quizAnswers } = useLeadContext();
   const clearLeadData = useClearLeadDataAfterSubmit();
   const [visible, setVisible] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
+  
+  // Flag para garantir que o envio acontece apenas uma vez
+  const sentRef = useRef(false);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
@@ -33,6 +37,7 @@ export default function Obrigado() {
   // Enviar dados para o backend
   const submitLead = trpc.leads.submit.useMutation({
     onSuccess: () => {
+      console.log("[Lead] Lead enviado com sucesso para automação");
       clearLeadData();
       // Redirecionar para home após 3 segundos
       setTimeout(() => {
@@ -40,37 +45,41 @@ export default function Obrigado() {
       }, 3000);
     },
     onError: (error) => {
-      console.error("Erro ao enviar lead:", error);
-      // Mesmo com erro, redirecionar após 3 segundos
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 3000);
+      console.error("[Lead] Erro ao enviar lead:", error);
+      setSubmitError(true);
     },
   });
 
   useEffect(() => {
-    if (leadData && quizAnswers) {
-      const score = calculateLeadScore(quizAnswers);
-      const leadPayload = {
-        nome: leadData.nome,
-        telefone: leadData.telefone,
-        email: leadData.email,
-        cidade: leadData.cidade,
-        tempo_compra: quizAnswers.tempo_compra || "",
-        situacao_atual: quizAnswers.situacao_atual || "",
-        renda: quizAnswers.renda || "",
-        criterio_escolha: quizAnswers.criterio_escolha || "",
-        cnpj_mei: quizAnswers.cnpj_mei || "",
-        idades: quizAnswers.idades || "",
-        pontuacao: score.total,
-        temperatura: score.temperature as "frio" | "morno" | "quente",
-        prioridade: score.isPriority ? "Sim" : "Não",
-      };
-      // Enviar para automação
-      console.log("[Lead] Enviando lead para automação:", leadPayload);
-      submitLead.mutate(leadPayload);
-    }
-  }, [leadData, quizAnswers, submitLead, clearLeadData]);
+    // Evitar múltiplos submits
+    if (sentRef.current) return;
+    if (!leadData || !quizAnswers) return;
+
+    sentRef.current = true;
+    const score = calculateLeadScore(quizAnswers);
+    
+    // Sanitizar telefone: remover caracteres não-numéricos
+    const telefoneLimpo = leadData.telefone.replace(/\D/g, "");
+    
+    const leadPayload = {
+      nome: leadData.nome,
+      telefone: telefoneLimpo,
+      email: leadData.email,
+      cidade: leadData.cidade,
+      tempo_compra: quizAnswers.tempo_compra || "",
+      situacao_atual: quizAnswers.situacao_atual || "",
+      renda: quizAnswers.renda || "",
+      criterio_escolha: quizAnswers.criterio_escolha || "",
+      cnpj_mei: quizAnswers.cnpj_mei || "",
+      idades: quizAnswers.idades || "",
+      pontuacao: score.total,
+      temperatura: score.temperature as "frio" | "morno" | "quente",
+      prioridade: score.isPriority ? "Sim" : "Não",
+    };
+    
+    console.log("[Lead] Enviando lead para automação:", leadPayload);
+    submitLead.mutate(leadPayload);
+  }, [leadData, quizAnswers]);
 
   // Exibir nome do lead se disponível
   const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
@@ -78,172 +87,128 @@ export default function Obrigado() {
 
   return (
     <div
-      className="min-h-screen relative flex flex-col items-center justify-center overflow-hidden px-4"
-      style={{ background: "linear-gradient(135deg, #ffffff 0%, #f9fafb 100%)" }}
+      className={`min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4 transition-opacity duration-500 ${
+        visible ? "opacity-100" : "opacity-0"
+      }`}
     >
-      {/* Background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-5"
-        style={{
-          backgroundImage: `url(https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hero-health-bg-igbSPaoZJKBqYM9KqjBYjP.webp)`,
-        }}
-      />
-      <div className="absolute inset-0 dot-pattern opacity-10" />
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, rgba(231, 76, 60, 0.05) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* Header logo */}
-      <div className="absolute top-6 left-6 flex items-center gap-2 z-10">
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center"
-          style={{ background: "linear-gradient(135deg, #E74C3C, #FF6B35)" }}
-        >
-          <Heart className="w-4 h-4 text-white fill-white" />
+      <div className="w-full max-w-2xl">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <img
+            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hapvida-logo-white-3xQvCHnDvYJrMBHwBqJfZB.png"
+            alt="Hapvida"
+            className="h-12 mx-auto mb-6"
+          />
         </div>
-        <span
-          className="font-bold text-sm"
-          style={{ fontFamily: "Space Grotesk, sans-serif", color: "#E74C3C" }}
-        >
-          Hapvida
-        </span>
-      </div>
 
-      {/* Main card */}
-      <div
-        className={`relative z-10 w-full max-w-md rounded-2xl p-8 text-center transition-all duration-700 ${
-          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-        }`}
-        style={{
-          background: "rgba(255, 255, 255, 0.95)",
-          border: "1px solid rgba(231, 76, 60, 0.2)",
-          boxShadow:
-            "0 0 0 1px rgba(231, 76, 60, 0.1), 0 20px 60px rgba(0,0,0,0.08), 0 0 80px rgba(231, 76, 60, 0.05)",
-        }}
-      >
-        {/* Success image */}
-        <div className="flex justify-center mb-6">
-          <div className="relative">
+        {/* Main Card */}
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+          {/* Image Section */}
+          <div className="relative h-64 bg-gradient-to-r from-teal-400 to-green-400 overflow-hidden">
             <img
               src={THANK_YOU_IMG}
-              alt="Sucesso"
-              className="w-28 h-28 rounded-full object-cover"
-              style={{
-                boxShadow: "0 0 0 3px rgba(231, 76, 60, 0.2), 0 0 30px rgba(231, 76, 60, 0.1)",
-              }}
+              alt="Thank You"
+              className="w-full h-full object-cover"
             />
-            <div
-              className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center"
-              style={{ background: "linear-gradient(135deg, #E74C3C, #FF6B35)" }}
-            >
-              <CheckCircle className="w-5 h-5 text-white" />
+            <div className="absolute inset-0 bg-black/20"></div>
+          </div>
+
+          {/* Content Section */}
+          <div className="p-8 md:p-10">
+            {/* Success Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="relative">
+                <div className="absolute inset-0 bg-teal-400/30 rounded-full blur-xl"></div>
+                <div className="relative bg-gradient-to-br from-teal-400 to-green-400 rounded-full p-4">
+                  <CheckCircle className="w-8 h-8 text-white" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        {/* Title */}
-        <div className="space-y-3 mb-6">
-          <div
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium"
-            style={{
-              background: "rgba(231, 76, 60, 0.1)",
-              border: "1px solid rgba(231, 76, 60, 0.2)",
-              color: "#E74C3C",
-              fontFamily: "DM Sans, sans-serif",
-            }}
-          >
-            <Star className="w-3 h-3 fill-current" />
-            Perfil qualificado com sucesso!
-          </div>
+            {/* Main Message */}
+            <h1 className="text-3xl md:text-4xl font-bold text-center text-slate-900 mb-4">
+              Obrigado, {leadName}! 🎉
+            </h1>
 
-          <h1
-            className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
-            style={{ fontFamily: "Space Grotesk, sans-serif" }}
-          >
-            Ótimas notícias{leadName ? `, ${leadName}` : ""}! 🎉
-          </h1>
+            <p className="text-lg text-slate-600 text-center mb-8">
+              Recebemos suas informações com sucesso! Nosso time está analisando seu perfil para encontrar o melhor plano de saúde para você.
+            </p>
 
-          <p
-            className="text-gray-600 text-sm leading-relaxed"
-            style={{ fontFamily: "DM Sans, sans-serif" }}
-          >
-            Com base nas suas respostas, identificamos{" "}
-            <strong className="text-gray-900">ótimas opções de plano</strong> para o seu perfil.
-            Um de nossos consultores especializados está pronto para te atender agora.
-            {leadData && (
-              <>
-                <br />
-                <span className="text-xs text-gray-500 mt-2 block">
-                  Seus dados foram registrados: {leadData.email}
-                </span>
-              </>
+            {/* Status Message */}
+            {isSending && (
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="animate-spin">
+                    <Heart className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <p className="text-blue-700 font-medium">Enviando seus dados para análise...</p>
+                </div>
+              </div>
             )}
-          </p>
-        </div>
 
-        {/* Benefits */}
-        <div className="space-y-2 mb-6">
-          {[
-            "Atendimento personalizado e sem enrolação",
-            "Planos que cabem no seu orçamento",
-            "Resposta em menos de 5 minutos",
-          ].map((benefit) => (
-            <div
-              key={benefit}
-              className="flex items-center gap-2.5 text-left px-3 py-2 rounded-lg"
-              style={{ background: "rgba(231, 76, 60, 0.05)" }}
-            >
-              <CheckCircle
-                className="w-4 h-4 flex-shrink-0"
-                style={{ color: "#E74C3C" }}
-              />
-              <span
-                className="text-xs text-gray-700"
-                style={{ fontFamily: "DM Sans, sans-serif" }}
-              >
-                {benefit}
-              </span>
+            {submitError && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                <p className="text-amber-700 font-medium">
+                  ⚠️ Houve um pequeno problema ao enviar seus dados, mas não se preocupe! Você será redirecionado em breve.
+                </p>
+              </div>
+            )}
+
+            {/* Info Boxes */}
+            <div className="grid md:grid-cols-2 gap-4 mb-8">
+              {/* Box 1 */}
+              <div className="bg-gradient-to-br from-teal-50 to-green-50 rounded-lg p-4 border border-teal-200">
+                <div className="flex items-start gap-3">
+                  <Star className="w-5 h-5 text-teal-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-slate-900 mb-1">Próximos Passos</h3>
+                    <p className="text-sm text-slate-600">
+                      Um especialista entrará em contato em breve com as melhores opções para você.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Box 2 */}
+              <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-4 border border-blue-200">
+                <div className="flex items-start gap-3">
+                  <MessageCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold text-slate-900 mb-1">Dúvidas?</h3>
+                    <p className="text-sm text-slate-600">
+                      Entre em contato conosco pelo WhatsApp para esclarecer qualquer dúvida.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
-          ))}
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Falar no WhatsApp
+              </a>
+              <button
+                onClick={() => (window.location.href = "/")}
+                className="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-900 font-semibold py-3 px-6 rounded-lg transition-all duration-200"
+              >
+                Voltar ao Início
+              </button>
+            </div>
+
+            {/* Footer Message */}
+            <p className="text-center text-sm text-slate-500 mt-6">
+              Você será redirecionado automaticamente em alguns segundos...
+            </p>
+          </div>
         </div>
-
-        {/* WhatsApp CTA */}
-        <a
-          href={WHATSAPP_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-3 w-full py-4 rounded-xl font-semibold text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            fontFamily: "Space Grotesk, sans-serif",
-            background: "linear-gradient(135deg, #E74C3C, #FF6B35)",
-            color: "#fff",
-            boxShadow: "0 4px 20px rgba(231, 76, 60, 0.35)",
-            textDecoration: "none",
-          }}
-        >
-          <MessageCircle className="w-5 h-5" />
-          Falar com consultor no WhatsApp
-        </a>
-
-        <p
-          className="text-xs text-gray-500 mt-4"
-          style={{ fontFamily: "DM Sans, sans-serif" }}
-        >
-          Atendimento gratuito • Sem compromisso • Dados registrados
-        </p>
       </div>
-
-      {/* Footer */}
-      <p
-        className="relative z-10 text-xs text-gray-500 mt-6"
-        style={{ fontFamily: "DM Sans, sans-serif" }}
-      >
-        Suas informações são confidenciais e protegidas
-      </p>
     </div>
   );
 }

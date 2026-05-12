@@ -4,7 +4,7 @@
  * Campos: Nome, Telefone, E-mail, Cidade
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Heart, Mail, Phone, MapPin, User } from "lucide-react";
 import { useLeadContext } from "@/contexts/LeadContext";
 import { LeadData } from "@/lib/types";
@@ -28,10 +28,10 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   const hapvidaLogoUrl = "/manus-storage/hapvida-logo_487cd512.png";
 
   // Trigger animation on mount
-  useState(() => {
+  useEffect(() => {
     const t = setTimeout(() => setVisible(true), 50);
     return () => clearTimeout(t);
-  });
+  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};

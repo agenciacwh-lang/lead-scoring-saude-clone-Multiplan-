@@ -15,9 +15,11 @@ export interface BotconversaLeadPayload {
  */
 export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promise<boolean> {
   if (!ENV.botconversaWebhookUrl) {
-    console.warn("[BotConversa] Webhook URL não configurada");
+    console.warn("[BotConversa] Webhook URL não configurada. Valor: '", ENV.botconversaWebhookUrl, "'");
     return false;
   }
+  
+  console.log("[BotConversa] Iniciando envio para URL:", ENV.botconversaWebhookUrl);
 
   try {
     const payload = {
