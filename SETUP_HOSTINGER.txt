@@ -1,0 +1,124 @@
+=============================================================================
+SETUP PARA HOSTINGER - Lead Scoring Hapvida
+=============================================================================
+
+PASSO 1: Upload do Projeto
+--------------------------
+1. Fazer upload de TODOS os arquivos para a pasta public_html ou similar
+2. Usar SFTP ou Git para fazer upload
+
+PASSO 2: Instalar Dependências
+-------------------------------
+ssh seu-usuario@seu-servidor.com
+cd public_html/lead-scoring-saude
+pnpm install
+
+PASSO 3: Configurar Banco de Dados
+-----------------------------------
+1. Criar banco de dados MySQL na Hostinger
+2. Anotar: host, usuario, senha, nome_banco
+3. Executar migrações:
+   pnpm db:push
+
+PASSO 4: Configurar Variáveis de Ambiente
+-------------------------------------------
+Criar arquivo .env com as variáveis necessárias
+(Ver lista completa em HOSTINGER_DEPLOY.md)
+
+PASSO 5: Fazer Build
+---------------------
+pnpm build
+
+PASSO 6: Executar o Servidor
+-----------------------------
+Opção A - Usando PM2 (Recomendado):
+  npm install -g pm2
+  pm2 start dist/index.js --name "lead-scoring"
+  pm2 startup
+  pm2 save
+
+Opção B - Usando Node direto:
+  node dist/index.js
+
+PASSO 7: Configurar Domínio
+----------------------------
+1. Apontar domínio para IP do servidor
+2. Configurar SSL (Let's Encrypt)
+3. Configurar reverse proxy (Nginx/Apache)
+
+PASSO 8: Testar
+---------------
+1. Acessar https://seu-dominio.com
+2. Preencher formulário
+3. Verificar se dados chegam no BotConversa
+4. Verificar se dados chegam no Google Sheets
+
+=============================================================================
+ESTRUTURA DE ARQUIVOS IMPORTANTES
+=============================================================================
+
+dist/index.js              - Servidor Node.js compilado
+dist/public/               - Frontend compilado
+client/                    - Código-fonte React
+server/                    - Código-fonte Express
+drizzle/                   - Migrações do banco
+package.json               - Dependências do projeto
+HOSTINGER_DEPLOY.md        - Documentação completa
+
+=============================================================================
+TROUBLESHOOTING
+=============================================================================
+
+Erro: "Cannot find module"
+→ Executar: pnpm install
+
+Erro: "Database connection failed"
+→ Verificar DATABASE_URL
+→ Verificar credenciais do MySQL
+→ Verificar firewall
+
+Erro: "Port 3000 already in use"
+→ Mudar porta em server/_core/index.ts
+→ Ou: pm2 kill && pm2 start dist/index.js
+
+Erro: "CORS error"
+→ Verificar configuração de domínio
+→ Verificar headers no server
+
+=============================================================================
+MONITORAMENTO
+=============================================================================
+
+Ver logs:
+  pm2 logs lead-scoring
+
+Reiniciar:
+  pm2 restart lead-scoring
+
+Parar:
+  pm2 stop lead-scoring
+
+Status:
+  pm2 status
+
+=============================================================================
+BACKUP
+=============================================================================
+
+Banco de dados:
+  mysqldump -u usuario -p banco_dados > backup.sql
+
+Arquivos:
+  tar -czf backup.tar.gz /caminho/do/projeto
+
+=============================================================================
+SUPORTE
+=============================================================================
+
+Para dúvidas:
+1. Consulte HOSTINGER_DEPLOY.md
+2. Verifique logs com: pm2 logs
+3. Teste webhook manualmente
+4. Entre em contato com suporte Hostinger
+
+=============================================================================
