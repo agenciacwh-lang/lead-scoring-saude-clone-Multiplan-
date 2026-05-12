@@ -147,13 +147,13 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
                 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
                 style={{ fontFamily: "Space Grotesk, sans-serif" }}
               >
-                Vamos começar! 👋
+                Olá! 😊
               </h1>
               <p
-                className="text-gray-600 text-sm"
+                className="text-gray-600 text-sm leading-relaxed"
                 style={{ fontFamily: "DM Sans, sans-serif" }}
               >
-                Precisamos de alguns dados para personalizar sua experiência
+                Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!
               </p>
             </div>
 
