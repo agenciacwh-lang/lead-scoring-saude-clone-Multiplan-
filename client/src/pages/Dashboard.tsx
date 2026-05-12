@@ -103,7 +103,7 @@ export default function Dashboard() {
 
         {/* Estatísticas */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-slate-400">Total de Leads</CardTitle>
@@ -160,6 +160,17 @@ export default function Dashboard() {
                 <div className="text-3xl font-bold text-green-400">{stats.prioridade}</div>
               </CardContent>
             </Card>
+
+            <Card className="bg-purple-900/20 border-purple-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-purple-400 flex items-center gap-2">
+                  ⏳ Incompletos
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-purple-400">{stats.incompletos || 0}</div>
+              </CardContent>
+            </Card>
           </div>
         )}
 
@@ -184,6 +195,7 @@ export default function Dashboard() {
                       <th className="text-left py-3 px-4 text-slate-400 font-medium">Cidade</th>
                       <th className="text-left py-3 px-4 text-slate-400 font-medium">Pontuação</th>
                       <th className="text-left py-3 px-4 text-slate-400 font-medium">Temperatura</th>
+                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Status</th>
                       <th className="text-left py-3 px-4 text-slate-400 font-medium">Data</th>
                     </tr>
                   </thead>
@@ -196,6 +208,11 @@ export default function Dashboard() {
                         <td className="py-3 px-4 text-slate-300">{lead.cidade}</td>
                         <td className="py-3 px-4 text-white font-bold">{lead.pontuacao}/10</td>
                         <td className="py-3 px-4">{getTemperaturaBadge(lead.temperatura)}</td>
+                        <td className="py-3 px-4">
+                          <Badge className={lead.status === "incompleto" ? "bg-purple-600 hover:bg-purple-700" : "bg-green-600 hover:bg-green-700"}>
+                            {lead.status === "incompleto" ? "⏳ Incompleto" : "✓ Completo"}
+                          </Badge>
+                        </td>
                         <td className="py-3 px-4 text-slate-400">
                           {new Date(lead.createdAt).toLocaleDateString("pt-BR")}
                         </td>

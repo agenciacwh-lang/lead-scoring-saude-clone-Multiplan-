@@ -51,6 +51,9 @@ export const leads = mysqlTable("leads", {
   // Status do lead
   status: mysqlEnum("status", ["completo", "incompleto", "confirmado"]).default("incompleto").notNull(),
   
+  // Rastreamento de inatividade
+  lastActivityAt: timestamp("lastActivityAt").defaultNow().notNull(),
+  
   // Timestamp
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });

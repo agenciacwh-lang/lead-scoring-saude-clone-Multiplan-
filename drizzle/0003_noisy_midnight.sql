@@ -1,0 +1,1 @@
+ALTER TABLE `leads` ADD `lastActivityAt` timestamp DEFAULT (now()) NOT NULL;

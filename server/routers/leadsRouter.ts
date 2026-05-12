@@ -97,6 +97,100 @@ export const leadsRouter = router({
   }),
 
   /**
+   * Submeter um lead incompleto (após timeout de inatividade)
+   */
+  submitIncomplete: publicProcedure
+    .input(
+      z.object({
+        nome: z.string(),
+        telefone: z.string(),
+        email: z.string(),
+        cidade: z.string(),
+        tempo_compra: z.string().optional(),
+        situacao_atual: z.string().optional(),
+        renda: z.string().optional(),
+        criterio_escolha: z.string().optional(),
+        cnpj_mei: z.string().optional(),
+        idades: z.string().optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      try {
+        // Salvar no banco com status "incompleto"
+        const result = await getDb().then((db) => {
+          if (!db) throw new Error("Database não disponível");
+          return db.insert(leads).values({
+            nome: input.nome,
+            telefone: input.telefone,
+            email: input.email,
+            cidade: input.cidade,
+            tempo_compra: input.tempo_compra || "",
+            situacao_atual: input.situacao_atual || "",
+            renda: input.renda || "",
+            criterio_escolha: input.criterio_escolha || "",
+            cnpj_mei: input.cnpj_mei || "",
+            idades: input.idades || "",
+            pontuacao: 0,
+            temperatura: "frio",
+            prioridade: "Não",
+            status: "incompleto",
+          });
+        });
+
+        // Enviar para BotConversa com status "incompleto"
+        const botconversaSent = await sendLeadToBotConversa({
+          nome: input.nome,
+          email: input.email,
+          telefone: input.telefone,
+          cidade: input.cidade,
+          pontuacao: 0,
+          temperatura: "Frio",
+          respostas: {
+            status: "incompleto",
+            tempo_compra: input.tempo_compra || "não preenchido",
+            situacao_atual: input.situacao_atual || "não preenchido",
+            renda: input.renda || "não preenchido",
+            criterio_escolha: input.criterio_escolha || "não preenchido",
+            cnpj_mei: input.cnpj_mei || "não preenchido",
+            idades: input.idades || "não preenchido",
+          },
+        });
+
+        // Enviar para Google Sheets
+        const sheetsSent = await sendLeadToSheets({
+          nome: input.nome,
+          telefone: input.telefone,
+          email: input.email,
+          cidade: input.cidade,
+          tempo_compra: input.tempo_compra || "",
+          situacao_atual: input.situacao_atual || "",
+          renda: input.renda || "",
+          criterio_escolha: input.criterio_escolha || "",
+          cnpj_mei: input.cnpj_mei || "",
+          idades: input.idades || "",
+          pontuacao: 0,
+          temperatura: "frio",
+          prioridade: "Não",
+          status: "incompleto",
+          createdAt: new Date(),
+        });
+
+        console.log("[Lead Incompleto] Lead incompleto enviado com sucesso");
+
+        return {
+          success: true,
+          message: "Lead incompleto salvo com sucesso",
+          result,
+          sheetsSent,
+          botconversaSent,
+        };
+      } catch (error) {
+        console.error("[Lead Incompleto] Erro ao salvar lead incompleto:", error);
+        return { success: false, message: "Erro ao salvar lead incompleto" };
+      }
+    }),
+
+  /**
    * Teste de integração com BotConversa
    */
   testBotConversa: publicProcedure

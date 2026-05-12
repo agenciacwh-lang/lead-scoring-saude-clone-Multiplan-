@@ -100,7 +100,10 @@ export async function saveLead(leadData: InsertLead) {
   }
 
   try {
-    const result = await db.insert(leads).values(leadData);
+    const result = await db.insert(leads).values({
+      ...leadData,
+      status: "completo",
+    });
     console.log("[Database] Lead salvo com sucesso:", leadData.email);
     return result;
   } catch (error) {

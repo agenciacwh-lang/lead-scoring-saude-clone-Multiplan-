@@ -113,13 +113,16 @@ export async function getLeadsStats() {
 
   try {
     const allLeads = await db.select().from(leads);
+    const completedLeads = allLeads.filter((l) => l.status === "completo");
 
     const stats = {
       total: allLeads.length,
-      frios: allLeads.filter((l) => l.temperatura === "frio").length,
-      mornos: allLeads.filter((l) => l.temperatura === "morno").length,
-      quentes: allLeads.filter((l) => l.temperatura === "quente").length,
-      prioridade: allLeads.filter((l) => l.prioridade === "Sim").length,
+      completos: completedLeads.length,
+      incompletos: allLeads.filter((l) => l.status === "incompleto").length,
+      frios: completedLeads.filter((l) => l.temperatura === "frio").length,
+      mornos: completedLeads.filter((l) => l.temperatura === "morno").length,
+      quentes: completedLeads.filter((l) => l.temperatura === "quente").length,
+      prioridade: completedLeads.filter((l) => l.prioridade === "Sim").length,
     };
 
     return stats;
