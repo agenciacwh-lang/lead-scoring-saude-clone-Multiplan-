@@ -52,13 +52,13 @@ export default function DiscountPopup({ onClose, onConfirm }: DiscountPopupProps
         onClick={handleClose}
       />
 
-      {/* Pop-up com animação de slide + scale */}
+      {/* Pop-up centralizado com animação de slide + scale */}
       <div
-        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-md ${
+        className={`fixed inset-0 z-50 flex items-center justify-center pointer-events-none ${
           isClosing ? "animate-popup-out" : animate ? "animate-popup-in" : "opacity-0"
         }`}
       >
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="pointer-events-auto w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header com gradiente */}
           <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-red-500 px-6 py-8 relative">
             {/* Close button com animação hover */}
