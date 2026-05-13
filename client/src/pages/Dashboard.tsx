@@ -3,7 +3,6 @@
  * Visualiza estatísticas e lista de leads qualificados
  */
 
-import { useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +14,19 @@ import { getLoginUrl } from "@/const";
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
 
-  // Se não está autenticado, mostrar tela de login
+  // ✅ TODOS os hooks DEVEM estar no topo, antes de qualquer retorno condicional
+  // Usar 'enabled' para controlar quando as queries rodam
+  const { data: allLeads = [], isLoading: leadsLoading } = trpc.leads.getAll.useQuery(undefined, {
+    enabled: !!user,
+    retry: false,
+  });
+
+  const { data: leadsStats } = trpc.leads.getStats.useQuery(undefined, {
+    enabled: !!user,
+    retry: false,
+  });
+
+  // Se está carregando auth, mostrar loading
   if (authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
@@ -27,6 +38,7 @@ export default function Dashboard() {
     );
   }
 
+  // Se não está autenticado, mostrar tela de login
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50 px-4">
@@ -43,12 +55,6 @@ export default function Dashboard() {
       </div>
     );
   }
-
-  // Buscar todos os leads
-  const { data: allLeads = [], isLoading: leadsLoading } = trpc.leads.getAll.useQuery();
-
-  // Buscar estatísticas
-  const { data: leadsStats, isLoading: statsLoading } = trpc.leads.getStats.useQuery();
 
   const getTemperaturaBadge = (temperatura: string) => {
     switch (temperatura) {
@@ -78,10 +84,6 @@ export default function Dashboard() {
     }
   };
 
-  // Memoizar leads para evitar re-renders desnecessários
-  const leads = useMemo(() => allLeads, [allLeads]);
-  const stats = useMemo(() => leadsStats, [leadsStats]);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
@@ -92,14 +94,14 @@ export default function Dashboard() {
         </div>
 
         {/* Estatísticas */}
-        {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-8">
+        {leadsStats && (
+          <div className="grid grid-cols-1 md:grid-cols-7 gap-4 mb-8">
             <Card className="bg-slate-800 border-slate-700">
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-slate-400">Total de Leads</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-white">{stats.total}</div>
+                <div className="text-3xl font-bold text-white">{leadsStats.total}</div>
               </CardContent>
             </Card>
 
@@ -108,7 +110,7 @@ export default function Dashboard() {
                 <CardTitle className="text-sm font-medium text-green-400">✓ Completos</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-400">{stats.completos || 0}</div>
+                <div className="text-3xl font-bold text-green-400">{leadsStats.completos || 0}</div>
               </CardContent>
             </Card>
 
@@ -120,7 +122,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-red-400">{stats.quentes}</div>
+                <div className="text-3xl font-bold text-red-400">{leadsStats.quentes}</div>
               </CardContent>
             </Card>
 
@@ -132,7 +134,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-yellow-400">{stats.mornos}</div>
+                <div className="text-3xl font-bold text-yellow-400">{leadsStats.mornos}</div>
               </CardContent>
             </Card>
 
@@ -144,7 +146,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-blue-400">{stats.frios}</div>
+                <div className="text-3xl font-bold text-blue-400">{leadsStats.frios}</div>
               </CardContent>
             </Card>
 
@@ -156,7 +158,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-400">{stats.prioridade}</div>
+                <div className="text-3xl font-bold text-green-400">{leadsStats.prioridade}</div>
               </CardContent>
             </Card>
 
@@ -167,7 +169,7 @@ export default function Dashboard() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-purple-400">{stats.incompletos || 0}</div>
+                <div className="text-3xl font-bold text-purple-400">{leadsStats.incompletos || 0}</div>
               </CardContent>
             </Card>
           </div>
@@ -179,9 +181,9 @@ export default function Dashboard() {
             <CardTitle className="text-white">Leads Qualificados</CardTitle>
           </CardHeader>
           <CardContent>
-            {leadsLoading || statsLoading ? (
+            {leadsLoading ? (
               <div className="text-center py-8 text-slate-400">Carregando leads...</div>
-            ) : leads.length === 0 ? (
+            ) : allLeads.length === 0 ? (
               <div className="text-center py-8 text-slate-400">Nenhum lead encontrado</div>
             ) : (
               <div className="overflow-x-auto">
@@ -199,7 +201,7 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {leads.map((lead) => (
+                    {allLeads.map((lead) => (
                       <tr key={lead.id} className="border-b border-slate-700 hover:bg-slate-700/50">
                         <td className="py-3 px-4 text-white font-medium">{lead.nome}</td>
                         <td className="py-3 px-4 text-slate-300">{lead.email}</td>
