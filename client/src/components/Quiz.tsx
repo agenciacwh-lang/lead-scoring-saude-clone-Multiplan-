@@ -13,7 +13,7 @@ import { ChevronLeft, Heart } from "lucide-react";
 
 const HERO_BG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hero-health-bg-igbSPaoZJKBqYM9KqjBYjP.webp";
-const MULTIPLAN_LOGO = "/manus-storage/multiplan-logo_daf8a1df.png";
+const MULTIPLAN_LOGO = "/manus-storage/BlackAndWhiteMinimalistTypographyPersonalLogo(1)_6f0208fe.png";
 
 export default function Quiz() {
   const [, navigate] = useLocation();

@@ -26,7 +26,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   const [visible, setVisible] = useState(false);
 
   const hapvidaLogoUrl = "/manus-storage/hapvida-logo_487cd512.png";
-  const multiplanLogoUrl = "/manus-storage/multiplan-logo_daf8a1df.png";
+  const multiplanLogoUrl = "/manus-storage/BlackAndWhiteMinimalistTypographyPersonalLogo(1)_6f0208fe.png";
 
   // Trigger animation on mount
   useEffect(() => {
