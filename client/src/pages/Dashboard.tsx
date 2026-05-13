@@ -1,21 +1,28 @@
 /**
  * Dashboard de Leads
- * Visualiza estatísticas e lista de leads qualificados
+ * Visualiza estatísticas e lista de leads qualificados com filtros e exportação
  */
 
+import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Flame, Thermometer, Snowflake, TrendingUp } from "lucide-react";
-import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
+import { Flame, Thermometer, Snowflake, TrendingUp, Download, Filter, X } from "lucide-react";
+import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    temperatura: "",
+    status: "",
+    dataInicio: "",
+    dataFim: "",
+  });
 
   // ✅ TODOS os hooks DEVEM estar no topo, antes de qualquer retorno condicional
-  // Usar 'enabled' para controlar quando as queries rodam
   const { data: allLeads = [], isLoading: leadsLoading } = trpc.leads.getAll.useQuery(undefined, {
     enabled: !!user,
     retry: false,
@@ -55,6 +62,71 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  // Aplicar filtros
+  const filteredLeads = allLeads.filter((lead) => {
+    if (filters.temperatura && lead.temperatura !== filters.temperatura) return false;
+    if (filters.status && lead.status !== filters.status) return false;
+    
+    if (filters.dataInicio) {
+      const leadDate = new Date(lead.createdAt).getTime();
+      const filterDate = new Date(filters.dataInicio).getTime();
+      if (leadDate < filterDate) return false;
+    }
+    
+    if (filters.dataFim) {
+      const leadDate = new Date(lead.createdAt).getTime();
+      const filterDate = new Date(filters.dataFim).getTime();
+      if (leadDate > filterDate) return false;
+    }
+    
+    return true;
+  });
+
+  // Exportar para CSV
+  const exportToCSV = () => {
+    if (filteredLeads.length === 0) {
+      alert("Nenhum lead para exportar");
+      return;
+    }
+
+    const headers = ["Nome", "E-mail", "Telefone", "Cidade", "Pontuação", "Temperatura", "Status", "Data"];
+    const rows = filteredLeads.map((lead) => [
+      lead.nome,
+      lead.email,
+      lead.telefone,
+      lead.cidade,
+      `${lead.pontuacao}/10`,
+      lead.temperatura,
+      lead.status === "incompleto" ? "Incompleto" : "Completo",
+      new Date(lead.createdAt).toLocaleDateString("pt-BR"),
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map((row) => row.map((cell) => `"${cell}"`).join(",")),
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const link = document.createElement("a");
+    const url = URL.createObjectURL(blob);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `leads_${new Date().toISOString().split("T")[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  // Limpar filtros
+  const clearFilters = () => {
+    setFilters({
+      temperatura: "",
+      status: "",
+      dataInicio: "",
+      dataFim: "",
+    });
+  };
 
   const getTemperaturaBadge = (temperatura: string) => {
     switch (temperatura) {
@@ -175,16 +247,108 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Filtros e Exportação */}
+        <div className="mb-6 flex gap-3 flex-wrap">
+          <Button
+            onClick={() => setShowFilters(!showFilters)}
+            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+          >
+            <Filter className="w-4 h-4" />
+            {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
+          </Button>
+
+          <Button
+            onClick={exportToCSV}
+            className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+          >
+            <Download className="w-4 h-4" />
+            Exportar CSV ({filteredLeads.length})
+          </Button>
+
+          {(filters.temperatura || filters.status || filters.dataInicio || filters.dataFim) && (
+            <Button
+              onClick={clearFilters}
+              className="bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-2"
+            >
+              <X className="w-4 h-4" />
+              Limpar Filtros
+            </Button>
+          )}
+        </div>
+
+        {/* Painel de Filtros */}
+        {showFilters && (
+          <Card className="bg-slate-800 border-slate-700 mb-6">
+            <CardHeader>
+              <CardTitle className="text-white">Filtros</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Temperatura</label>
+                  <select
+                    value={filters.temperatura}
+                    onChange={(e) => setFilters({ ...filters, temperatura: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                  >
+                    <option value="">Todas</option>
+                    <option value="quente">Quente</option>
+                    <option value="morno">Morno</option>
+                    <option value="frio">Frio</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Status</label>
+                  <select
+                    value={filters.status}
+                    onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                  >
+                    <option value="">Todos</option>
+                    <option value="completo">Completo</option>
+                    <option value="incompleto">Incompleto</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Data Início</label>
+                  <input
+                    type="date"
+                    value={filters.dataInicio}
+                    onChange={(e) => setFilters({ ...filters, dataInicio: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-slate-400 mb-2">Data Fim</label>
+                  <input
+                    type="date"
+                    value={filters.dataFim}
+                    onChange={(e) => setFilters({ ...filters, dataFim: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Lista de Leads */}
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Leads Qualificados</CardTitle>
+            <CardTitle className="text-white">
+              Leads Qualificados {filteredLeads.length !== allLeads.length && `(${filteredLeads.length} de ${allLeads.length})`}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {leadsLoading ? (
               <div className="text-center py-8 text-slate-400">Carregando leads...</div>
-            ) : allLeads.length === 0 ? (
-              <div className="text-center py-8 text-slate-400">Nenhum lead encontrado</div>
+            ) : filteredLeads.length === 0 ? (
+              <div className="text-center py-8 text-slate-400">
+                {allLeads.length === 0 ? "Nenhum lead encontrado" : "Nenhum lead corresponde aos filtros"}
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -201,7 +365,7 @@ export default function Dashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {allLeads.map((lead) => (
+                    {filteredLeads.map((lead) => (
                       <tr key={lead.id} className="border-b border-slate-700 hover:bg-slate-700/50">
                         <td className="py-3 px-4 text-white font-medium">{lead.nome}</td>
                         <td className="py-3 px-4 text-slate-300">{lead.email}</td>
