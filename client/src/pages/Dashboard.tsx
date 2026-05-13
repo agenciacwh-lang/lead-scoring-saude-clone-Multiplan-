@@ -1,9 +1,9 @@
 /**
  * Dashboard de Leads
- * Visualiza estatísticas e lista de leads qualificados com filtros e exportação
+ * Visualiza estatísticas, gráficos e lista de leads qualificados com filtros e exportação
  */
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Flame, Thermometer, Snowflake, TrendingUp, Download, Filter, X } from "lucide-react";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { getLoginUrl } from "@/const";
+import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
@@ -82,6 +83,47 @@ export default function Dashboard() {
     
     return true;
   });
+
+  // Dados para gráfico de pizza (distribuição por temperatura)
+  const temperatureData = useMemo(() => {
+    const counts = { quente: 0, morno: 0, frio: 0 };
+    filteredLeads.forEach((lead) => {
+      if (lead.temperatura in counts) {
+        counts[lead.temperatura as keyof typeof counts]++;
+      }
+    });
+    return [
+      { name: "Quente", value: counts.quente, fill: "#ef4444" },
+      { name: "Morno", value: counts.morno, fill: "#eab308" },
+      { name: "Frio", value: counts.frio, fill: "#3b82f6" },
+    ].filter((item) => item.value > 0);
+  }, [filteredLeads]);
+
+  // Dados para gráfico de linha (conversão ao longo do tempo)
+  const conversionData = useMemo(() => {
+    const dateMap = new Map<string, { completos: number; incompletos: number }>();
+    
+    filteredLeads.forEach((lead) => {
+      const date = new Date(lead.createdAt).toLocaleDateString("pt-BR");
+      if (!dateMap.has(date)) {
+        dateMap.set(date, { completos: 0, incompletos: 0 });
+      }
+      const data = dateMap.get(date)!;
+      if (lead.status === "completo") {
+        data.completos++;
+      } else {
+        data.incompletos++;
+      }
+    });
+
+    return Array.from(dateMap.entries())
+      .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
+      .map(([date, data]) => ({
+        date,
+        "Completos": data.completos,
+        "Incompletos": data.incompletos,
+      }));
+  }, [filteredLeads]);
 
   // Exportar para CSV
   const exportToCSV = () => {
@@ -246,6 +288,80 @@ export default function Dashboard() {
             </Card>
           </div>
         )}
+
+        {/* Gráficos */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Gráfico de Pizza */}
+          <Card className="bg-slate-800 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Distribuição por Temperatura</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {temperatureData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <PieChart>
+                    <Pie
+                      data={temperatureData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, value }) => `${name}: ${value}`}
+                      outerRadius={80}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {temperatureData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.fill} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center py-8 text-slate-400">Sem dados para exibir</div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Gráfico de Linha */}
+          <Card className="bg-slate-800 border-slate-700">
+            <CardHeader>
+              <CardTitle className="text-white">Conversão ao Longo do Tempo</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {conversionData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={conversionData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                    <XAxis dataKey="date" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
+                    <Tooltip 
+                      contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #475569" }}
+                      labelStyle={{ color: "#e2e8f0" }}
+                    />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="Completos" 
+                      stroke="#10b981" 
+                      strokeWidth={2}
+                      dot={{ fill: "#10b981", r: 4 }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="Incompletos" 
+                      stroke="#a855f7" 
+                      strokeWidth={2}
+                      dot={{ fill: "#a855f7", r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-center py-8 text-slate-400">Sem dados para exibir</div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Filtros e Exportação */}
         <div className="mb-6 flex gap-3 flex-wrap">
