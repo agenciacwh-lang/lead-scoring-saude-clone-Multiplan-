@@ -10,8 +10,8 @@ import { useLeadContext, useClearLeadDataAfterSubmit } from "@/contexts/LeadCont
 import { calculateLeadScore } from "@/lib/quizData";
 import { trpc } from "@/lib/trpc";
 
-// ⚠️ Substitua pelo número de WhatsApp real
-const WHATSAPP_NUMBER = "5511999999999";
+// ⚠️ Número de WhatsApp da Hapvida
+const WHATSAPP_NUMBER = "5579888218359"; // +55 79 8821-8359
 const WHATSAPP_MESSAGE = encodeURIComponent(
   "Olá! Acabei de preencher o formulário de qualificação e gostaria de saber mais sobre os planos de saúde disponíveis para mim. 😊"
 );
