@@ -16,8 +16,10 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import { LeadProvider } from "./contexts/LeadContext";
 import Home from "./pages/Home";
 import Obrigado from "./pages/Obrigado";
-
+import DiscountPopup from "./components/DiscountPopup";
 import Dashboard from "./pages/Dashboard";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
@@ -33,12 +35,44 @@ function Router() {
 }
 
 function App() {
+  const [showPopup, setShowPopup] = useState(false);
+  const [location] = useLocation();
+
+  useEffect(() => {
+    // Mostrar pop-up apenas na página inicial e se não tiver sido fechado
+    if (location === "/") {
+      const hasClosedPopup = localStorage.getItem("discountPopupClosed");
+      if (!hasClosedPopup) {
+        // Mostrar pop-up após 1 segundo
+        const timer = setTimeout(() => {
+          setShowPopup(true);
+        }, 1000);
+        return () => clearTimeout(timer);
+      }
+    } else {
+      setShowPopup(false);
+    }
+  }, [location]);
+
+  const handleClosePopup = () => {
+    setShowPopup(false);
+    localStorage.setItem("discountPopupClosed", "true");
+  };
+
+  const handleConfirmPopup = () => {
+    setShowPopup(false);
+    // Pop-up fecha e o usuário continua no formulário
+  };
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
         <LeadProvider>
           <TooltipProvider>
             <Toaster />
+            {showPopup && (
+              <DiscountPopup onClose={handleClosePopup} onConfirm={handleConfirmPopup} />
+            )}
             <Router />
           </TooltipProvider>
         </LeadProvider>
