@@ -5,7 +5,7 @@
  */
 
 import { useEffect, useState, useRef } from "react";
-import { Heart, MessageCircle, CheckCircle, Star, ArrowRight } from "lucide-react";
+import { Heart, MessageCircle, CheckCircle, Star } from "lucide-react";
 import { useLeadContext, useClearLeadDataAfterSubmit } from "@/contexts/LeadContext";
 import { calculateLeadScore } from "@/lib/quizData";
 import { trpc } from "@/lib/trpc";
@@ -170,24 +170,17 @@ export default function Obrigado() {
               </div>
             </div>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 mb-8">
+            {/* CTA Button - Centralizado */}
+            <div className="flex justify-center mb-8">
               <a
                 href={WHATSAPP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex-1 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-2xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl text-base"
+                className="w-full sm:w-auto max-w-md bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-2xl transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg hover:shadow-xl text-base"
               >
                 <MessageCircle className="w-5 h-5" />
                 Falar no WhatsApp
               </a>
-              <button
-                onClick={() => (window.location.href = "/")}
-                className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold py-4 px-6 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 text-base"
-              >
-                Voltar ao Início
-                <ArrowRight className="w-5 h-5" />
-              </button>
             </div>
 
             {/* Footer Message */}
