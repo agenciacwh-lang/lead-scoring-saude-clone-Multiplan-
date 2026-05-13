@@ -124,7 +124,7 @@ export default function Quiz() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-orange-100">
         <div className="flex items-center gap-3">
-          <img src={MULTIPLAN_LOGO} alt="Multi Plan" className="h-8 object-contain" />
+          <img src={MULTIPLAN_LOGO} alt="Multi Plan" className="h-12 object-contain" />
         </div>
         <div className="flex items-center gap-2">
           <div
