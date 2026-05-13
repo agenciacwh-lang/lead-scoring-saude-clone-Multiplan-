@@ -50,15 +50,31 @@ export default function DiscountPopup({ onClose, onConfirm }: DiscountPopupProps
           isClosing ? "animate-backdrop-out" : animate ? "animate-backdrop-in" : "opacity-0"
         }`}
         onClick={handleClose}
+        style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          zIndex: 40,
+        }}
       />
 
       {/* Pop-up centralizado com animação de slide + scale */}
       <div
-        className={`fixed inset-0 z-50 flex items-center justify-center pointer-events-none ${
-          isClosing ? "animate-popup-out" : animate ? "animate-popup-in" : "opacity-0"
-        }`}
+        style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          zIndex: 50,
+          width: "100%",
+          maxWidth: "28rem",
+          padding: "1rem",
+        }}
+        className={isClosing ? "animate-popup-out" : animate ? "animate-popup-in" : "opacity-0"}
       >
-        <div className="pointer-events-auto w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header com gradiente */}
           <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-red-500 px-6 py-8 relative">
             {/* Close button com animação hover */}
