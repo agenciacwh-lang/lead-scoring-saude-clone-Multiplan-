@@ -3,7 +3,7 @@
  * Visualiza estatísticas e lista de leads qualificados
  */
 
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,8 +14,6 @@ import { getLoginUrl } from "@/const";
 
 export default function Dashboard() {
   const { user, loading: authLoading } = useAuth();
-  const [leads, setLeads] = useState<any[]>([]);
-  const [stats, setStats] = useState<any>(null);
 
   // Se não está autenticado, mostrar tela de login
   if (authLoading) {
@@ -47,22 +45,10 @@ export default function Dashboard() {
   }
 
   // Buscar todos os leads
-  const { data: allLeads, isLoading: leadsLoading } = trpc.leads.getAll.useQuery();
+  const { data: allLeads = [], isLoading: leadsLoading } = trpc.leads.getAll.useQuery();
 
   // Buscar estatísticas
   const { data: leadsStats, isLoading: statsLoading } = trpc.leads.getStats.useQuery();
-
-  useEffect(() => {
-    if (allLeads) {
-      setLeads(allLeads);
-    }
-  }, [allLeads]);
-
-  useEffect(() => {
-    if (leadsStats) {
-      setStats(leadsStats);
-    }
-  }, [leadsStats]);
 
   const getTemperaturaBadge = (temperatura: string) => {
     switch (temperatura) {
@@ -92,6 +78,10 @@ export default function Dashboard() {
     }
   };
 
+  // Memoizar leads para evitar re-renders desnecessários
+  const leads = useMemo(() => allLeads, [allLeads]);
+  const stats = useMemo(() => leadsStats, [leadsStats]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
@@ -110,6 +100,15 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold text-white">{stats.total}</div>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-green-900/20 border-green-800">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-sm font-medium text-green-400">✓ Completos</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold text-green-400">{stats.completos || 0}</div>
               </CardContent>
             </Card>
 
@@ -177,10 +176,10 @@ export default function Dashboard() {
         {/* Lista de Leads */}
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">Leads Recentes</CardTitle>
+            <CardTitle className="text-white">Leads Qualificados</CardTitle>
           </CardHeader>
           <CardContent>
-            {leadsLoading ? (
+            {leadsLoading || statsLoading ? (
               <div className="text-center py-8 text-slate-400">Carregando leads...</div>
             ) : leads.length === 0 ? (
               <div className="text-center py-8 text-slate-400">Nenhum lead encontrado</div>

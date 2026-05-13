@@ -21,7 +21,7 @@ export function InactivityProvider({ children }: { children: ReactNode }) {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const submittedRef = useRef(false);
 
-  // Mutation para enviar lead incompleto
+  // Mutation para enviar lead incompleto - SEMPRE chamado, mesmo que não use
   const submitIncompleteLead = trpc.leads.submitIncomplete.useMutation({
     onSuccess: () => {
       console.log("[Inactividade] Lead incompleto enviado com sucesso");
