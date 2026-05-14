@@ -550,7 +550,7 @@ export default function Dashboard() {
 
   // Se PIN não foi desbloqueado, mostrar tela de PIN
   if (!isPinUnlocked) {
-    return <PinProtection onUnlock={handlePinUnlock} correctPin="1234" maxAttempts={3} />;
+    return <PinProtection onUnlock={handlePinUnlock} correctPin="8814" maxAttempts={3} />;
   }
 
   // Renderizar conteúdo do dashboard após desbloqueio

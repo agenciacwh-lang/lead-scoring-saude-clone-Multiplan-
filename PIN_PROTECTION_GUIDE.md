@@ -20,12 +20,12 @@ O dashboard agora possui proteção por PIN de 4 dígitos. Usuários devem inser
 
 ### PIN Padrão
 
-O PIN padrão é **1234**. Para alterar, edite o arquivo `client/src/pages/Dashboard.tsx`:
+O PIN atual é **8814**. Para alterar, edite o arquivo `client/src/pages/Dashboard.tsx`:
 
 ```typescript
-// Linha 46
+// Linha 553
 if (!isPinUnlocked) {
-  return <PinProtection onUnlock={handlePinUnlock} correctPin="NOVO_PIN" maxAttempts={3} />;
+  return <PinProtection onUnlock={handlePinUnlock} correctPin="8814" maxAttempts={3} />;
 }
 ```
 
