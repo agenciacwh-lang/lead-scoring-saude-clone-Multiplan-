@@ -43,3 +43,12 @@
 - [x] Criar testes unitários (11 testes)
 - [x] Documentação de WebSocket (WEBSOCKET_REALTIME_GUIDE.md)
 - [x] Todos os testes passando (17/17 ✓)
+
+
+## Proteção por PIN (Implementado)
+
+- [x] Criar componente PinProtection.tsx
+- [x] Integrar PIN no Dashboard
+- [x] Adicionar testes para PIN (20 testes)
+- [x] Documentar sistema de PIN (PIN_PROTECTION_GUIDE.md)
+- [x] Todos os testes passando (37/37 ✓)

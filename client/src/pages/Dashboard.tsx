@@ -11,10 +11,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Flame, Thermometer, Snowflake, TrendingUp, Download, Filter, X, Wifi, WifiOff } from "lucide-react";
 import { useWebSocket, WebSocketLead, WebSocketStats } from "@/hooks/useWebSocket";
+import { PinProtection } from "@/components/PinProtection";
 
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-export default function Dashboard() {
+function DashboardContent() {
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     temperatura: "",
@@ -208,7 +209,7 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6 relative">
       <div className="max-w-7xl mx-auto">
         {/* Header com Status WebSocket */}
         <div className="mb-8">
@@ -529,4 +530,29 @@ export default function Dashboard() {
       </div>
     </div>
   );
+}
+
+export default function Dashboard() {
+  const [isPinUnlocked, setIsPinUnlocked] = useState(false);
+
+  // Verificar se PIN já foi desbloqueado na sessão
+  useEffect(() => {
+    const unlocked = sessionStorage.getItem('dashboardPinUnlocked');
+    if (unlocked === 'true') {
+      setIsPinUnlocked(true);
+    }
+  }, []);
+
+  const handlePinUnlock = () => {
+    setIsPinUnlocked(true);
+    sessionStorage.setItem('dashboardPinUnlocked', 'true');
+  };
+
+  // Se PIN não foi desbloqueado, mostrar tela de PIN
+  if (!isPinUnlocked) {
+    return <PinProtection onUnlock={handlePinUnlock} correctPin="1234" maxAttempts={3} />;
+  }
+
+  // Renderizar conteúdo do dashboard após desbloqueio
+  return <DashboardContent />;
 }
