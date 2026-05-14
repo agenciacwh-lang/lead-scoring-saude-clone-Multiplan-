@@ -31,3 +31,15 @@
 - [x] Verificar se leads incompletos chegam no BotConversa com descrição correta
 - [x] Verificar se todos os leads chegam no Google Sheets
 - [x] Todos os testes passando (6/6 ✓)
+
+## WebSocket em Tempo Real (Implementado)
+
+- [x] Instalar socket.io e socket.io-client
+- [x] Criar websocketService.ts com broadcast de leads e stats
+- [x] Integrar WebSocket no servidor Express
+- [x] Criar hook useWebSocket para cliente
+- [x] Integrar WebSocket no Dashboard
+- [x] Adicionar indicador visual de conexão
+- [x] Criar testes unitários (11 testes)
+- [x] Documentação de WebSocket (WEBSOCKET_REALTIME_GUIDE.md)
+- [x] Todos os testes passando (17/17 ✓)

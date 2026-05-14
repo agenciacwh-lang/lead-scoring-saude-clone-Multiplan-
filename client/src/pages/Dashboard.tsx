@@ -1,14 +1,16 @@
 /**
  * Dashboard de Leads
  * Visualiza estatísticas, gráficos e lista de leads qualificados com filtros e exportação
+ * Integrado com WebSocket para atualizações em tempo real
  */
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Flame, Thermometer, Snowflake, TrendingUp, Download, Filter, X } from "lucide-react";
+import { Flame, Thermometer, Snowflake, TrendingUp, Download, Filter, X, Wifi, WifiOff } from "lucide-react";
+import { useWebSocket, WebSocketLead, WebSocketStats } from "@/hooks/useWebSocket";
 
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
@@ -20,18 +22,57 @@ export default function Dashboard() {
     dataInicio: "",
     dataFim: "",
   });
+  const [allLeads, setAllLeads] = useState<any[]>([]);
+  const [leadsStats, setLeadsStats] = useState<any>(null);
+  const [leadsLoading, setLeadsLoading] = useState(true);
 
   // ✅ TODOS os hooks DEVEM estar no topo, ANTES de qualquer retorno condicional
-  const { data: allLeads = [], isLoading: leadsLoading } = trpc.leads.getAll.useQuery(undefined, {
+  const { data: initialLeads = [], isLoading: initialLoading } = trpc.leads.getAll.useQuery(undefined, {
     retry: false,
   });
 
-  const { data: leadsStats } = trpc.leads.getStats.useQuery(undefined, {
+  const { data: initialStats } = trpc.leads.getStats.useQuery(undefined, {
     retry: false,
   });
+
+  // WebSocket para atualizações em tempo real
+  const { isConnected } = useWebSocket({
+    subscribeToLeads: true,
+    subscribeToStats: true,
+    onNewLead: (lead: WebSocketLead) => {
+      console.log('[Dashboard] Novo lead recebido via WebSocket:', lead);
+      setAllLeads((prevLeads) => {
+        // Verificar se o lead já existe
+        const leadExists = prevLeads.some((l) => l.id === lead.id);
+        if (leadExists) return prevLeads;
+        
+        // Adicionar novo lead no topo da lista
+        return [lead, ...prevLeads];
+      });
+    },
+    onStatsUpdate: (stats: WebSocketStats) => {
+      console.log('[Dashboard] Estatísticas atualizadas via WebSocket:', stats);
+      setLeadsStats(stats);
+    },
+  });
+
+  // Sincronizar dados iniciais
+  useEffect(() => {
+    if (initialLeads && initialLeads.length > 0) {
+      setAllLeads(initialLeads);
+      setLeadsLoading(false);
+    }
+  }, [initialLeads]);
+
+  useEffect(() => {
+    if (initialStats) {
+      setLeadsStats(initialStats);
+    }
+  }, [initialStats]);
 
   // Aplicar filtros - DEVE estar antes dos useMemo
   const filteredLeads = useMemo(() => {
+    if (!allLeads) return [];
     return allLeads.filter((lead) => {
       if (filters.temperatura && lead.temperatura !== filters.temperatura) return false;
       if (filters.status && lead.status !== filters.status) return false;
@@ -92,8 +133,6 @@ export default function Dashboard() {
         "Incompletos": data.incompletos,
       }));
   }, [filteredLeads]);
-
-
 
   // Exportar para CSV
   const exportToCSV = () => {
@@ -171,10 +210,25 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
+        {/* Header com Status WebSocket */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Dashboard de Leads</h1>
-          <p className="text-slate-400">Visualize e gerencie todos os seus leads qualificados</p>
+          <div className="flex items-center justify-between mb-2">
+            <h1 className="text-4xl font-bold text-white">Dashboard de Leads</h1>
+            <div className="flex items-center gap-2">
+              {isConnected ? (
+                <div className="flex items-center gap-2 px-3 py-1 bg-green-900/20 border border-green-800 rounded-full">
+                  <Wifi className="w-4 h-4 text-green-400" />
+                  <span className="text-sm text-green-400">Tempo Real Ativo</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-1 bg-red-900/20 border border-red-800 rounded-full">
+                  <WifiOff className="w-4 h-4 text-red-400" />
+                  <span className="text-sm text-red-400">Desconectado</span>
+                </div>
+              )}
+            </div>
+          </div>
+          <p className="text-slate-400">Visualize e gerencie todos os seus leads qualificados em tempo real</p>
         </div>
 
         {/* Estatísticas */}
@@ -284,11 +338,12 @@ export default function Dashboard() {
                         <Cell key={`cell-${index}`} fill={entry.fill} />
                       ))}
                     </Pie>
-                    <Tooltip />
                   </PieChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-center py-8 text-slate-400">Sem dados para exibir</div>
+                <div className="h-[300px] flex items-center justify-center text-slate-400">
+                  Sem dados para exibir
+                </div>
               )}
             </CardContent>
           </Card>
@@ -302,7 +357,7 @@ export default function Dashboard() {
               {conversionData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={300}>
                   <LineChart data={conversionData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
                     <XAxis dataKey="date" stroke="#94a3b8" />
                     <YAxis stroke="#94a3b8" />
                     <Tooltip 
@@ -313,9 +368,9 @@ export default function Dashboard() {
                     <Line 
                       type="monotone" 
                       dataKey="Completos" 
-                      stroke="#10b981" 
+                      stroke="#22c55e" 
                       strokeWidth={2}
-                      dot={{ fill: "#10b981", r: 4 }}
+                      dot={{ fill: "#22c55e", r: 4 }}
                     />
                     <Line 
                       type="monotone" 
@@ -327,36 +382,36 @@ export default function Dashboard() {
                   </LineChart>
                 </ResponsiveContainer>
               ) : (
-                <div className="text-center py-8 text-slate-400">Sem dados para exibir</div>
+                <div className="h-[300px] flex items-center justify-center text-slate-400">
+                  Sem dados para exibir
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Filtros e Exportação */}
+        {/* Filtros e Ações */}
         <div className="mb-6 flex gap-3 flex-wrap">
           <Button
             onClick={() => setShowFilters(!showFilters)}
-            className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
+            className="bg-slate-700 hover:bg-slate-600 text-white"
           >
-            <Filter className="w-4 h-4" />
+            <Filter className="w-4 h-4 mr-2" />
             {showFilters ? "Ocultar Filtros" : "Mostrar Filtros"}
           </Button>
-
           <Button
             onClick={exportToCSV}
-            className="bg-green-600 hover:bg-green-700 text-white flex items-center gap-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white"
           >
-            <Download className="w-4 h-4" />
-            Exportar CSV ({filteredLeads.length})
+            <Download className="w-4 h-4 mr-2" />
+            Exportar CSV
           </Button>
-
           {(filters.temperatura || filters.status || filters.dataInicio || filters.dataFim) && (
             <Button
               onClick={clearFilters}
-              className="bg-gray-600 hover:bg-gray-700 text-white flex items-center gap-2"
+              className="bg-red-600 hover:bg-red-700 text-white"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 mr-2" />
               Limpar Filtros
             </Button>
           )}
@@ -371,11 +426,11 @@ export default function Dashboard() {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Temperatura</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Temperatura</label>
                   <select
                     value={filters.temperatura}
                     onChange={(e) => setFilters({ ...filters, temperatura: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
                   >
                     <option value="">Todas</option>
                     <option value="quente">Quente</option>
@@ -385,11 +440,11 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Status</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Status</label>
                   <select
                     value={filters.status}
                     onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
                   >
                     <option value="">Todos</option>
                     <option value="completo">Completo</option>
@@ -398,22 +453,22 @@ export default function Dashboard() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Data Início</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Data Início</label>
                   <input
                     type="date"
                     value={filters.dataInicio}
                     onChange={(e) => setFilters({ ...filters, dataInicio: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-400 mb-2">Data Fim</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">Data Fim</label>
                   <input
                     type="date"
                     value={filters.dataFim}
                     onChange={(e) => setFilters({ ...filters, dataFim: e.target.value })}
-                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white"
+                    className="w-full px-3 py-2 bg-slate-700 border border-slate-600 rounded text-white"
                   />
                 </div>
               </div>
@@ -424,47 +479,43 @@ export default function Dashboard() {
         {/* Lista de Leads */}
         <Card className="bg-slate-800 border-slate-700">
           <CardHeader>
-            <CardTitle className="text-white">
-              Leads Qualificados {filteredLeads.length !== allLeads.length && `(${filteredLeads.length} de ${allLeads.length})`}
-            </CardTitle>
+            <CardTitle className="text-white">Leads ({filteredLeads.length})</CardTitle>
           </CardHeader>
           <CardContent>
             {leadsLoading ? (
               <div className="text-center py-8 text-slate-400">Carregando leads...</div>
             ) : filteredLeads.length === 0 ? (
-              <div className="text-center py-8 text-slate-400">
-                {allLeads.length === 0 ? "Nenhum lead encontrado" : "Nenhum lead corresponde aos filtros"}
-              </div>
+              <div className="text-center py-8 text-slate-400">Nenhum lead encontrado</div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full text-sm">
+                <table className="w-full">
                   <thead>
                     <tr className="border-b border-slate-700">
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Nome</th>
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">E-mail</th>
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Telefone</th>
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Cidade</th>
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Pontuação</th>
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Temperatura</th>
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Status</th>
-                      <th className="text-left py-3 px-4 text-slate-400 font-medium">Data</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">Nome</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">E-mail</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">Telefone</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">Cidade</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">Pontuação</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">Temperatura</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">Status</th>
+                      <th className="text-left py-3 px-4 text-slate-300 font-medium">Data</th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredLeads.map((lead) => (
-                      <tr key={lead.id} className="border-b border-slate-700 hover:bg-slate-700/50">
-                        <td className="py-3 px-4 text-white font-medium">{lead.nome}</td>
+                      <tr key={lead.id} className="border-b border-slate-700 hover:bg-slate-700/50 transition">
+                        <td className="py-3 px-4 text-white">{lead.nome}</td>
                         <td className="py-3 px-4 text-slate-300">{lead.email}</td>
                         <td className="py-3 px-4 text-slate-300">{lead.telefone}</td>
                         <td className="py-3 px-4 text-slate-300">{lead.cidade}</td>
-                        <td className="py-3 px-4 text-white font-bold">{lead.pontuacao}/10</td>
+                        <td className="py-3 px-4 text-white font-medium">{lead.pontuacao}/10</td>
                         <td className="py-3 px-4">{getTemperaturaBadge(lead.temperatura)}</td>
                         <td className="py-3 px-4">
-                          <Badge className={lead.status === "incompleto" ? "bg-purple-600 hover:bg-purple-700" : "bg-green-600 hover:bg-green-700"}>
-                            {lead.status === "incompleto" ? "⏳ Incompleto" : "✓ Completo"}
+                          <Badge className={lead.status === "completo" ? "bg-green-600" : "bg-yellow-600"}>
+                            {lead.status === "completo" ? "Completo" : "Incompleto"}
                           </Badge>
                         </td>
-                        <td className="py-3 px-4 text-slate-400">
+                        <td className="py-3 px-4 text-slate-300">
                           {new Date(lead.createdAt).toLocaleDateString("pt-BR")}
                         </td>
                       </tr>

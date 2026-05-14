@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { saveLead, getDb } from "../db";
 import { leads } from "../../drizzle/schema";
 import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
+import { broadcastNewLead, broadcastStatsUpdate } from "../services/websocketService";
 
 export const leadsRouter = router({
   /**
@@ -37,6 +38,21 @@ export const leadsRouter = router({
         // Salvar no banco de dados
         const result = await saveLead(input);
 
+        // Broadcast novo lead em tempo real
+        if (result && 'insertId' in result) {
+          broadcastNewLead({
+            id: result.insertId as number,
+            nome: input.nome,
+            email: input.email,
+            telefone: input.telefone,
+            cidade: input.cidade,
+            temperatura: input.temperatura,
+            pontuacao: input.pontuacao,
+            status: "completo",
+            createdAt: new Date(),
+          });
+        }
+
         // Enviar para Google Sheets
         const sheetsSent = await sendLeadToSheets(input);
 
@@ -57,6 +73,12 @@ export const leadsRouter = router({
             idades: input.idades,
           },
         });
+
+        // Broadcast atualização de estatísticas
+        const stats = await getLeadsStats();
+        if (stats) {
+          broadcastStatsUpdate(stats);
+        }
 
         return {
           success: true,
