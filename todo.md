@@ -60,3 +60,18 @@
 - [x] Adicionar logs detalhados no router de leads
 - [x] Criar guia de troubleshooting (TROUBLESHOOTING_LEADS.md)
 - [x] Todos os testes passando (37/37 ✓)
+
+
+## Remoção de Dashboard e Integração com Google Sheets (Concluído)
+
+- [x] Remover rota /dashboardcwh
+- [x] Remover componentes Dashboard, WebSocket, useWebSocket
+- [x] Remover serviços WebSocket (websocketService.ts)
+- [x] Criar planilha Google Sheets com 17 colunas (ID, ID_CLIENTE, NOME, EMAIL, TELEFONE, CIDADE, ESTADO, IDADE, TEMPERATURA, RESPOSTAS, DATA, STATUS, OBSERVAÇÕES)
+- [x] Criar Google Apps Script para receber dados e inserir na planilha
+- [x] Fazer deploy do Google Apps Script
+- [x] Configurar webhook URL no projeto (GOOGLE_SHEETS_WEBHOOK_URL)
+- [x] Criar guia de teste (GOOGLE_SHEETS_TESTING.md)
+- [x] Todos os testes passando (26/26 ✓)
+
+**Status Final:** ✅ INTEGRAÇÃO COMPLETA COM GOOGLE SHEETS

@@ -17,7 +17,7 @@ import { LeadProvider } from "./contexts/LeadContext";
 import Home from "./pages/Home";
 import Obrigado from "./pages/Obrigado";
 import DiscountPopup from "./components/DiscountPopup";
-import Dashboard from "./pages/Dashboard";
+
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 function Router() {
@@ -28,7 +28,7 @@ function Router() {
       <Route path="/obrigado" component={Obrigado} />
       <Route path="/confirmado" component={Obrigado} />
 
-      <Route path="/dashboardcwh" component={Dashboard} />
+
       <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>

@@ -8,7 +8,7 @@ import { registerStorageProxy } from "./storageProxy";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
-import { initializeWebSocket } from "../services/websocketService";
+
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -53,13 +53,7 @@ async function startServer() {
     serveStatic(app);
   }
   
-  // Inicializar WebSocket DEPOIS de configurar tudo
-  try {
-    initializeWebSocket(server);
-    console.log("[Server] Socket.IO inicializado com sucesso");
-  } catch (error) {
-    console.error("[Server] Erro ao inicializar Socket.IO:", error);
-  }
+
 
   const preferredPort = parseInt(process.env.PORT || "3000");
   const port = await findAvailablePort(preferredPort);
