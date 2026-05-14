@@ -58,7 +58,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     const socket = io(socketUrl, {
       path: '/socket.io',
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionDelay: 1000,
       reconnectionDelayMax: 5000,
