@@ -64,17 +64,21 @@ function DashboardContent() {
 
   // Sincronizar dados iniciais
   useEffect(() => {
-    if (initialLeads && initialLeads.length > 0) {
-      setAllLeads(initialLeads);
+    // Sempre finalizar loading quando a query termina, mesmo que vazia
+    if (!initialLoading) {
+      setAllLeads(initialLeads || []);
       setLeadsLoading(false);
     }
-  }, [initialLeads]);
+  }, [initialLeads, initialLoading]);
 
   useEffect(() => {
     if (initialStats) {
       setLeadsStats(initialStats);
     }
   }, [initialStats]);
+
+  // Mostrar lista mesmo que vazia para permitir receber leads via WebSocket
+  const shouldShowEmptyState = !leadsLoading && allLeads.length === 0;
 
   // Aplicar filtros - DEVE estar antes dos useMemo
   const filteredLeads = useMemo(() => {

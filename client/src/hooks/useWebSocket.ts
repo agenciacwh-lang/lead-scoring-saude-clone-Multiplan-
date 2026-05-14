@@ -51,12 +51,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
   // Conectar ao WebSocket
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const socketUrl = `${protocol}://${window.location.host}`;
+    // Socket.IO espera http/https, nao ws/wss
+    const socketUrl = window.location.origin;
 
     console.log('[WebSocket Hook] Conectando a:', socketUrl);
 
     const socket = io(socketUrl, {
+      path: '/socket.io',
       transports: ['websocket', 'polling'],
       reconnection: true,
       reconnectionDelay: 1000,
