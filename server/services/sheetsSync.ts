@@ -13,21 +13,24 @@ const GOOGLE_SHEETS_WEBHOOK_URL = process.env.GOOGLE_SHEETS_WEBHOOK_URL || "";
  * Formata um lead para envio ao Google Sheets
  */
 function formatLeadForSheets(lead: any) {
+  const createdAt = lead.createdAt ? new Date(lead.createdAt) : new Date();
+  const temperatura = String(lead.temperatura || 'frio').toUpperCase();
+  
   return {
-    data_hora: new Date(lead.createdAt).toLocaleString("pt-BR"),
-    nome: lead.nome,
-    telefone: lead.telefone,
-    email: lead.email,
-    cidade: lead.cidade,
-    tempo_compra: lead.tempo_compra,
-    situacao_atual: lead.situacao_atual,
-    renda: lead.renda,
-    criterio_escolha: lead.criterio_escolha,
-    cnpj_mei: lead.cnpj_mei,
-    idades: lead.idades,
-    pontuacao: lead.pontuacao,
-    temperatura: lead.temperatura.toUpperCase(),
-    prioridade: lead.prioridade,
+    data_hora: createdAt.toLocaleString("pt-BR"),
+    nome: lead.nome || "",
+    telefone: lead.telefone || "",
+    email: lead.email || "",
+    cidade: lead.cidade || "",
+    tempo_compra: lead.tempo_compra || "",
+    situacao_atual: lead.situacao_atual || "",
+    renda: lead.renda || "",
+    criterio_escolha: lead.criterio_escolha || "",
+    cnpj_mei: lead.cnpj_mei || "",
+    idades: lead.idades || "",
+    pontuacao: lead.pontuacao || 0,
+    temperatura: temperatura,
+    prioridade: lead.prioridade || "Não",
   };
 }
 
