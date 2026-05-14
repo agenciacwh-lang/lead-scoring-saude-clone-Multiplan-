@@ -33,9 +33,6 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Inicializar WebSocket
-  initializeWebSocket(server);
-  
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
@@ -54,6 +51,14 @@ async function startServer() {
     await setupVite(app, server);
   } else {
     serveStatic(app);
+  }
+  
+  // Inicializar WebSocket DEPOIS de configurar tudo
+  try {
+    initializeWebSocket(server);
+    console.log("[Server] Socket.IO inicializado com sucesso");
+  } catch (error) {
+    console.error("[Server] Erro ao inicializar Socket.IO:", error);
   }
 
   const preferredPort = parseInt(process.env.PORT || "3000");
