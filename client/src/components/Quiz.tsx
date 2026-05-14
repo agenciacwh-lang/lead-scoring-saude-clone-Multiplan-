@@ -62,8 +62,9 @@ export default function Quiz() {
 
           const score = calculateLeadScore(finalAnswers);
 
-          // Todos os leads vão para /obrigado (página de agradecimento e envio para automação)
-          navigate("/obrigado");
+          // Leads frios vão para /confirmado, outros para /obrigado
+          const targetRoute = score.temperature === "frio" ? "/confirmado" : "/obrigado";
+          navigate(targetRoute);
           return;
         }
 
