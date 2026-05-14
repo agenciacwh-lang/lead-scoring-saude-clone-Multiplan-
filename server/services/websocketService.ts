@@ -35,11 +35,15 @@ let io: SocketIOServer | null = null;
  */
 export function initializeWebSocket(httpServer: HTTPServer): SocketIOServer {
   io = new SocketIOServer(httpServer, {
+    path: '/socket.io',
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
+      credentials: true,
     },
     transports: ["websocket", "polling"],
+    pingInterval: 25000,
+    pingTimeout: 60000,
   });
 
   io.on("connection", (socket: Socket) => {

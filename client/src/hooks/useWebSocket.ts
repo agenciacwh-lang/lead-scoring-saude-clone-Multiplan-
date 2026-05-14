@@ -67,9 +67,11 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
     socketRef.current = socket;
 
-    // Evento de conexão
+    // Evento de conexao
     socket.on('connect', () => {
       console.log('[WebSocket Hook] Conectado com ID:', socket.id);
+      console.log('[WebSocket Hook] Socket conectado:', socket.connected);
+      console.log('[WebSocket Hook] Transporte:', socket.io.engine.transport.name);
       setIsConnected(true);
       setConnectionError(null);
 
@@ -112,20 +114,23 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       }
     });
 
-    // Erro de conexão
-    socket.on('connect_error', (error) => {
-      console.error('[WebSocket Hook] Erro de conexão:', error);
-      setConnectionError(error.message);
+    // Erro de conexao
+    socket.on('connect_error', (error: any) => {
+      console.error('[WebSocket Hook] Erro de conexao:', error);
+      console.error('[WebSocket Hook] Detalhes do erro:', error.message);
+      setConnectionError(error.message || 'Erro de conexao');
     });
 
     // Erro geral
     socket.on('error', (error) => {
-      console.error('[WebSocket Hook] Erro:', error);
+      console.error('[WebSocket Hook] Erro geral:', error);
+      console.error('[WebSocket Hook] Tipo de erro:', typeof error);
       setConnectionError(typeof error === 'string' ? error : 'Erro desconhecido');
     });
 
     // Cleanup
     return () => {
+      console.log('[WebSocket Hook] Desconectando socket');
       socket.disconnect();
       socketRef.current = null;
     };
