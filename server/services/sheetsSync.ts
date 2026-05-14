@@ -43,17 +43,27 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
 
   try {
     const payload = formatLeadForSheets(lead);
+    console.log("[Sheets Sync] Payload a enviar:", JSON.stringify(payload));
+    console.log("[Sheets Sync] Webhook URL:", webhookUrl);
 
     const response = await fetch(webhookUrl, {
       method: "POST",
-      mode: "no-cors",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(payload),
     });
 
-    console.log("[Sheets Sync] Lead enviado para Google Sheets:", lead.email);
+    console.log("[Sheets Sync] Response status:", response.status);
+    console.log("[Sheets Sync] Response ok:", response.ok);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[Sheets Sync] Erro na resposta:", errorText);
+      return false;
+    }
+
+    console.log("[Sheets Sync] Lead enviado com sucesso para Google Sheets:", lead.email);
     return true;
   } catch (error) {
     console.error("[Sheets Sync] Erro ao enviar lead para Google Sheets:", error);

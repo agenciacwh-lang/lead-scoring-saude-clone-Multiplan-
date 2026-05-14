@@ -44,7 +44,9 @@ export const leadsRouter = router({
 
 
         // Enviar para Google Sheets
+        console.log('[Leads Router] Enviando lead para Google Sheets:', input.email);
         const sheetsSent = await sendLeadToSheets(input);
+        console.log('[Leads Router] Resultado Google Sheets:', sheetsSent);
 
         // Enviar para BotConversa
         const botconversaSent = await sendLeadToBotConversa({
