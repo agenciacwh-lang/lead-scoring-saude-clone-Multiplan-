@@ -9,12 +9,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Flame, Thermometer, Snowflake, TrendingUp, Download, Filter, X } from "lucide-react";
-import { useAuth } from "@/_core/hooks/useAuth";
-import { getLoginUrl } from "@/const";
+
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function Dashboard() {
-  const { user, loading: authLoading } = useAuth();
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     temperatura: "",
@@ -25,12 +23,10 @@ export default function Dashboard() {
 
   // ✅ TODOS os hooks DEVEM estar no topo, ANTES de qualquer retorno condicional
   const { data: allLeads = [], isLoading: leadsLoading } = trpc.leads.getAll.useQuery(undefined, {
-    enabled: !!user,
     retry: false,
   });
 
   const { data: leadsStats } = trpc.leads.getStats.useQuery(undefined, {
-    enabled: !!user,
     retry: false,
   });
 
@@ -97,35 +93,7 @@ export default function Dashboard() {
       }));
   }, [filteredLeads]);
 
-  // Se está carregando auth, mostrar loading
-  if (authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
-        </div>
-      </div>
-    );
-  }
 
-  // Se não está autenticado, mostrar tela de login
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50 px-4">
-        <div className="text-center max-w-md">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Acesso Restrito</h1>
-          <p className="text-gray-600 mb-6">Você precisa fazer login para acessar o dashboard.</p>
-          <Button
-            onClick={() => (window.location.href = getLoginUrl())}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2 rounded-lg font-semibold"
-          >
-            Fazer Login
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   // Exportar para CSV
   const exportToCSV = () => {
