@@ -35,11 +35,15 @@ export const leadsRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
+        console.log('[Leads Router] Recebido novo lead:', input.nome, input.email);
+        
         // Salvar no banco de dados
         const result = await saveLead(input);
+        console.log('[Leads Router] Lead salvo no banco:', result);
 
         // Broadcast novo lead em tempo real
         if (result && 'insertId' in result) {
+          console.log('[Leads Router] Enviando broadcast do novo lead com ID:', result.insertId);
           broadcastNewLead({
             id: result.insertId as number,
             nome: input.nome,

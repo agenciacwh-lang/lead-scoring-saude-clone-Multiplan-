@@ -51,4 +51,12 @@
 - [x] Integrar PIN no Dashboard
 - [x] Adicionar testes para PIN (20 testes)
 - [x] Documentar sistema de PIN (PIN_PROTECTION_GUIDE.md)
+- [x] PIN alterado para 8814
+- [x] Todos os testes passando (37/37 ✓)
+
+## Correção de WebSocket (Implementado)
+
+- [x] Corrigir callbacks inline no Dashboard com useCallback
+- [x] Adicionar logs detalhados no router de leads
+- [x] Criar guia de troubleshooting (TROUBLESHOOTING_LEADS.md)
 - [x] Todos os testes passando (37/37 ✓)

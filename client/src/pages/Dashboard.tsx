@@ -4,7 +4,7 @@
  * Integrado com WebSocket para atualizações em tempo real
  */
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -36,25 +36,30 @@ function DashboardContent() {
     retry: false,
   });
 
-  // WebSocket para atualizações em tempo real
+  // Callbacks memoizados para WebSocket
+  const handleNewLead = useCallback((lead: WebSocketLead) => {
+    console.log('[Dashboard] Novo lead recebido via WebSocket:', lead);
+    setAllLeads((prevLeads) => {
+      // Verificar se o lead ja existe
+      const leadExists = prevLeads.some((l) => l.id === lead.id);
+      if (leadExists) return prevLeads;
+      
+      // Adicionar novo lead no topo da lista
+      return [lead, ...prevLeads];
+    });
+  }, []);
+
+  const handleStatsUpdate = useCallback((stats: WebSocketStats) => {
+    console.log('[Dashboard] Estatisticas atualizadas via WebSocket:', stats);
+    setLeadsStats(stats);
+  }, []);
+
+  // WebSocket para atualizacoes em tempo real
   const { isConnected } = useWebSocket({
     subscribeToLeads: true,
     subscribeToStats: true,
-    onNewLead: (lead: WebSocketLead) => {
-      console.log('[Dashboard] Novo lead recebido via WebSocket:', lead);
-      setAllLeads((prevLeads) => {
-        // Verificar se o lead já existe
-        const leadExists = prevLeads.some((l) => l.id === lead.id);
-        if (leadExists) return prevLeads;
-        
-        // Adicionar novo lead no topo da lista
-        return [lead, ...prevLeads];
-      });
-    },
-    onStatsUpdate: (stats: WebSocketStats) => {
-      console.log('[Dashboard] Estatísticas atualizadas via WebSocket:', stats);
-      setLeadsStats(stats);
-    },
+    onNewLead: handleNewLead,
+    onStatsUpdate: handleStatsUpdate,
   });
 
   // Sincronizar dados iniciais
