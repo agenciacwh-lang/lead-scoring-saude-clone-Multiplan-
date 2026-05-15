@@ -107,7 +107,7 @@
   },
   "packageManager": "pnpm@11.0.8",
   "pnpm": {
-    "allowedScripts": ["build", "preinstall", "postinstall"],
+    "onlyBuiltDependencies": ["esbuild", "@tailwindcss/oxide"],
     "patchedDependencies": {
       "wouter@3.7.1": "patches/wouter@3.7.1.patch"
     },
