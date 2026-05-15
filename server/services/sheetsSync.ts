@@ -5,6 +5,7 @@
 
 import { getDb } from "../db";
 import { leads } from "../../drizzle/schema";
+import { formatResponse } from "../../shared/responseLabels";
 
 // URL do Google Apps Script que você configurou
 const GOOGLE_SHEETS_WEBHOOK_URL = process.env.GOOGLE_SHEETS_WEBHOOK_URL || "";
@@ -22,11 +23,11 @@ function formatLeadForSheets(lead: any) {
     telefone: lead.telefone || "",
     email: lead.email || "",
     cidade: lead.cidade || "",
-    tempo_compra: lead.tempo_compra || "",
-    situacao_atual: lead.situacao_atual || "",
-    renda: lead.renda || "",
-    criterio_escolha: lead.criterio_escolha || "",
-    cnpj_mei: lead.cnpj_mei || "",
+    tempo_compra: formatResponse('tempo_compra', lead.tempo_compra || ""),
+    situacao_atual: formatResponse('situacao_atual', lead.situacao_atual || ""),
+    renda: formatResponse('renda', lead.renda || ""),
+    criterio_escolha: formatResponse('criterio_escolha', lead.criterio_escolha || ""),
+    cnpj_mei: formatResponse('cnpj_mei', lead.cnpj_mei || ""),
     idades: lead.idades || "",
     pontuacao: lead.pontuacao || 0,
     temperatura: temperatura,

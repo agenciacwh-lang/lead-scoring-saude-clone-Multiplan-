@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { saveLead, getDb } from "../db";
 import { leads } from "../../drizzle/schema";
 import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
+import { formatResponse } from "../../shared/responseLabels";
 
 
 export const leadsRouter = router({
@@ -62,7 +63,7 @@ export const leadsRouter = router({
         const sheetsSent = await sendLeadToSheets(leadToSend);
         console.log('[Leads Router] Resultado Google Sheets:', sheetsSent);
 
-        // Enviar para BotConversa
+        // Enviar para BotConversa com respostas formatadas
         const botconversaSent = await sendLeadToBotConversa({
           nome: input.nome,
           email: input.email,
@@ -71,11 +72,11 @@ export const leadsRouter = router({
           pontuacao: input.pontuacao,
           temperatura: input.temperatura === "quente" ? "Quente" : input.temperatura === "morno" ? "Morno" : "Frio",
           respostas: {
-            tempo_compra: input.tempo_compra,
-            situacao_atual: input.situacao_atual,
-            renda: input.renda,
-            criterio_escolha: input.criterio_escolha,
-            cnpj_mei: input.cnpj_mei,
+            tempo_compra: formatResponse('tempo_compra', input.tempo_compra),
+            situacao_atual: formatResponse('situacao_atual', input.situacao_atual),
+            renda: formatResponse('renda', input.renda),
+            criterio_escolha: formatResponse('criterio_escolha', input.criterio_escolha),
+            cnpj_mei: formatResponse('cnpj_mei', input.cnpj_mei),
             idades: input.idades,
           },
         });
