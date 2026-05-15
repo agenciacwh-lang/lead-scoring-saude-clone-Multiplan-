@@ -1,0 +1,150 @@
+{
+  "query": "SELECT id, nome, email, temperatura, createdAt FROM leads ORDER BY createdAt DESC LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway06.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2d3rim8iqANRWLZ.root --database CDTyNfiJxsVHYYAJrVSjSS --execute SELECT id, nome, email, temperatura, createdAt FROM leads ORDER BY createdAt DESC LIMIT 20;",
+  "rows": [
+    {
+      "id": "1590001",
+      "nome": "Wesley Henrique",
+      "email": "wesleystore69@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-15 14:27:32"
+    },
+    {
+      "id": "1560001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-14 21:30:00"
+    },
+    {
+      "id": "1530001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-14 21:23:59"
+    },
+    {
+      "id": "1500001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-14 21:19:25"
+    },
+    {
+      "id": "1470001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-14 21:16:16"
+    },
+    {
+      "id": "1440001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-14 19:33:09"
+    },
+    {
+      "id": "1410001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-14 19:24:28"
+    },
+    {
+      "id": "1380001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "frio",
+      "createdAt": "2026-05-13 21:27:08"
+    },
+    {
+      "id": "1350001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "frio",
+      "createdAt": "2026-05-13 20:50:22"
+    },
+    {
+      "id": "1320001",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "frio",
+      "createdAt": "2026-05-13 20:32:22"
+    },
+    {
+      "id": "1290001",
+      "nome": "WESLEY HENRIQUE BARBOSA DE JESUS",
+      "email": "wesleygost59@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-13 20:19:51"
+    },
+    {
+      "id": "1260001",
+      "nome": "WESLEY HENRIQUE BARBOSA DE JESUS",
+      "email": "wesleygost59@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-13 19:47:05"
+    },
+    {
+      "id": "1230001",
+      "nome": "WESLEY HENRIQUE BARBOSA DE JESUS",
+      "email": "wesleygost59@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-13 19:28:42"
+    },
+    {
+      "id": "1200001",
+      "nome": "WESLEY HENRIQUE BARBOSA DE JESUS",
+      "email": "wesleygost59@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-12 18:46:14"
+    },
+    {
+      "id": "1170001",
+      "nome": "WESLEY HENRIQUE BARBOSA DE JESUS",
+      "email": "wesleygost59@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-12 18:38:44"
+    },
+    {
+      "id": "1140001",
+      "nome": "WESLEY HENRIQUE BARBOSA DE JESUS",
+      "email": "wesleygost59@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-12 18:36:22"
+    },
+    {
+      "id": "1111599",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-12 18:01:44"
+    },
+    {
+      "id": "1111596",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-12 18:01:44"
+    },
+    {
+      "id": "1111600",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-12 18:01:44"
+    },
+    {
+      "id": "1111598",
+      "nome": "ANNY ELLEN BARBOSA MENDES SANTOS",
+      "email": "wesleyselling@gmail.com",
+      "temperatura": "quente",
+      "createdAt": "2026-05-12 18:01:44"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tnome\temail\ttemperatura\tcreatedAt\n1590001\tWesley Henrique\twesleystore69@gmail.com\tquente\t2026-05-15 14:27:32\n1560001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-14 21:30:00\n1530001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-14 21:23:59\n1500001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-14 21:19:25\n1470001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-14 21:16:16\n1440001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-14 19:33:09\n1410001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-14 19:24:28\n1380001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tfrio\t2026-05-13 21:27:08\n1350001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tfrio\t2026-05-13 20:50:22\n1320001\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tfrio\t2026-05-13 20:32:22\n1290001\tWESLEY HENRIQUE BARBOSA DE JESUS\twesleygost59@gmail.com\tquente\t2026-05-13 20:19:51\n1260001\tWESLEY HENRIQUE BARBOSA DE JESUS\twesleygost59@gmail.com\tquente\t2026-05-13 19:47:05\n1230001\tWESLEY HENRIQUE BARBOSA DE JESUS\twesleygost59@gmail.com\tquente\t2026-05-13 19:28:42\n1200001\tWESLEY HENRIQUE BARBOSA DE JESUS\twesleygost59@gmail.com\tquente\t2026-05-12 18:46:14\n1170001\tWESLEY HENRIQUE BARBOSA DE JESUS\twesleygost59@gmail.com\tquente\t2026-05-12 18:38:44\n1140001\tWESLEY HENRIQUE BARBOSA DE JESUS\twesleygost59@gmail.com\tquente\t2026-05-12 18:36:22\n1111599\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-12 18:01:44\n1111596\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-12 18:01:44\n1111600\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-12 18:01:44\n1111598\tANNY ELLEN BARBOSA MENDES SANTOS\twesleyselling@gmail.com\tquente\t2026-05-12 18:01:44\n",
+  "stderr": "",
+  "execution_time_ms": 3967
+}

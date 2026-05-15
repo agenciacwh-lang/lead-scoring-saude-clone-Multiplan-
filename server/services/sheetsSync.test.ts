@@ -22,12 +22,13 @@ describe("sheetsSync", () => {
       createdAt: new Date(),
     };
 
-    // Testar o envio
+    // Testar o envio (com timeout de 15 segundos)
     const result = await sendLeadToSheets(mockLead);
 
-    // O resultado deve ser um booleano
+    // O resultado deve ser um booleano (true se enviado com sucesso)
     expect(typeof result).toBe("boolean");
-  });
+    expect(result).toBe(true);
+  }, 15000); // 15 segundos de timeout
 
   it("deve retornar false se GOOGLE_SHEETS_WEBHOOK_URL nao estiver configurada", async () => {
     // Se a URL não estiver configurada, a função deve retornar false
