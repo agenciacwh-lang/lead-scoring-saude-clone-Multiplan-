@@ -56,29 +56,41 @@ export const leadsRouter = router({
           console.error('[Leads Router] Erro ao buscar lead do banco:', dbError);
         }
 
-        // Enviar para Google Sheets (usar o lead do banco se disponível)
-        console.log('[Leads Router] Enviando lead para Google Sheets:', input.email);
-        const leadToSend = leadFromDb || input;
-        const sheetsSent = await sendLeadToSheets(leadToSend);
-        console.log('[Leads Router] Resultado Google Sheets:', sheetsSent);
+        // Enviar para Google Sheets (usar o lead do banco se disponivel)
+        let sheetsSent = false;
+        try {
+          console.log('[Leads Router] Enviando lead para Google Sheets:', input.email);
+          const leadToSend = leadFromDb || input;
+          sheetsSent = await sendLeadToSheets(leadToSend);
+          console.log('[Leads Router] Resultado Google Sheets:', sheetsSent ? 'Sucesso' : 'Falhou');
+        } catch (sheetsError) {
+          console.error('[Leads Router] Erro ao enviar para Google Sheets:', sheetsError);
+        }
 
         // Enviar para BotConversa
-        const botconversaSent = await sendLeadToBotConversa({
-          nome: input.nome,
-          email: input.email,
-          telefone: input.telefone,
-          cidade: input.cidade,
-          pontuacao: input.pontuacao,
-          temperatura: input.temperatura === "quente" ? "Quente" : input.temperatura === "morno" ? "Morno" : "Frio",
-          respostas: {
-            tempo_compra: input.tempo_compra,
-            situacao_atual: input.situacao_atual,
-            renda: input.renda,
-            criterio_escolha: input.criterio_escolha,
-            cnpj_mei: input.cnpj_mei,
-            idades: input.idades,
-          },
-        });
+        let botconversaSent = false;
+        try {
+          console.log('[Leads Router] Enviando lead para BotConversa...');
+          botconversaSent = await sendLeadToBotConversa({
+            nome: input.nome,
+            email: input.email,
+            telefone: input.telefone,
+            cidade: input.cidade,
+            pontuacao: input.pontuacao,
+            temperatura: input.temperatura === "quente" ? "Quente" : input.temperatura === "morno" ? "Morno" : "Frio",
+            respostas: {
+              tempo_compra: input.tempo_compra,
+              situacao_atual: input.situacao_atual,
+              renda: input.renda,
+              criterio_escolha: input.criterio_escolha,
+              cnpj_mei: input.cnpj_mei,
+              idades: input.idades,
+            },
+          });
+          console.log('[Leads Router] Resultado BotConversa:', botconversaSent ? 'Sucesso' : 'Falhou');
+        } catch (botError) {
+          console.error('[Leads Router] Erro ao enviar para BotConversa:', botError);
+        }
 
 
 
