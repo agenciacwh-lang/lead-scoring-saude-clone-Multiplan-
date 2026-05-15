@@ -5,9 +5,7 @@
 
 import { getDb } from "../db";
 import { leads } from "../../drizzle/schema";
-
-// URL do Google Apps Script que você configurou
-const GOOGLE_SHEETS_WEBHOOK_URL = process.env.GOOGLE_SHEETS_WEBHOOK_URL || "";
+import { ENV } from "../_core/env";
 
 /**
  * Formata um lead para envio ao Google Sheets
@@ -38,7 +36,7 @@ function formatLeadForSheets(lead: any) {
  * Envia um lead para o Google Sheets
  */
 export async function sendLeadToSheets(lead: any): Promise<boolean> {
-  const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL || GOOGLE_SHEETS_WEBHOOK_URL;
+  const webhookUrl = ENV.googleSheetsWebhookUrl;
   if (!webhookUrl) {
     console.warn("[Sheets Sync] GOOGLE_SHEETS_WEBHOOK_URL não configurada");
     return false;
