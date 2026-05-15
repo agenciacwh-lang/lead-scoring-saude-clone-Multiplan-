@@ -1,15 +1,19 @@
 import { eq } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 import { InsertUser, users, leads, InsertLead } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
+let _client: postgres.Sql | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
-      _db = drizzle(process.env.DATABASE_URL);
+      _client = postgres(process.env.DATABASE_URL);
+      _db = drizzle(_client);
+      console.log("[Database] Conectado ao Supabase com sucesso");
     } catch (error) {
       console.warn("[Database] Failed to connect:", error);
       _db = null;
@@ -68,7 +72,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       updateSet.lastSignedIn = new Date();
     }
 
-    await db.insert(users).values(values).onDuplicateKeyUpdate({
+    // Para PostgreSQL, usar ON CONFLICT
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
       set: updateSet,
     });
   } catch (error) {
@@ -103,7 +109,7 @@ export async function saveLead(leadData: InsertLead) {
     const result = await db.insert(leads).values({
       ...leadData,
       status: "completo",
-    });
+    }).returning();
     console.log("[Database] Lead salvo com sucesso:", leadData.email);
     return result;
   } catch (error) {
