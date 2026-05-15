@@ -107,8 +107,8 @@
   },
   "packageManager": "pnpm@11.0.8",
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild", "@tailwindcss/oxide"],
-    "allowBuild": ["esbuild", "@tailwindcss/oxide"],
+    "onlyBuiltDependencies": ["esbuild", "@tailwindcss/oxide", "@esbuild-kit/core-utils", "@esbuild-kit/esm-loader"],
+    "allowBuild": ["esbuild", "@tailwindcss/oxide", "@esbuild-kit/core-utils", "@esbuild-kit/esm-loader"],
     "patchedDependencies": {
       "wouter@3.7.1": "patches/wouter@3.7.1.patch"
     },
