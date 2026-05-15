@@ -88,11 +88,7 @@ export default function Obrigado() {
       <div className="w-full max-w-2xl">
         {/* Logo Hapvida no topo */}
         <div className="text-center mb-8">
-          <img
-            src="https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310519663616331473/PEqnCpAsASXRgGoX.png"
-            alt="Hapvida"
-            className="h-12 mx-auto"
-          />
+          <h2 className="text-3xl font-bold text-orange-600">Hapvida</h2>
         </div>
 
         {/* Card Principal */}
