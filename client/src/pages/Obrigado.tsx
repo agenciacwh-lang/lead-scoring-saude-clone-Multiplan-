@@ -89,7 +89,7 @@ export default function Obrigado() {
         {/* Logo Hapvida no topo */}
         <div className="text-center mb-8">
           <img
-            src="https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hapvida-logo_487cd512.png"
+            src="https://files.manuscdn.com/user_upload_by_module/web_dev_logo/310519663616331473/PEqnCpAsASXRgGoX.png"
             alt="Hapvida"
             className="h-12 mx-auto"
           />
