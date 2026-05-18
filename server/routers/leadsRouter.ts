@@ -94,14 +94,12 @@ export const leadsRouter = router({
             cidade: input.cidade,
             pontuacao: input.pontuacao,
             temperatura: input.temperatura === "quente" ? "Quente" : input.temperatura === "morno" ? "Morno" : "Frio",
-            respostas: {
-              tempo_compra: input.tempo_compra,
-              situacao_atual: input.situacao_atual,
-              renda: input.renda,
-              criterio_escolha: input.criterio_escolha,
-              cnpj_mei: input.cnpj_mei,
-              idades: input.idades,
-            },
+            tempo_compra: input.tempo_compra,
+            situacao_atual: input.situacao_atual,
+            renda: input.renda,
+            criterio_escolha: input.criterio_escolha,
+            cnpj_mei: input.cnpj_mei,
+            idades: input.idades,
           });
           console.log('[Leads Router] Resultado BotConversa:', botconversaSent ? 'Sucesso' : 'Falhou');
         } catch (botError) {
@@ -197,15 +195,12 @@ export const leadsRouter = router({
           cidade: input.cidade,
           pontuacao: 0,
           temperatura: "Frio",
-          respostas: {
-            status: "incompleto",
-            tempo_compra: input.tempo_compra || "não preenchido",
-            situacao_atual: input.situacao_atual || "não preenchido",
-            renda: input.renda || "não preenchido",
-            criterio_escolha: input.criterio_escolha || "não preenchido",
-            cnpj_mei: input.cnpj_mei || "não preenchido",
-            idades: input.idades || "não preenchido",
-          },
+          tempo_compra: input.tempo_compra || "",
+          situacao_atual: input.situacao_atual || "",
+          renda: input.renda || "",
+          criterio_escolha: input.criterio_escolha || "",
+          cnpj_mei: input.cnpj_mei || "",
+          idades: input.idades || "",
         });
 
         // Enviar para Google Sheets
@@ -263,10 +258,12 @@ export const leadsRouter = router({
           cidade: input.cidade,
           pontuacao: 7,
           temperatura: "Morno",
-          respostas: {
-            teste: "true",
-            timestamp: new Date().toISOString(),
-          },
+          tempo_compra: "teste",
+          situacao_atual: "teste",
+          renda: "teste",
+          criterio_escolha: "teste",
+          cnpj_mei: "teste",
+          idades: "teste",
         });
 
         return {
