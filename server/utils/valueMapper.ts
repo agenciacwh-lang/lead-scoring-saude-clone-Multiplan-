@@ -66,12 +66,12 @@ export function formatAllResponses(responses: Record<string, string>): Record<st
  * Formata nomes de campos para português
  */
 export const fieldNameMapper: Record<string, string> = {
-  "tempo_compra": "Quando pretende comprar?",
-  "situacao_atual": "Qual é sua situação atual?",
-  "renda": "Qual é sua faixa de renda?",
-  "criterio_escolha": "O que é mais importante para você?",
-  "cnpj_mei": "Você tem CNPJ/MEI?",
-  "idades": "Quais são as idades?",
+  "tempo_compra": "Previsão de Contratação",
+  "situacao_atual": "Situação Atual",
+  "renda": "Faixa de Renda",
+  "criterio_escolha": "Principal Interesse",
+  "cnpj_mei": "Possui CNPJ",
+  "idades": "Idades dos Beneficiários",
 };
 
 /**
