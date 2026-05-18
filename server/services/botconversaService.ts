@@ -1,4 +1,5 @@
 import { ENV } from "../_core/env";
+import { formatAllResponses, formatFieldName } from "../utils/valueMapper";
 
 export interface BotconversaLeadPayload {
   nome: string;
@@ -22,6 +23,16 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
   console.log("[BotConversa] Iniciando envio para URL:", ENV.botconversaWebhookUrl);
 
   try {
+    // Formatar as respostas para valores legíveis
+    const formattedRespostas = formatAllResponses(lead.respostas);
+    
+    // Criar objeto com nomes de campos formatados
+    const respostasFormatadas: Record<string, string> = {};
+    Object.entries(formattedRespostas).forEach(([key, value]) => {
+      const fieldName = formatFieldName(key);
+      respostasFormatadas[fieldName] = value;
+    });
+    
     const payload = {
       nome: lead.nome,
       email: lead.email,
@@ -29,7 +40,7 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       cidade: lead.cidade,
       pontuacao: lead.pontuacao,
       temperatura: lead.temperatura,
-      respostas: lead.respostas,
+      respostas: respostasFormatadas,
       timestamp: new Date().toISOString(),
     };
 
@@ -48,7 +59,7 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       return false;
     }
 
-    console.log("[BotConversa] Lead enviado com sucesso para automação");
+    console.log("[BotConversa] Lead enviado com sucesso para automação com respostas formatadas");
     return true;
   } catch (error) {
     console.error("[BotConversa] Erro ao enviar lead:", error);

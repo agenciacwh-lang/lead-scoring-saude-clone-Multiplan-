@@ -6,6 +6,7 @@
 import { getDb } from "../db";
 import { leads } from "../../drizzle/schema";
 import { ENV } from "../_core/env";
+import { formatAllResponses, formatFieldName } from "../utils/valueMapper";
 
 /**
  * Formata um lead para envio ao Google Sheets
@@ -20,12 +21,12 @@ function formatLeadForSheets(lead: any) {
     telefone: lead.telefone || "",
     email: lead.email || "",
     cidade: lead.cidade || "",
-    tempo_compra: lead.tempo_compra || "",
-    situacao_atual: lead.situacao_atual || "",
-    renda: lead.renda || "",
-    criterio_escolha: lead.criterio_escolha || "",
-    cnpj_mei: lead.cnpj_mei || "",
-    idades: lead.idades || "",
+    "Quando pretende comprar?": lead.tempo_compra ? formatAllResponses({ tempo_compra: lead.tempo_compra }).tempo_compra : "",
+    "Qual é sua situação atual?": lead.situacao_atual ? formatAllResponses({ situacao_atual: lead.situacao_atual }).situacao_atual : "",
+    "Qual é sua faixa de renda?": lead.renda ? formatAllResponses({ renda: lead.renda }).renda : "",
+    "O que é mais importante para você?": lead.criterio_escolha ? formatAllResponses({ criterio_escolha: lead.criterio_escolha }).criterio_escolha : "",
+    "Você tem CNPJ/MEI?": lead.cnpj_mei ? formatAllResponses({ cnpj_mei: lead.cnpj_mei }).cnpj_mei : "",
+    "Quais são as idades?": lead.idades || "",
     pontuacao: lead.pontuacao || 0,
     temperatura: temperatura,
     prioridade: lead.prioridade || "Não",
@@ -43,8 +44,8 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
   }
 
   try {
-    const payload = formatLeadForSheets(lead);
-    console.log("[Sheets Sync] Payload a enviar:", JSON.stringify(payload));
+    const formattedLead = formatLeadForSheets(lead);
+    console.log("[Sheets Sync] Payload a enviar:", JSON.stringify(formattedLead));
     console.log("[Sheets Sync] Webhook URL:", webhookUrl);
 
     const response = await fetch(webhookUrl, {
@@ -52,7 +53,7 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(formattedLead),
     });
 
     console.log("[Sheets Sync] Response status:", response.status);
@@ -64,7 +65,7 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
       return false;
     }
 
-    console.log("[Sheets Sync] Lead enviado com sucesso para Google Sheets:", lead.email);
+    console.log("[Sheets Sync] Lead enviado com sucesso para Google Sheets com respostas formatadas:", lead.email);
     return true;
   } catch (error) {
     console.error("[Sheets Sync] Erro ao enviar lead para Google Sheets:", error);
