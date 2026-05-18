@@ -41,19 +41,15 @@ export const leadsRouter = router({
         const result = await saveLead(input);
         console.log('[Leads Router] Lead salvo no banco:', result);
 
-        // Buscar o lead salvo do banco para enviar para Google Sheets
+        // O lead já foi salvo e retornado pelo Postgres
         let leadFromDb = null;
         try {
-          const db = await getDb();
-          if (db && result && 'insertId' in result) {
-            const leadData = await db.select().from(leads).where(eq(leads.id, result.insertId as number));
-            if (leadData.length > 0) {
-              leadFromDb = leadData[0];
-              console.log('[Leads Router] Lead recuperado do banco:', leadFromDb);
-            }
+          if (result && Array.isArray(result) && result.length > 0) {
+            leadFromDb = result[0];
+            console.log('[Leads Router] Lead recuperado do banco:', leadFromDb);
           }
         } catch (dbError) {
-          console.error('[Leads Router] Erro ao buscar lead do banco:', dbError);
+          console.error('[Leads Router] Erro ao processar lead do banco:', dbError);
         }
 
         // Enviar para Google Sheets (usar o lead do banco se disponivel)
