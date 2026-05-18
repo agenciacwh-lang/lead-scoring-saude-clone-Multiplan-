@@ -15,21 +15,26 @@ function formatLeadForSheets(lead: any) {
   const createdAt = lead.createdAt ? new Date(lead.createdAt) : new Date();
   const temperatura = String(lead.temperatura || 'frio').toUpperCase();
   
-  return {
-    data_hora: createdAt.toLocaleString("pt-BR"),
-    nome: lead.nome || "",
-    telefone: lead.telefone || "",
-    email: lead.email || "",
-    cidade: lead.cidade || "",
+  // Formatar respostas do quiz
+  const respostasFormatadas = {
     "Quando pretende comprar?": lead.tempo_compra ? formatAllResponses({ tempo_compra: lead.tempo_compra }).tempo_compra : "",
     "Qual é sua situação atual?": lead.situacao_atual ? formatAllResponses({ situacao_atual: lead.situacao_atual }).situacao_atual : "",
     "Qual é sua faixa de renda?": lead.renda ? formatAllResponses({ renda: lead.renda }).renda : "",
     "O que é mais importante para você?": lead.criterio_escolha ? formatAllResponses({ criterio_escolha: lead.criterio_escolha }).criterio_escolha : "",
     "Você tem CNPJ/MEI?": lead.cnpj_mei ? formatAllResponses({ cnpj_mei: lead.cnpj_mei }).cnpj_mei : "",
     "Quais são as idades?": lead.idades || "",
-    pontuacao: lead.pontuacao || 0,
-    temperatura: temperatura,
-    prioridade: lead.prioridade || "Não",
+  };
+  
+  return {
+    "Data/Hora": createdAt.toLocaleString("pt-BR"),
+    "Nome": lead.nome || "",
+    "Telefone": lead.telefone || "",
+    "Email": lead.email || "",
+    "Cidade": lead.cidade || "",
+    "Respostas": JSON.stringify(respostasFormatadas, null, 2),
+    "Pontuação": lead.pontuacao || 0,
+    "Temperatura": temperatura,
+    "Prioridade": lead.prioridade || "Não",
   };
 }
 
@@ -45,7 +50,7 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
 
   try {
     const formattedLead = formatLeadForSheets(lead);
-    console.log("[Sheets Sync] Payload a enviar:", JSON.stringify(formattedLead));
+    console.log("[Sheets Sync] Payload formatado a enviar:", JSON.stringify(formattedLead, null, 2));
     console.log("[Sheets Sync] Webhook URL:", webhookUrl);
 
     const response = await fetch(webhookUrl, {
@@ -65,7 +70,8 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
       return false;
     }
 
-    console.log("[Sheets Sync] Lead enviado com sucesso para Google Sheets com respostas formatadas:", lead.email);
+    console.log("[Sheets Sync] Lead enviado com sucesso para Google Sheets com respostas organizadas:", lead.email);
+    console.log("[Sheets Sync] Dados enviados:", JSON.stringify(formattedLead, null, 2));
     return true;
   } catch (error) {
     console.error("[Sheets Sync] Erro ao enviar lead para Google Sheets:", error);
@@ -93,10 +99,15 @@ export async function syncAllLeadsToSheets(): Promise<{ synced: number; failed: 
 
     // Enviar cada lead para Google Sheets
     for (const lead of allLeads) {
-      const success = await sendLeadToSheets(lead);
-      if (success) {
-        synced++;
-      } else {
+      try {
+        const success = await sendLeadToSheets(lead);
+        if (success) {
+          synced++;
+        } else {
+          failed++;
+        }
+      } catch (error) {
+        console.error("[Sheets Sync] Erro ao sincronizar lead:", error);
         failed++;
       }
       // Pequeno delay para evitar rate limiting

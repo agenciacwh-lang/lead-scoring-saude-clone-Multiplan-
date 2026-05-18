@@ -33,6 +33,11 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       respostasFormatadas[fieldName] = value;
     });
     
+    // Criar um texto formatado e legível com as respostas
+    const respostasTexto = Object.entries(respostasFormatadas)
+      .map(([pergunta, resposta]) => `${pergunta}: ${resposta}`)
+      .join("\n");
+    
     const payload = {
       nome: lead.nome,
       email: lead.email,
@@ -41,6 +46,7 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       pontuacao: lead.pontuacao,
       temperatura: lead.temperatura,
       respostas: respostasFormatadas,
+      respostas_texto: respostasTexto,
       timestamp: new Date().toISOString(),
     };
 
@@ -59,7 +65,8 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       return false;
     }
 
-    console.log("[BotConversa] Lead enviado com sucesso para automação com respostas formatadas");
+    console.log("[BotConversa] Lead enviado com sucesso para automação com respostas organizadas");
+    console.log("[BotConversa] Respostas formatadas:", respostasTexto);
     return true;
   } catch (error) {
     console.error("[BotConversa] Erro ao enviar lead:", error);
