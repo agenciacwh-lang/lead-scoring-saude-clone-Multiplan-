@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, text, timestamp, integer } from "drizzle-orm/pg-core";
 
 /**
  * Core user table backing auth flow.
@@ -44,7 +44,7 @@ export const leads = pgTable("leads", {
   idades: text("idades"),
   
   // Lead Scoring
-  pontuacao: serial("pontuacao").notNull(),
+  pontuacao: integer("pontuacao").notNull(),
   temperatura: varchar("temperatura", { length: 20 }).notNull(),
   prioridade: varchar("prioridade", { length: 3 }).notNull(), // "Sim" ou "Não"
   
