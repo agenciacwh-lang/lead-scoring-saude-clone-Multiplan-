@@ -9,15 +9,19 @@ let _client: postgres.Sql | null = null;
 
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
-  if (!_db && process.env.DATABASE_URL) {
+  if (!_db && ENV.databaseUrl) {
     try {
-      _client = postgres(process.env.DATABASE_URL);
+      console.log("[Database] Tentando conectar ao Supabase...");
+      console.log("[Database] DATABASE_URL configurada:", ENV.databaseUrl ? "✓ Sim" : "✗ Não");
+      _client = postgres(ENV.databaseUrl);
       _db = drizzle(_client);
       console.log("[Database] Conectado ao Supabase com sucesso");
     } catch (error) {
-      console.warn("[Database] Failed to connect:", error);
+      console.error("[Database] Failed to connect:", error);
       _db = null;
     }
+  } else if (!ENV.databaseUrl) {
+    console.warn("[Database] DATABASE_URL não está configurada no ENV");
   }
   return _db;
 }
