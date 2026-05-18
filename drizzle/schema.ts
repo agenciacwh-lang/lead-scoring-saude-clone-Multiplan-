@@ -1,24 +1,24 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { pgTable, serial, varchar, text, timestamp, pgEnum } from "drizzle-orm/pg-core";
 
 /**
  * Core user table backing auth flow.
  * Extend this file with additional tables as your product grows.
  * Columns use camelCase to match both database fields and generated types.
  */
-export const users = mysqlTable("users", {
+export const users = pgTable("users", {
   /**
    * Surrogate primary key. Auto-incremented numeric value managed by the database.
    * Use this for relations between tables.
    */
-  id: int("id").autoincrement().primaryKey(),
+  id: serial("id").primaryKey(),
   /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+  role: pgEnum("role", ["user", "admin"]).default("user").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
@@ -28,8 +28,8 @@ export type InsertUser = typeof users.$inferInsert;
 /**
  * Leads table para armazenar dados dos leads do quiz
  */
-export const leads = mysqlTable("leads", {
-  id: int("id").autoincrement().primaryKey(),
+export const leads = pgTable("leads", {
+  id: serial("id").primaryKey(),
   nome: varchar("nome", { length: 255 }).notNull(),
   telefone: varchar("telefone", { length: 20 }).notNull(),
   email: varchar("email", { length: 320 }).notNull(),
@@ -44,12 +44,12 @@ export const leads = mysqlTable("leads", {
   idades: text("idades"),
   
   // Lead Scoring
-  pontuacao: int("pontuacao").notNull(),
-  temperatura: mysqlEnum("temperatura", ["frio", "morno", "quente"]).notNull(),
+  pontuacao: serial("pontuacao").notNull(),
+  temperatura: pgEnum("temperatura", ["frio", "morno", "quente"]).notNull(),
   prioridade: varchar("prioridade", { length: 3 }).notNull(), // "Sim" ou "Não"
   
   // Status do lead
-  status: mysqlEnum("status", ["completo", "incompleto", "confirmado"]).default("incompleto").notNull(),
+  status: pgEnum("status", ["completo", "incompleto", "confirmado"]).default("incompleto").notNull(),
   
   // Rastreamento de inatividade
   lastActivityAt: timestamp("lastActivityAt").defaultNow().notNull(),
