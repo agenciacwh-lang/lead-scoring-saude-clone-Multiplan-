@@ -35,6 +35,26 @@ export const leadsRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
+        // DEBUG LOG - Payload completo recebido
+        console.log('[DEBUG] ========================================');
+        console.log('[DEBUG] PAYLOAD RECEBIDO NO SERVIDOR');
+        console.log('[DEBUG] ========================================');
+        console.log('[DEBUG] Nome:', input.nome);
+        console.log('[DEBUG] Telefone:', input.telefone);
+        console.log('[DEBUG] Email:', input.email);
+        console.log('[DEBUG] Cidade:', input.cidade);
+        console.log('[DEBUG] Tempo Compra:', input.tempo_compra);
+        console.log('[DEBUG] Situacao Atual:', input.situacao_atual);
+        console.log('[DEBUG] Renda:', input.renda);
+        console.log('[DEBUG] Criterio Escolha:', input.criterio_escolha);
+        console.log('[DEBUG] CNPJ/MEI:', input.cnpj_mei);
+        console.log('[DEBUG] Idades:', input.idades);
+        console.log('[DEBUG] Pontuacao:', input.pontuacao);
+        console.log('[DEBUG] Temperatura:', input.temperatura);
+        console.log('[DEBUG] Prioridade:', input.prioridade);
+        console.log('[DEBUG] Payload completo:', JSON.stringify(input, null, 2));
+        console.log('[DEBUG] ========================================');
+        
         console.log('[Leads Router] Recebido novo lead:', input.nome, input.email);
         
         // Salvar no banco de dados

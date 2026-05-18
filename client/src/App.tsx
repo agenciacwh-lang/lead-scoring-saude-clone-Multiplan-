@@ -13,7 +13,6 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import { LeadProvider } from "./contexts/LeadContext";
 import Home from "./pages/Home";
 import Obrigado from "./pages/Obrigado";
 import DiscountPopup from "./components/DiscountPopup";
@@ -68,15 +67,13 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="dark">
-        <LeadProvider>
-          <TooltipProvider>
-            <Toaster />
-            {showPopup && (
-              <DiscountPopup onClose={handleClosePopup} onConfirm={handleConfirmPopup} />
-            )}
-            <Router />
-          </TooltipProvider>
-        </LeadProvider>
+        <TooltipProvider>
+          <Toaster />
+          {showPopup && (
+            <DiscountPopup onClose={handleClosePopup} onConfirm={handleConfirmPopup} />
+          )}
+          <Router />
+        </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
