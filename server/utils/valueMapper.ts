@@ -80,3 +80,22 @@ export const fieldNameMapper: Record<string, string> = {
 export function formatFieldName(fieldName: string): string {
   return fieldNameMapper[fieldName] || fieldName;
 }
+
+/**
+ * Formata o payload do BotConversa com valores legíveis
+ * Transforma valores "crus" do banco em strings formatadas
+ * Exemplo: acima_6000 -> "Acima de R$ 6.000"
+ */
+export function formatarPayloadBotConversa(payload: Record<string, any>): Record<string, any> {
+  const campos = ['tempo_compra', 'situacao_atual', 'renda', 'criterio_escolha', 'cnpj_mei'];
+  
+  const payloadFormatado = { ...payload };
+  
+  for (const campo of campos) {
+    if (payloadFormatado[campo]) {
+      payloadFormatado[campo] = formatValue(campo, payloadFormatado[campo]);
+    }
+  }
+  
+  return payloadFormatado;
+}

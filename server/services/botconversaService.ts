@@ -1,4 +1,5 @@
 import { ENV } from "../_core/env";
+import { formatarPayloadBotConversa } from "../utils/valueMapper";
 
 export interface BotconversaLeadPayload {
   nome: string;
@@ -35,7 +36,7 @@ function nullToEmpty(value: any): string {
 
 /**
  * Envia um lead para o BotConversa via webhook
- * Payload com campos na RAIZ (não aninhados)
+ * Payload com campos na RAIZ (não aninhados) e valores formatados
  */
 export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promise<boolean> {
   if (!ENV.botconversaWebhookUrl) {
@@ -50,7 +51,7 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
     const telefoneLimpo = sanitizePhone(lead.telefone);
     
     // Payload com campos na RAIZ (estrutura esperada pelo BotConversa)
-    const payload = {
+    let payload: Record<string, any> = {
       nome: nullToEmpty(lead.nome),
       email: nullToEmpty(lead.email),
       telefone: telefoneLimpo,
@@ -65,7 +66,12 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       idades: nullToEmpty(lead.idades),
     };
     
-    console.log("[BotConversa] Payload a enviar:", JSON.stringify(payload, null, 2));
+    // Formatar valores "crus" em strings legíveis
+    // Exemplo: acima_6000 -> "Acima de R$ 6.000"
+    // Exemplo: sim_cnpj -> "Sim, tenho CNPJ/MEI"
+    payload = formatarPayloadBotConversa(payload);
+    
+    console.log("[BotConversa] Payload formatado a enviar:", JSON.stringify(payload, null, 2));
 
     const response = await fetch(ENV.botconversaWebhookUrl, {
       method: "POST",
@@ -93,7 +99,7 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       return false;
     }
 
-    console.log("[BotConversa] ✅ Lead enviado com sucesso para automação");
+    console.log("[BotConversa] ✅ Lead enviado com sucesso para automação com valores formatados");
     return true;
   } catch (error) {
     console.error("[BotConversa] ❌ Erro ao enviar lead:", error);
