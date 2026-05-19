@@ -13,7 +13,6 @@ import { ChevronLeft, Heart } from "lucide-react";
 
 const HERO_BG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hero-health-bg-igbSPaoZJKBqYM9KqjBYjP.webp";
-const MULTIPLAN_LOGO = "/manus-storage/BlackAndWhiteMinimalistTypographyPersonalLogo(1)_6f0208fe.png";
 
 export default function Quiz() {
   const [, navigate] = useLocation();
@@ -125,7 +124,6 @@ export default function Quiz() {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-orange-100">
         <div className="flex items-center gap-3">
-          <img src={MULTIPLAN_LOGO} alt="Multi Plan" className="h-12 object-contain" />
         </div>
         <div className="flex items-center gap-2">
           <div

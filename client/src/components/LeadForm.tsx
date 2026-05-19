@@ -26,7 +26,6 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   const [visible, setVisible] = useState(false);
 
   const hapvidaLogoUrl = "/manus-storage/hapvida-logo_487cd512.png";
-  const multiplanLogoUrl = "/manus-storage/BlackAndWhiteMinimalistTypographyPersonalLogo(1)_6f0208fe.png";
 
   // Trigger animation on mount
   useEffect(() => {
@@ -113,7 +112,6 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
       {/* Header */}
       <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-orange-100">
         <div className="flex items-center gap-3">
-          <img src={multiplanLogoUrl} alt="Multi Plan" className="h-12 object-contain" />
         </div>
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full flex items-center justify-center animate-pulse-ring bg-gradient-to-r from-orange-500 to-orange-600">
