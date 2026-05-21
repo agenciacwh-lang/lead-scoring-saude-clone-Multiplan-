@@ -9,6 +9,9 @@ export const ENV = {
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   botconversaWebhookUrl: process.env.BOTCONVERSA_WEBHOOK_URL ?? "",
   googleSheetsWebhookUrl: process.env.GOOGLE_SHEETS_WEBHOOK_URL ?? "",
+  facebookPixelId: process.env.FB_PIXEL_ID ?? "",
+  facebookCapiToken: process.env.FB_CAPI_TOKEN ?? "",
+  siteUrl: process.env.SITE_URL ?? "https://lead-scoring.manus.space",
 };
 
 // Log de diagnóstico em produção
@@ -17,4 +20,7 @@ if (ENV.isProduction) {
   console.log("[ENV] BOTCONVERSA_WEBHOOK_URL:", ENV.botconversaWebhookUrl ? "✓ Configurada" : "✗ NÃO CONFIGURADA");
   console.log("[ENV] GOOGLE_SHEETS_WEBHOOK_URL:", ENV.googleSheetsWebhookUrl ? "✓ Configurada" : "✗ NÃO CONFIGURADA");
   console.log("[ENV] DATABASE_URL:", ENV.databaseUrl ? "✓ Configurada" : "✗ NÃO CONFIGURADA");
+  console.log("[ENV] FB_PIXEL_ID:", ENV.facebookPixelId ? "✓ Configurada" : "✗ NÃO CONFIGURADA");
+  console.log("[ENV] FB_CAPI_TOKEN:", ENV.facebookCapiToken ? "✓ Configurada" : "✗ NÃO CONFIGURADA");
+  console.log("[ENV] SITE_URL:", ENV.siteUrl ? "✓ Configurada" : "✗ NÃO CONFIGURADA");
 }
