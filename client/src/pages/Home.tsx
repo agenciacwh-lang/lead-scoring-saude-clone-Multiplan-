@@ -85,52 +85,7 @@ export default function Home() {
 
             {/* Lado Direito - Formulário */}
             <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">Receba a Tabela no Seu WhatsApp</h2>
-              <p className="text-gray-600 mb-8">Preencha seus dados para ver a tabela de preços.</p>
-
-              <form className="space-y-6">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Nome</label>
-                  <input
-                    type="text"
-                    placeholder="Seu nome completo"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">E-mail</label>
-                  <input
-                    type="email"
-                    placeholder="seu@email.com"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Celular/WhatsApp</label>
-                  <input
-                    type="tel"
-                    placeholder="(11) 99999-9999"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
-                  />
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setShowForm(true)}
-                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 rounded-lg transition-all duration-300 transform hover:scale-105 text-lg"
-                >
-                  VER TABELA DE PREÇOS
-                </button>
-              </form>
-
-              {/* Badge de Segurança */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-xs text-gray-600 text-center">
-                  ✅ Seus dados estão seguros e protegidos
-                </p>
-              </div>
+              <LeadForm onSubmit={handleFormSubmit} />
             </div>
           </div>
         </div>
