@@ -5,6 +5,7 @@
 import { publicProcedure, router } from "../_core/trpc";
 import { z } from "zod";
 import { sendLeadToBotConversa } from "../services/botconversaService";
+import { sendLeadToFacebookCapi } from "../services/facebookCapiService";
 import { eq } from "drizzle-orm";
 import { saveLead, getDb } from "../db";
 import { leads } from "../../drizzle/schema";
@@ -106,7 +107,24 @@ export const leadsRouter = router({
           console.error('[Leads Router] Erro ao enviar para BotConversa:', botError);
         }
 
-
+        // Enviar para Facebook CAPI (Conversions API)
+        let facebookCapiSent = false;
+        try {
+          if (leadFromDb && leadFromDb.id) {
+            console.log('[Leads Router] Enviando evento Lead para Facebook CAPI...');
+            facebookCapiSent = await sendLeadToFacebookCapi({
+              leadId: leadFromDb.id,
+              email: input.email,
+              telefone: input.telefone,
+              pageUrl: undefined, // Usa SITE_URL do env automaticamente
+            });
+            console.log('[Leads Router] Resultado Facebook CAPI:', facebookCapiSent ? 'Sucesso' : 'Falhou');
+          } else {
+            console.warn('[Leads Router] Lead ID não disponível para Facebook CAPI');
+          }
+        } catch (facebookError) {
+          console.error('[Leads Router] Erro ao enviar para Facebook CAPI:', facebookError);
+        }
 
         return {
           success: true,
@@ -114,6 +132,7 @@ export const leadsRouter = router({
           result,
           sheetsSent,
           botconversaSent,
+          facebookCapiSent,
         };
       } catch (error) {
         console.error("Erro ao salvar lead:", error);
