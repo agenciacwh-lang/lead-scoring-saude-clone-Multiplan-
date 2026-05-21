@@ -74,10 +74,16 @@ export default function Home() {
 
               {/* Botões Secundários */}
               <div className="flex flex-col sm:flex-row gap-4">
-                <button className="px-6 py-3 border-2 border-green-400 text-green-400 font-bold rounded-full hover:bg-green-400/10 transition-colors">
+                <button 
+                  onClick={() => setShowForm(true)}
+                  className="px-6 py-3 border-2 border-green-400 text-green-400 font-bold rounded-full hover:bg-green-400/10 transition-colors cursor-pointer"
+                >
                   💬 Simule no WhatsApp
                 </button>
-                <button className="px-6 py-3 border-2 border-blue-300 text-blue-300 font-bold rounded-full hover:bg-blue-300/10 transition-colors">
+                <button 
+                  onClick={() => setShowForm(true)}
+                  className="px-6 py-3 border-2 border-blue-300 text-blue-300 font-bold rounded-full hover:bg-blue-300/10 transition-colors cursor-pointer"
+                >
                   ☎️ Clique aqui para ligar
                 </button>
               </div>
