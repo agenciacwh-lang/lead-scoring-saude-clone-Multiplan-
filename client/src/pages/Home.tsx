@@ -50,10 +50,10 @@ export default function Home() {
               {/* Título Principal */}
               <div className="space-y-4">
                 <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-                  Planos de Saúde
+                  Hapvida
                   <br />
                   <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
-                    Saiba o Preço Aqui!
+                    Contrate seu plano de saúde aqui
                   </span>
                 </h1>
                 <p className="text-xl text-blue-100 max-w-md">
@@ -61,19 +61,14 @@ export default function Home() {
                 </p>
               </div>
 
-              {/* Preço em Destaque */}
-              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 max-w-sm">
-                <p className="text-blue-100 mb-2">Planos com preços a partir de</p>
-                <p className="text-5xl font-bold text-orange-400">R$ 126,89</p>
-                <p className="text-sm text-blue-100 mt-2">Entre em contato e ganhe um desconto imperdível no plano Hapvida HOJE!</p>
-              </div>
+
 
               {/* CTA Botão */}
               <button
                 onClick={() => setShowForm(true)}
                 className="group inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg text-lg w-full md:w-auto justify-center"
               >
-                <span>FALE COM UM CONSULTOR AGORA!</span>
+                <span>Quero aproveitar os 15% de desconto</span>
                 <Zap className="w-5 h-5" />
               </button>
 
