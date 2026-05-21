@@ -134,7 +134,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
           {/* Card */}
           <div
             className={`
-              relative rounded-2xl border border-orange-200 backdrop-blur-md p-6 md:p-8
+              relative rounded-2xl border border-orange-200 backdrop-blur-md p-0
               transition-all duration-700 shadow-lg
               ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
             `}
@@ -144,7 +144,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
             }}
           >
             {/* Title */}
-            <div className="space-y-2 mb-6">
+            <div className="space-y-2 mb-6 px-6 md:px-8 pt-6 md:pt-8">
               <h1
                 className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
                 style={{ fontFamily: "Space Grotesk, sans-serif" }}
@@ -160,7 +160,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-4 px-6 md:px-8">
               {/* Nome */}
               <div className="space-y-1.5">
                 <label
@@ -329,7 +329,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded-xl bg-gradient-to-r from-orange-500 to-orange-600 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/30 disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+                className="w-full rounded-none bg-gradient-to-r from-orange-500 to-orange-600 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/30 disabled:opacity-50 disabled:cursor-not-allowed mt-8"
                 style={{ fontFamily: "DM Sans, sans-serif" }}
               >
                 {submitting ? "Carregando..." : "Responder perguntas →"}
@@ -337,7 +337,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
             </form>
 
             {/* Footer */}
-            <p className="text-center text-xs text-gray-500 mt-6" style={{ fontFamily: "DM Sans, sans-serif" }}>
+            <p className="text-center text-xs text-gray-500 py-6 px-6 md:px-8 border-t border-orange-100" style={{ fontFamily: "DM Sans, sans-serif" }}>
               Seus dados são confidenciais e protegidos
             </p>
           </div>
