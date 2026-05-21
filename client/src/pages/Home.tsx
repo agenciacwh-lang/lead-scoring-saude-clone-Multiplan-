@@ -1,7 +1,8 @@
 /**
- * Home Page – Landing Page com Oferta de 15% OFF
- * Design: Premium Conversion-Focused
- * Hero Section + Quiz Modal como "Passo a Passo" para desbloquear desconto
+ * Home Page – Landing Page Premium Hapvida
+ * Design: Inspirado em seuplanoagora.com.br mas com melhorias
+ * Cores: Azul Hapvida + Laranja + Verde
+ * Layout: Hero + Formulário lado a lado + Quiz Modal
  */
 
 import { useLeadContext } from "@/contexts/LeadContext";
@@ -9,7 +10,7 @@ import LeadForm from "@/components/LeadForm";
 import QuizModal from "@/components/QuizModal";
 import { LeadData } from "@/lib/types";
 import { useState } from "react";
-import { Sparkles, CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, Heart, Zap, Users, Stethoscope, Clock } from "lucide-react";
 
 export default function Home() {
   const { leadData, setLeadData } = useLeadContext();
@@ -18,107 +19,209 @@ export default function Home() {
 
   const handleFormSubmit = (data: LeadData) => {
     setLeadData(data);
-    // Abrir o quiz modal após preencher o formulário
     setShowQuizModal(true);
   };
 
-  // Se clicou em "Destravar Desconto" e preencheu o formulário, mostra o formulário
   if (showForm && !leadData) {
     return <LeadForm onSubmit={handleFormSubmit} />;
   }
 
-  // Caso contrário, mostra a Hero Section com Quiz Modal
   return (
     <>
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 overflow-hidden">
-        {/* Background decorativo */}
+      {/* Hero Section com Formulário */}
+      <div className="min-h-screen bg-gradient-to-r from-blue-900 via-blue-800 to-blue-900 relative overflow-hidden">
+        {/* Decorações de fundo */}
         <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-500/10 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -top-40 -right-40 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-green-500/10 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Conteúdo */}
-        <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-4 py-20">
-          <div className="w-full max-w-4xl mx-auto text-center">
-            {/* Badge */}
-            <div className="mb-8 inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/50 rounded-full px-4 py-2">
-              <Sparkles className="w-4 h-4 text-orange-400" />
-              <span className="text-sm font-semibold text-orange-300">Oferta Exclusiva Limitada</span>
-            </div>
-
-            {/* Título Principal com Destaque */}
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              <span className="text-white">Encontre o Plano de Saúde</span>
-              <br />
-              <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-red-500 bg-clip-text text-transparent">
-                15% OFF
-              </span>
-              <br />
-              <span className="text-white">Perfeito para Você</span>
-            </h1>
-
-            {/* Subtítulo */}
-            <p className="text-xl md:text-2xl text-slate-300 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Responda um rápido questionário (menos de 2 minutos) e desbloqueie seu desconto exclusivo em planos de saúde premium.
-            </p>
-
-            {/* CTA Principal - Abre o formulário */}
-            <button
-              onClick={() => setShowForm(true)}
-              className="group mb-16 inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-5 px-10 rounded-2xl transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg text-lg"
-            >
-              <span>Quero Destravar Meus 15% OFF</span>
-              <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-            </button>
-
-            {/* Seção de Benefícios */}
-            <div className="grid md:grid-cols-3 gap-6 mb-16">
-              {/* Benefício 1 */}
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all">
-                <div className="flex justify-center mb-4">
-                  <div className="bg-orange-500/20 rounded-full p-4">
-                    <CheckCircle2 className="w-8 h-8 text-orange-400" />
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Rápido & Fácil</h3>
-                <p className="text-slate-400">Menos de 2 minutos para descobrir a melhor opção</p>
+        {/* Container principal */}
+        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 md:py-24">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            {/* Lado Esquerdo - Conteúdo */}
+            <div className="text-white space-y-8">
+              {/* Logo Hapvida */}
+              <div className="flex items-center gap-3">
+                <Heart className="w-8 h-8 text-orange-400" />
+                <span className="text-2xl font-bold">Hapvida</span>
               </div>
 
-              {/* Benefício 2 */}
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all">
-                <div className="flex justify-center mb-4">
-                  <div className="bg-blue-500/20 rounded-full p-4">
-                    <CheckCircle2 className="w-8 h-8 text-blue-400" />
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">100% Personalizado</h3>
-                <p className="text-slate-400">Recomendações baseadas no seu perfil e necessidades</p>
+              {/* Título Principal */}
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-6xl font-bold leading-tight">
+                  Planos de Saúde
+                  <br />
+                  <span className="bg-gradient-to-r from-orange-400 to-orange-500 bg-clip-text text-transparent">
+                    Saiba o Preço Aqui!
+                  </span>
+                </h1>
+                <p className="text-xl text-blue-100 max-w-md">
+                  Encontre o plano perfeito para você e sua família com até <span className="font-bold text-orange-300">15% OFF</span> nas 3 primeiras mensalidades.
+                </p>
               </div>
 
-              {/* Benefício 3 */}
-              <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all">
-                <div className="flex justify-center mb-4">
-                  <div className="bg-green-500/20 rounded-full p-4">
-                    <CheckCircle2 className="w-8 h-8 text-green-400" />
-                  </div>
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Desconto Garantido</h3>
-                <p className="text-slate-400">15% OFF nas 3 primeiras mensalidades</p>
+              {/* Preço em Destaque */}
+              <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 max-w-sm">
+                <p className="text-blue-100 mb-2">Planos com preços a partir de</p>
+                <p className="text-5xl font-bold text-orange-400">R$ 126,89</p>
+                <p className="text-sm text-blue-100 mt-2">Entre em contato e ganhe um desconto imperdível no plano Hapvida HOJE!</p>
+              </div>
+
+              {/* CTA Botão */}
+              <button
+                onClick={() => setShowForm(true)}
+                className="group inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-8 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg text-lg w-full md:w-auto justify-center"
+              >
+                <span>FALE COM UM CONSULTOR AGORA!</span>
+                <Zap className="w-5 h-5" />
+              </button>
+
+              {/* Botões Secundários */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <button className="px-6 py-3 border-2 border-green-400 text-green-400 font-bold rounded-full hover:bg-green-400/10 transition-colors">
+                  💬 Simule no WhatsApp
+                </button>
+                <button className="px-6 py-3 border-2 border-blue-300 text-blue-300 font-bold rounded-full hover:bg-blue-300/10 transition-colors">
+                  ☎️ Clique aqui para ligar
+                </button>
               </div>
             </div>
 
-            {/* Seção de Segurança */}
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8 max-w-2xl mx-auto">
-              <p className="text-slate-300 mb-4">
-                ✅ Seus dados estão seguros e protegidos
-              </p>
-              <p className="text-sm text-slate-400">
-                Usamos criptografia de ponta a ponta e nunca compartilhamos suas informações com terceiros.
-              </p>
+            {/* Lado Direito - Formulário */}
+            <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-10">
+              <h2 className="text-3xl font-bold text-gray-900 mb-2">Receba a Tabela no Seu WhatsApp</h2>
+              <p className="text-gray-600 mb-8">Preencha seus dados para ver a tabela de preços.</p>
+
+              <form className="space-y-6">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Nome</label>
+                  <input
+                    type="text"
+                    placeholder="Seu nome completo"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">E-mail</label>
+                  <input
+                    type="email"
+                    placeholder="seu@email.com"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">Celular/WhatsApp</label>
+                  <input
+                    type="tel"
+                    placeholder="(11) 99999-9999"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setShowForm(true)}
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 rounded-lg transition-all duration-300 transform hover:scale-105 text-lg"
+                >
+                  VER TABELA DE PREÇOS
+                </button>
+              </form>
+
+              {/* Badge de Segurança */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-xs text-gray-600 text-center">
+                  ✅ Seus dados estão seguros e protegidos
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Seção de Benefícios */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
+            Por que escolher <span className="text-orange-500">Hapvida</span>?
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Benefício 1 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <Stethoscope className="w-8 h-8 text-blue-900" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Rede Exclusiva</h3>
+              <p className="text-gray-600">32 Hospitais próprios, 20 Prontos atendimentos e 105 Clínicas em todo Brasil</p>
+            </div>
+
+            {/* Benefício 2 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <CheckCircle2 className="w-8 h-8 text-green-900" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Odontologia Incluída</h3>
+              <p className="text-gray-600">Plano completo com prevenção, diagnóstico, urgência 24h e cobertura em todo Brasil</p>
+            </div>
+
+            {/* Benefício 3 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <Users className="w-8 h-8 text-orange-900" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Maior Rede Pediátrica</h3>
+              <p className="text-gray-600">Infraestrutura moderna e especializada com UTI neonatal e acompanhamento infantil</p>
+            </div>
+
+            {/* Benefício 4 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-blue-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <Clock className="w-8 h-8 text-blue-900" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Contact Center 24h</h3>
+              <p className="text-gray-600">Marcação de consulta, exames e autorização via call center exclusivo sem esperas</p>
+            </div>
+
+            {/* Benefício 5 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <Heart className="w-8 h-8 text-green-900" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Atendimento 11 Estados</h3>
+              <p className="text-gray-600">Atendimento em todos os estados do Norte/Nordeste sem custo adicional</p>
+            </div>
+
+            {/* Benefício 6 */}
+            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
+              <div className="bg-orange-100 rounded-full w-16 h-16 flex items-center justify-center mb-6">
+                <Zap className="w-8 h-8 text-orange-900" />
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 mb-3">Agendamento Online</h3>
+              <p className="text-gray-600">Agendamento de consultas, autorização online e chat de atendimento 24/7</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Final */}
+      <section className="py-20 bg-gradient-to-r from-blue-900 to-blue-800">
+        <div className="max-w-4xl mx-auto px-4 text-center text-white">
+          <h2 className="text-4xl font-bold mb-6">
+            Quer saber quanto custa o plano ideal pra você?
+          </h2>
+          <p className="text-2xl text-orange-300 font-bold mb-8">A partir de R$ 126,89</p>
+          <button
+            onClick={() => setShowForm(true)}
+            className="inline-flex items-center gap-3 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-5 px-12 rounded-full transition-all duration-300 transform hover:scale-105 hover:shadow-2xl shadow-lg text-lg"
+          >
+            <span>Baixar Tabela de Preços Hapvida</span>
+            <Heart className="w-6 h-6" />
+          </button>
+        </div>
+      </section>
 
       {/* Quiz Modal */}
       <QuizModal 
