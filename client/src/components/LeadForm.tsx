@@ -1,11 +1,11 @@
 /**
- * LeadForm – Formulário inicial de captura de dados
- * Design: Hapvida – Orange + Blue + Clean
+ * LeadForm – Formulário de Captura Premium
+ * Design: Hapvida – Elegante, sofisticado, sem scrollbar
  * Campos: Nome, Telefone, E-mail, Cidade
  */
 
 import { useState, useEffect } from "react";
-import { Heart, Mail, Phone, MapPin, User } from "lucide-react";
+import { Heart, Mail, Phone, MapPin, User, ArrowRight } from "lucide-react";
 import { useLeadContext } from "@/contexts/LeadContext";
 import { LeadData } from "@/lib/types";
 
@@ -23,15 +23,6 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
-  const [visible, setVisible] = useState(false);
-
-  const hapvidaLogoUrl = "/manus-storage/hapvida-logo_487cd512.png";
-
-  // Trigger animation on mount
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 50);
-    return () => clearTimeout(t);
-  }, []);
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
@@ -60,7 +51,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
@@ -70,8 +61,11 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let value = e.target.value.replace(/\D/g, "");
-    if (value.length > 11) value = value.slice(0, 11);
-    
+
+    if (value.length > 11) {
+      value = value.slice(0, 11);
+    }
+
     if (value.length > 0) {
       if (value.length <= 2) {
         value = `(${value}`;
@@ -103,243 +97,101 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   };
 
   return (
-    <div className="relative flex flex-col bg-gradient-to-br from-white via-gray-50 to-white">
-      {/* Subtle background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 dot-pattern" />
+    <form onSubmit={handleSubmit} className="w-full space-y-6">
+      {/* Nome */}
+      <div className="space-y-2">
+        <label className="block text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <User className="w-4 h-4 text-orange-500" />
+          Seu nome completo
+        </label>
+        <input
+          type="text"
+          name="nome"
+          value={formData.nome}
+          onChange={handleInputChange}
+          placeholder="Ex: João Silva"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all bg-white text-gray-900 placeholder-gray-500"
+        />
+        {errors.nome && <p className="text-sm text-red-500">{errors.nome}</p>}
       </div>
 
-      {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-orange-100">
-        <div className="flex items-center gap-3">
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full flex items-center justify-center animate-pulse-ring bg-gradient-to-r from-orange-500 to-orange-600">
-            <Heart className="w-4 h-4 text-white fill-white" />
-          </div>
-          <span className="font-bold text-sm tracking-wide text-gray-900" style={{ fontFamily: "Space Grotesk, sans-serif" }}>
-            Hapvida
-          </span>
-        </div>
-      </header>
+      {/* Telefone */}
+      <div className="space-y-2">
+        <label className="block text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <Phone className="w-4 h-4 text-orange-500" />
+          Telefone com WhatsApp
+        </label>
+        <input
+          type="tel"
+          name="telefone"
+          value={formData.telefone}
+          onChange={handlePhoneChange}
+          placeholder="(11) 99999-9999"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all bg-white text-gray-900 placeholder-gray-500"
+        />
+        {errors.telefone && <p className="text-sm text-red-500">{errors.telefone}</p>}
+      </div>
 
-      {/* Main content */}
-      <main className="relative z-10 flex items-center justify-center px-4 py-8">
-        <div className="w-full max-w-md">
-    
+      {/* Email */}
+      <div className="space-y-2">
+        <label className="block text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <Mail className="w-4 h-4 text-orange-500" />
+          E-mail
+        </label>
+        <input
+          type="email"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          placeholder="seu@email.com"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all bg-white text-gray-900 placeholder-gray-500"
+        />
+        {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+      </div>
 
-          {/* Card */}
-          <div
-            className={`
-              relative rounded-2xl border border-orange-200 backdrop-blur-md p-0
-              transition-all duration-700 shadow-lg
-              ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}
-            `}
-            style={{
-              background: "rgba(255, 255, 255, 0.95)",
-              boxShadow: "0 0 0 1px rgba(229, 76, 60, 0.1), 0 20px 60px rgba(0, 0, 0, 0.08)",
-            }}
-          >
-            {/* Title */}
-            <div className="space-y-2 mb-6 px-6 md:px-8 pt-6 md:pt-8">
-              <h1
-                className="text-2xl md:text-3xl font-bold text-gray-900 leading-tight"
-                style={{ fontFamily: "Space Grotesk, sans-serif" }}
-              >
-                Olá! 😊
-              </h1>
-              <p
-                className="text-gray-600 text-sm leading-relaxed"
-                style={{ fontFamily: "DM Sans, sans-serif" }}
-              >
-                Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!
-              </p>
-            </div>
+      {/* Cidade */}
+      <div className="space-y-2">
+        <label className="block text-sm font-semibold text-gray-900 flex items-center gap-2">
+          <MapPin className="w-4 h-4 text-orange-500" />
+          Cidade
+        </label>
+        <input
+          type="text"
+          name="cidade"
+          value={formData.cidade}
+          onChange={handleInputChange}
+          placeholder="Ex: São Paulo"
+          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all bg-white text-gray-900 placeholder-gray-500"
+        />
+        {errors.cidade && <p className="text-sm text-red-500">{errors.cidade}</p>}
+      </div>
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4 px-6 md:px-8">
-              {/* Nome */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="nome"
-                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
-                  style={{ fontFamily: "DM Sans, sans-serif" }}
-                >
-                  <User className="w-3.5 h-3.5 text-orange-500" />
-                  Seu nome completo
-                </label>
-                <input
-                  id="nome"
-                  type="text"
-                  name="nome"
-                  value={formData.nome}
-                  onChange={handleChange}
-                  placeholder="João Silva"
-                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
-                    errors.nome ? "border-red-500/50" : "border-orange-200"
-                  }`}
-                  style={{
-                    fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255, 255, 255, 0.8)",
-                    fontSize: "16px",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.nome ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
-                    e.target.style.boxShadow = errors.nome ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = errors.nome ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
-                {errors.nome && (
-                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
-                    {errors.nome}
-                  </p>
-                )}
-              </div>
+      {/* Submit Button */}
+      <button
+        type="submit"
+        disabled={submitting}
+        className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 disabled:from-gray-400 disabled:to-gray-500 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 flex items-center justify-center gap-2 shadow-lg"
+      >
+        {submitting ? (
+          <>
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            Processando...
+          </>
+        ) : (
+          <>
+            Continuar para o Quiz
+            <ArrowRight className="w-5 h-5" />
+          </>
+        )}
+      </button>
 
-              {/* Telefone */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="telefone"
-                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
-                  style={{ fontFamily: "DM Sans, sans-serif" }}
-                >
-                  <Phone className="w-3.5 h-3.5 text-orange-500" />
-                  Telefone com WhatsApp
-                </label>
-                <input
-                  id="telefone"
-                  type="tel"
-                  name="telefone"
-                  value={formData.telefone}
-                  onChange={handlePhoneChange}
-                  placeholder="(11) 99999-9999"
-                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
-                    errors.telefone ? "border-red-500/50" : "border-orange-200"
-                  }`}
-                  style={{
-                    fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255, 255, 255, 0.8)",
-                    fontSize: "16px",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.telefone ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
-                    e.target.style.boxShadow = errors.telefone ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = errors.telefone ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
-                {errors.telefone && (
-                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
-                    {errors.telefone}
-                  </p>
-                )}
-              </div>
-
-              {/* E-mail */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="email"
-                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
-                  style={{ fontFamily: "DM Sans, sans-serif" }}
-                >
-                  <Mail className="w-3.5 h-3.5 text-orange-500" />
-                  E-mail
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="seu@email.com"
-                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
-                    errors.email ? "border-red-500/50" : "border-orange-200"
-                  }`}
-                  style={{
-                    fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255, 255, 255, 0.8)",
-                    fontSize: "16px",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.email ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
-                    e.target.style.boxShadow = errors.email ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = errors.email ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
-                {errors.email && (
-                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
-                    {errors.email}
-                  </p>
-                )}
-              </div>
-
-              {/* Cidade */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="cidade"
-                  className="flex items-center gap-2 text-xs font-semibold text-gray-700"
-                  style={{ fontFamily: "DM Sans, sans-serif" }}
-                >
-                  <MapPin className="w-3.5 h-3.5 text-orange-500" />
-                  Cidade
-                </label>
-                <input
-                  id="cidade"
-                  type="text"
-                  name="cidade"
-                  value={formData.cidade}
-                  onChange={handleChange}
-                  placeholder="São Paulo"
-                  className={`w-full rounded-xl px-4 py-3 text-gray-900 placeholder-gray-400 outline-none transition-all duration-200 border ${
-                    errors.cidade ? "border-red-500/50" : "border-orange-200"
-                  }`}
-                  style={{
-                    fontFamily: "DM Sans, sans-serif",
-                    background: "rgba(255, 255, 255, 0.8)",
-                    fontSize: "16px",
-                  }}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = errors.cidade ? "rgba(239, 68, 68, 0.7)" : "rgba(229, 76, 60, 0.5)";
-                    e.target.style.boxShadow = errors.cidade ? "0 0 0 3px rgba(239, 68, 68, 0.1)" : "0 0 0 3px rgba(229, 76, 60, 0.1)";
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = errors.cidade ? "rgba(239, 68, 68, 0.5)" : "rgba(229, 76, 60, 0.2)";
-                    e.target.style.boxShadow = "none";
-                  }}
-                />
-                {errors.cidade && (
-                  <p className="text-xs text-red-500" style={{ fontFamily: "DM Sans, sans-serif" }}>
-                    {errors.cidade}
-                  </p>
-                )}
-              </div>
-
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={submitting}
-                className="w-full rounded-none bg-gradient-to-r from-orange-500 to-orange-600 py-3 font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/30 disabled:opacity-50 disabled:cursor-not-allowed mt-8"
-                style={{ fontFamily: "DM Sans, sans-serif" }}
-              >
-                {submitting ? "Carregando..." : "Responder perguntas →"}
-              </button>
-            </form>
-
-            {/* Footer */}
-            <p className="text-center text-xs text-gray-500 py-6 px-6 md:px-8 border-t border-orange-100" style={{ fontFamily: "DM Sans, sans-serif" }}>
-              Seus dados são confidenciais e protegidos
-            </p>
-          </div>
-        </div>
-      </main>
-    </div>
+      {/* Security Badge */}
+      <div className="flex items-center justify-center gap-2 pt-4 border-t border-gray-200">
+        <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 111.414 1.414L7.414 9l3.293 3.293a1 1 0 01-1.414 1.414l-4-4z" clipRule="evenodd" />
+        </svg>
+        <span className="text-xs text-gray-600">Seus dados são confidenciais e protegidos</span>
+      </div>
+    </form>
   );
 }
