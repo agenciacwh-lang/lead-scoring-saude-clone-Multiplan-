@@ -179,7 +179,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
           </>
         ) : (
           <>
-            Continuar para o Quiz
+            Responder perguntas
             <ArrowRight className="w-5 h-5" />
           </>
         )}

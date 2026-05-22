@@ -138,10 +138,10 @@ export default function Home() {
             <div className="hidden lg:flex items-center justify-center h-fit overflow-visible" id="formulario-lead">
               <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10 sticky top-20 h-fit">
                 <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     ✨ Responda rápido para liberar seu desconto de 15%
                   </h2>
-                  <p className="text-gray-600 text-sm">Leva menos de 2 minutos</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!</p>
                 </div>
 
                 {!showQuiz ? (
@@ -157,10 +157,10 @@ export default function Home() {
           <div className="lg:hidden mt-12" id="formulario-lead-mobile">
             <div className="bg-white rounded-2xl shadow-2xl p-6">
               <div className="mb-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-2">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">
                   ✨ Responda rápido para liberar seu desconto de 15%
                 </h2>
-                <p className="text-gray-600 text-sm">Leva menos de 2 minutos</p>
+                <p className="text-gray-600 text-sm leading-relaxed">Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!</p>
               </div>
 
               {!showQuiz ? (
