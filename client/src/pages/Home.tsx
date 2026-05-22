@@ -8,7 +8,7 @@ import { useLocation } from "wouter";
 import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
 import Quiz from "@/components/Quiz";
-import { Heart, Stethoscope, Users, Zap, Shield, Clock } from "lucide-react";
+import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -27,6 +27,13 @@ export default function Home() {
 
   const handleQuizSubmit = () => {
     setLocation("/obrigado");
+  };
+
+  const scrollToForm = () => {
+    const formElement = document.getElementById("formulario-lead");
+    if (formElement) {
+      formElement.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
@@ -76,7 +83,7 @@ export default function Home() {
               {/* CTA Button */}
               <div>
                 <button
-                  onClick={() => setShowQuiz(true)}
+                  onClick={scrollToForm}
                   className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl inline-flex items-center gap-2"
                 >
                   Quero Aproveitar os 15% de Desconto
@@ -100,8 +107,8 @@ export default function Home() {
             </div>
 
             {/* Right Side - Form (Fixed on Desktop) */}
-            <div className="hidden lg:flex items-center justify-center h-fit overflow-visible">
-              <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10 sticky top-20">
+            <div className="hidden lg:flex items-center justify-center h-fit overflow-visible" id="formulario-lead">
+              <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10 sticky top-20 h-fit">
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     ✨ Responda rápido para liberar seu desconto de 15%
@@ -119,7 +126,7 @@ export default function Home() {
           </div>
 
           {/* Mobile Form - Below Title */}
-          <div className="lg:hidden mt-12">
+          <div className="lg:hidden mt-12" id="formulario-lead-mobile">
             <div className="bg-white rounded-2xl shadow-2xl p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-2">
@@ -154,7 +161,7 @@ export default function Home() {
           {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Por que escolher a <span className="text-orange-500">Hapvida?</span>
+              Por que escolher a <span className="text-orange-500">Multiplan?</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Proteção completa com os melhores benefícios e atendimento de qualidade
@@ -217,10 +224,10 @@ export default function Home() {
             Não deixe essa oportunidade passar!
           </h2>
           <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Aproveite os 15% de desconto nas 3 primeiras mensalidades e comece sua jornada de saúde com a Hapvida.
+            Aproveite os 15% de desconto nas 3 primeiras mensalidades e comece sua jornada de saúde com a Multiplan.
           </p>
           <button
-            onClick={() => setShowQuiz(true)}
+            onClick={scrollToForm}
             className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl inline-flex items-center gap-2"
           >
             Quero Aproveitar os 15% de Desconto
@@ -234,40 +241,65 @@ export default function Home() {
       {/* ========== FOOTER ========== */}
       <footer className="bg-gray-900 text-gray-400 py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             {/* Company Info */}
             <div>
-              <div className="flex items-center gap-3 mb-4">
-                <Heart className="w-6 h-6 text-orange-500 fill-orange-500" />
-                <span className="text-white font-bold text-lg">Hapvida</span>
-              </div>
-              <p className="text-sm">Sua saúde é nossa prioridade.</p>
-              <p className="text-xs mt-4">CNPJ: 17.197.385/0001-21</p>
-            </div>
-
-            {/* Security Badges */}
-            <div>
-              <h3 className="text-white font-bold mb-4">Segurança</h3>
-              <div className="space-y-2 text-sm">
-                <p>✓ Dados criptografados</p>
-                <p>✓ Certificado SSL</p>
-                <p>✓ Privacidade garantida</p>
+              <div className="mb-6">
+                <h3 className="text-white font-bold text-lg mb-3">MULTIPLAN SEGUROS E PLANOS DE SAÚDE</h3>
+                <div className="space-y-2 text-sm">
+                  <p><strong>CNPJ:</strong> 26.200.497/0001-85</p>
+                  <p><strong>SUSEP:</strong> nº 251164987</p>
+                  <p><strong>Endereço:</strong> R. São Cristóvão, 431 - Centro, Aracaju - SE, 49055-620</p>
+                </div>
               </div>
             </div>
 
-            {/* Contact */}
+            {/* Contact & Social */}
             <div>
               <h3 className="text-white font-bold mb-4">Contato</h3>
-              <div className="space-y-2 text-sm">
-                <p>📞 0800 000 0000</p>
-                <p>💬 WhatsApp: (11) 99999-9999</p>
-                <p>📧 contato@hapvida.com.br</p>
+              <div className="space-y-3 text-sm">
+                <p>
+                  <strong>Telefone/WhatsApp:</strong>
+                  <br />
+                  <a href="tel:+5579999232489" className="text-orange-400 hover:text-orange-300 transition">
+                    (79) 99923-2489
+                  </a>
+                </p>
+                <p>
+                  <strong>E-mail:</strong>
+                  <br />
+                  <a href="mailto:comercial@multiplanvendas.com.br" className="text-orange-400 hover:text-orange-300 transition">
+                    comercial@multiplanvendas.com.br
+                  </a>
+                </p>
+              </div>
+
+              {/* Social Media */}
+              <div className="flex items-center gap-4 mt-6">
+                <a
+                  href="https://facebook.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-orange-400 transition"
+                  title="Facebook"
+                >
+                  <Facebook className="w-6 h-6" />
+                </a>
+                <a
+                  href="https://instagram.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-gray-400 hover:text-orange-400 transition"
+                  title="Instagram"
+                >
+                  <Instagram className="w-6 h-6" />
+                </a>
               </div>
             </div>
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-xs">
-            <p>&copy; 2026 Hapvida. Todos os direitos reservados.</p>
+            <p>&copy; 2026 Multiplan Seguros e Planos de Saúde. Todos os direitos reservados.</p>
             <p className="mt-2">Desenvolvido com ❤️ para sua saúde</p>
           </div>
         </div>
