@@ -45,17 +45,30 @@ export default function Home() {
   };
 
   useEffect(() => {
-    if (leadData && leadData.nome) {
-      setShowQuiz(true);
-    }
-  }, [leadData]);
+    // Nunca renderizar Quiz automaticamente
+    // Quiz só é renderizado quando handleFormSubmit é chamado explicitamente
+    // Isso garante que o formulário de dados foi preenchido
+  }, []);
 
   const handleFormSubmit = () => {
-    setShowQuiz(true);
+    // Validar que leadData foi salvo com sucesso
+    if (leadData && leadData.nome && leadData.telefone && leadData.email && leadData.cidade) {
+      setShowQuiz(true);
+    } else {
+      // Se dados não foram salvos, não avançar
+      console.warn("Formulário incompleto - não avançando para Quiz");
+    }
   };
 
   const handleQuizSubmit = () => {
-    setLocation("/obrigado");
+    // Verificar se leadData existe antes de ir para /obrigado
+    if (leadData && leadData.nome) {
+      setLocation("/obrigado");
+    } else {
+      // Redirecionar para início se dados foram perdidos
+      setShowQuiz(false);
+      console.warn("Dados do lead foram perdidos - retornando ao formulário");
+    }
   };
 
   const scrollToForm = () => {
@@ -64,6 +77,10 @@ export default function Home() {
       formElement.scrollIntoView({ behavior: "smooth" });
     }
   };
+
+  // Renderizar apenas o formulário se Quiz não foi iniciado
+  // Quiz só é renderizado após handleFormSubmit validar os dados
+  const shouldShowQuiz = showQuiz && leadData && leadData.nome;
 
   return (
     <div className="min-h-screen bg-white" key="home-page">
@@ -145,7 +162,7 @@ export default function Home() {
                   <p className="text-gray-600 text-sm leading-relaxed">Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!</p>
                 </div>
 
-                {!showQuiz ? (
+                {!shouldShowQuiz ? (
                   <LeadForm onSubmit={handleFormSubmit} />
                 ) : (
                   <Quiz onSubmit={handleQuizSubmit} />
@@ -164,7 +181,7 @@ export default function Home() {
                 <p className="text-gray-600 text-sm leading-relaxed">Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!</p>
               </div>
 
-              {!showQuiz ? (
+              {!shouldShowQuiz ? (
                 <LeadForm onSubmit={handleFormSubmit} />
               ) : (
                 <Quiz onSubmit={handleQuizSubmit} />
