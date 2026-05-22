@@ -19,19 +19,19 @@ export default function Home() {
   const carouselItems = [
     {
       title: "Hospital Gabriel Soares",
-      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.01_d9818831.jpeg",
+      image: "/gabriel-soares.jpg",
     },
     {
       title: "Diagnóstico Centro",
-      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.01(2)_ffea51fd.jpeg",
+      image: "/diagnostico-centro.jpg",
     },
     {
       title: "Clínica Hermes Fontes",
-      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.00(2)_36291e1f.jpeg",
+      image: "/hermes-fontes.jpg",
     },
     {
       title: "Clínica São José",
-      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.00(1)_3f7b2a9e.jpeg",
+      image: "/sao-jose.jpg",
     },
   ];
 
