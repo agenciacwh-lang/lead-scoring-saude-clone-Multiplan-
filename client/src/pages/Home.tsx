@@ -8,6 +8,7 @@ import { useLocation } from "wouter";
 import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
 import Quiz from "@/components/Quiz";
+import FormCard from "@/components/FormCard";
 import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram } from "lucide-react";
 
 export default function Home() {
@@ -136,7 +137,7 @@ export default function Home() {
 
             {/* Right Side - Form (Fixed on Desktop) */}
             <div className="hidden lg:flex items-center justify-center h-fit overflow-visible" id="formulario-lead">
-              <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10 sticky top-20 h-fit">
+              <FormCard className="sticky top-20 h-fit">
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     ✨ Responda rápido para liberar seu desconto de 15%
@@ -149,13 +150,13 @@ export default function Home() {
                 ) : (
                   <Quiz onSubmit={handleQuizSubmit} />
                 )}
-              </div>
+              </FormCard>
             </div>
           </div>
 
           {/* Mobile Form - Below Title */}
           <div className="lg:hidden mt-12" id="formulario-lead-mobile">
-            <div className="bg-white rounded-2xl shadow-2xl p-6">
+            <FormCard className="!rounded-2xl !p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   ✨ Responda rápido para liberar seu desconto de 15%
@@ -168,7 +169,7 @@ export default function Home() {
               ) : (
                 <Quiz onSubmit={handleQuizSubmit} />
               )}
-            </div>
+            </FormCard>
           </div>
         </div>
 

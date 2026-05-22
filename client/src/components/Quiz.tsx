@@ -10,6 +10,7 @@ import { useLocation } from "wouter";
 import { QUIZ_QUESTIONS, calculateLeadScore } from "@/lib/quizData";
 import { useLeadContext } from "@/contexts/LeadContext";
 import { ChevronLeft, Heart } from "lucide-react";
+import FormCard from "@/components/FormCard";
 
 const HERO_BG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hero-health-bg-igbSPaoZJKBqYM9KqjBYjP.webp";
@@ -175,15 +176,14 @@ export default function Quiz() {
           <div
             ref={cardRef}
             className={`
-              relative rounded-2xl border border-white/10 backdrop-blur-md p-6 md:p-8
+              relative !rounded-3xl !shadow-2xl !p-10 !border-gray-100
               ${animating && animDir === "out" ? "animate-slide-out" : ""}
               ${animating && animDir === "in" ? "animate-slide-in" : ""}
               ${!animating ? "animate-fade-up" : ""}
             `}
             style={{
-              background: "rgba(255, 255, 255, 0.95)",
-              boxShadow:
-                "0 0 0 1px rgba(231, 76, 60, 0.1), 0 20px 60px rgba(0, 0, 0, 0.08), 0 0 80px rgba(231, 76, 60, 0.05)",
+              background: "rgb(255, 255, 255)",
+              boxShadow: "0 20px 60px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05)",
             }}
           >
             {currentQuestion ? (
