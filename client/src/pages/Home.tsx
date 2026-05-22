@@ -8,13 +8,7 @@ import { useLocation } from "wouter";
 import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
 import Quiz from "@/components/Quiz";
-import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram, ChevronLeft, ChevronRight } from "lucide-react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Autoplay } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "swiper/css/scrollbar";
+import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -334,45 +328,23 @@ export default function Home() {
           </div>
 
           {/* Carousel with Swiper - Center Mode */}
-          <div className="w-full flex justify-center">
-            <Swiper
-              modules={[Autoplay]}
-              centeredSlides={true}
-              slidesPerView={1}
-              spaceBetween={40}
-              loop={carouselItems.length > 1}
-              autoplay={{
-                delay: 3500,
-                disableOnInteraction: false,
-              }}
-              className="w-full max-w-6xl"
-            >
-              {carouselItems.map((item, index) => (
-                <SwiperSlide key={`carousel-${index}-${item.image}`} className="!w-[280px] sm:!w-[380px] md:!w-[500px]">
-                  {({ isActive }) => (
-                    <div
-                      className={`transition-all duration-500 ease-out h-[300px] sm:h-[350px] md:h-[420px] ${
-                        isActive ? "scale-110" : "scale-90 opacity-50"
-                      }`}
-                    >
-                      <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gray-300">
-                        <img
-                          src={item.image}
-                          alt={item.title}
-                          className="w-full h-full object-cover"
-                        />
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
-                          <div className="p-6 w-full">
-                            <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">{item.title}</h3>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </SwiperSlide>
-              ))}
-            </Swiper>
+          {/* Grid de Imagens - Simples e Estável */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {carouselItems.map((item, index) => (
+              <div key={`grid-${index}-${item.image}`} className="relative h-80 rounded-2xl overflow-hidden shadow-2xl group">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
+                  <div className="p-6 w-full">
+                    <h3 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg">{item.title}</h3>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
