@@ -12,6 +12,9 @@ import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram, Che
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
 import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -331,39 +334,37 @@ export default function Home() {
           </div>
 
           {/* Carousel with Swiper - Center Mode */}
-          <div className="w-full max-w-6xl mx-auto px-4">
+          <div className="w-full flex justify-center">
             <Swiper
               modules={[Autoplay]}
               centeredSlides={true}
               slidesPerView="auto"
-              spaceBetween={30}
+              spaceBetween={40}
               loop={true}
               autoplay={{
                 delay: 3500,
                 disableOnInteraction: false,
               }}
-              className="w-full"
+              className="w-full max-w-6xl"
             >
               {carouselItems.map((item, index) => (
-                <SwiperSlide key={index} className="w-auto">
+                <SwiperSlide key={index} className="!w-[280px] sm:!w-[380px] md:!w-[500px]">
                   {({ isActive }) => (
                     <div
-                      className={`transition-all duration-500 ease-out ${
+                      className={`transition-all duration-500 ease-out h-[300px] sm:h-[350px] md:h-[420px] ${
                         isActive ? "scale-110" : "scale-90 opacity-50"
                       }`}
                     >
-                      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-200">
-                        <div className="aspect-video w-96 flex items-center justify-center">
-                          <img
-                            src={item.image}
-                            alt={item.title}
-                            className="w-full h-full object-contain"
-                          />
-                        </div>
+                      <div className="relative w-full h-full rounded-2xl overflow-hidden shadow-2xl bg-gray-300">
+                        <img
+                          src={item.image}
+                          alt={item.title}
+                          className="w-full h-full object-cover"
+                        />
                         {/* Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
                           <div className="p-6 w-full">
-                            <h3 className="text-2xl font-bold text-white">{item.title}</h3>
+                            <h3 className="text-xl sm:text-2xl font-bold text-white drop-shadow-lg">{item.title}</h3>
                           </div>
                         </div>
                       </div>
