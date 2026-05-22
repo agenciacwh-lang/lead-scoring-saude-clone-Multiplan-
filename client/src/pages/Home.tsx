@@ -328,23 +328,74 @@ export default function Home() {
           </div>
 
           {/* Carousel with Swiper - Center Mode */}
-          {/* Grid de Imagens - Simples e Estável */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            {carouselItems.map((item, index) => (
-              <div key={`grid-${index}-${item.image}`} className="relative h-80 rounded-2xl overflow-hidden shadow-2xl group">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
-                  <div className="p-6 w-full">
-                    <h3 className="text-lg sm:text-xl font-bold text-white drop-shadow-lg">{item.title}</h3>
+          {/* Bento Grid Premium - Layout de Revista */}
+          <div className="max-w-6xl mx-auto px-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-max">
+              {/* Hospital Gabriel Soares - Destaque Principal (2x2) */}
+              <div className="md:col-span-2 md:row-span-2">
+                <div className="relative h-96 md:h-full rounded-3xl overflow-hidden shadow-2xl group">
+                  <img
+                    src={carouselItems[0].image}
+                    alt={carouselItems[0].title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end">
+                    <div className="p-8 w-full">
+                      <h3 className="text-2xl md:text-3xl font-bold text-white drop-shadow-lg">{carouselItems[0].title}</h3>
+                      <p className="text-sm text-blue-100 mt-2">Destaque Principal</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            ))}
+
+              {/* Diagnóstico Centro */}
+              <div className="md:col-span-2">
+                <div className="relative h-56 rounded-2xl overflow-hidden shadow-lg group">
+                  <img
+                    src={carouselItems[1].image}
+                    alt={carouselItems[1].title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end">
+                    <div className="p-4 w-full">
+                      <h3 className="text-lg font-bold text-white drop-shadow-lg">{carouselItems[1].title}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Clínica Hermes Fontes */}
+              <div className="md:col-span-1">
+                <div className="relative h-56 rounded-2xl overflow-hidden shadow-lg group">
+                  <img
+                    src={carouselItems[2].image}
+                    alt={carouselItems[2].title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end">
+                    <div className="p-4 w-full">
+                      <h3 className="text-sm md:text-base font-bold text-white drop-shadow-lg">{carouselItems[2].title}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Clínica São José */}
+              <div className="md:col-span-1">
+                <div className="relative h-56 rounded-2xl overflow-hidden shadow-lg group">
+                  <img
+                    src={carouselItems[3].image}
+                    alt={carouselItems[3].title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end">
+                    <div className="p-4 w-full">
+                      <h3 className="text-sm md:text-base font-bold text-white drop-shadow-lg">{carouselItems[3].title}</h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
