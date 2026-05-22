@@ -8,12 +8,36 @@ import { useLocation } from "wouter";
 import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
 import Quiz from "@/components/Quiz";
-import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram } from "lucide-react";
+import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram, ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
   const { leadData } = useLeadContext();
   const [showQuiz, setShowQuiz] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  const carouselItems = [
+    {
+      title: "Hospital Gabriel Soares",
+      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=500&fit=crop",
+    },
+    {
+      title: "Hapclínicas Aracaju",
+      image: "https://images.unsplash.com/photo-1631217b9201-d5ffd5433f13?w=800&h=500&fit=crop",
+    },
+    {
+      title: "Pronto Atendimento 24h",
+      image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde0b?w=800&h=500&fit=crop",
+    },
+  ];
+
+  const nextSlide = () => {
+    setCarouselIndex((prev) => (prev + 1) % carouselItems.length);
+  };
+
+  const prevSlide = () => {
+    setCarouselIndex((prev) => (prev - 1 + carouselItems.length) % carouselItems.length);
+  };
 
   useEffect(() => {
     if (leadData && leadData.nome) {
@@ -212,6 +236,150 @@ export default function Home() {
               <p className="text-gray-600">
                 Prazos menores para ativar seus benefícios e começar a usar seu plano.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== TIPOS DE PLANO ========== */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Escolha o Plano Ideal para Você
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Soluções personalizadas com a melhor cobertura e preço justo
+            </p>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card 1 - Individual */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-blue-900 mb-2">INDIVIDUAL</h3>
+                <div className="h-1 w-16 bg-orange-500 rounded"></div>
+              </div>
+              <p className="text-gray-700 mb-8 leading-relaxed">
+                Sua saúde em primeiro lugar. Cobertura completa para consultas, exames e urgências com o melhor custo-benefício. Garanta sua tranquilidade pagando menos.
+              </p>
+              <button
+                onClick={scrollToForm}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
+              >
+                Simular com Desconto
+              </button>
+            </div>
+
+            {/* Card 2 - Familiar */}
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 md:scale-105">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-orange-900 mb-2">FAMILIAR</h3>
+                <div className="h-1 w-16 bg-blue-900 rounded"></div>
+              </div>
+              <p className="text-gray-700 mb-8 leading-relaxed">
+                Proteção para quem você mais ama. Ampla rede pediátrica e estrutura completa para cuidar de toda a sua família com mensalidades que cabem no bolso.
+              </p>
+              <button
+                onClick={scrollToForm}
+                className="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
+              >
+                Simular com Desconto
+              </button>
+            </div>
+
+            {/* Card 3 - Empresarial */}
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-green-900 mb-2">EMPRESARIAL (MEI / PME)</h3>
+                <div className="h-1 w-16 bg-orange-500 rounded"></div>
+              </div>
+              <p className="text-gray-700 mb-8 leading-relaxed">
+                Saúde para o seu negócio crescer. Condições exclusivas a partir de 2 vidas (válido para MEI). Valorize sua equipe com a maior rede do Norte e Nordeste.
+              </p>
+              <button
+                onClick={scrollToForm}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
+              >
+                Simular com Desconto
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ========== REDE DE ATENDIMENTO ========== */}
+      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <div className="container mx-auto px-4">
+          {/* Header */}
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              Maior Rede Exclusiva de Sergipe
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Atendimento de ponta e infraestrutura completa pertinho de você
+            </p>
+          </div>
+
+          {/* Carousel */}
+          <div className="relative max-w-4xl mx-auto">
+            {/* Carousel Container */}
+            <div className="relative h-96 bg-gray-200 rounded-2xl overflow-hidden shadow-2xl">
+              {/* Slides */}
+              {carouselItems.map((item, index) => (
+                <div
+                  key={index}
+                  className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
+                    index === carouselIndex ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  <img
+                    src={item.image}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
+                    <div className="p-8 w-full">
+                      <h3 className="text-3xl font-bold text-white">{item.title}</h3>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Navigation Buttons */}
+            <button
+              onClick={prevSlide}
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-900 p-3 rounded-full shadow-lg transition-all duration-200 z-10"
+              aria-label="Slide anterior"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={nextSlide}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-900 p-3 rounded-full shadow-lg transition-all duration-200 z-10"
+              aria-label="Próximo slide"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+
+            {/* Dots Indicator */}
+            <div className="flex justify-center gap-2 mt-6">
+              {carouselItems.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCarouselIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === carouselIndex
+                      ? "bg-blue-900 w-8"
+                      : "bg-gray-300 hover:bg-gray-400"
+                  }`}
+                  aria-label={`Ir para slide ${index + 1}`}
+                />
+              ))}
             </div>
           </div>
         </div>
