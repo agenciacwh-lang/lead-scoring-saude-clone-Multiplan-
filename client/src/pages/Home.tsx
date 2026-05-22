@@ -4,14 +4,14 @@
  */
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
 import Quiz from "@/components/Quiz";
 import { Heart, Stethoscope, Users, Zap, Shield, Clock } from "lucide-react";
 
 export default function Home() {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { leadData } = useLeadContext();
   const [showQuiz, setShowQuiz] = useState(false);
 
@@ -26,11 +26,11 @@ export default function Home() {
   };
 
   const handleQuizSubmit = () => {
-    navigate("/obrigado");
+    setLocation("/obrigado");
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" key="home-page">
       {/* ========== HERO SECTION ========== */}
       <section className="relative min-h-screen flex items-center overflow-hidden bg-gradient-to-br from-blue-900 via-blue-800 to-blue-950">
         {/* Background Image with Overlay */}

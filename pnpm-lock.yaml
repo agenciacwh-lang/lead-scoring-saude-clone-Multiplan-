@@ -240,7 +240,7 @@ importers:
         specifier: ^0.0.57
         version: 0.0.57
       wouter:
-        specifier: ^3.3.5
+        specifier: ^3.7.1
         version: 3.10.0(react@19.2.6)
       zod:
         specifier: ^4.1.12
