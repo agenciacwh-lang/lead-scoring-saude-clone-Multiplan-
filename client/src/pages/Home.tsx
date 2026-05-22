@@ -207,7 +207,7 @@ export default function Home() {
           {/* Header */}
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Por que escolher a <span className="text-orange-500">Multiplan?</span>
+              Por que escolher a <span className="text-orange-500">Hapvida?</span>
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               Proteção completa com os melhores benefícios e atendimento de qualidade
