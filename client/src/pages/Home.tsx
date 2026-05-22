@@ -39,7 +39,7 @@ export default function Home() {
       title: "Clínica São José",
       image: "/sao-jose.jpg",
     },
-  ];
+  ].filter((item) => item.image && item.title);
 
   const nextSlide = () => {
     setCarouselIndex((prev) => (prev + 1) % carouselItems.length);
@@ -338,9 +338,9 @@ export default function Home() {
             <Swiper
               modules={[Autoplay]}
               centeredSlides={true}
-              slidesPerView="auto"
+              slidesPerView={1}
               spaceBetween={40}
-              loop={true}
+              loop={carouselItems.length > 1}
               autoplay={{
                 delay: 3500,
                 disableOnInteraction: false,
@@ -348,7 +348,7 @@ export default function Home() {
               className="w-full max-w-6xl"
             >
               {carouselItems.map((item, index) => (
-                <SwiperSlide key={index} className="!w-[280px] sm:!w-[380px] md:!w-[500px]">
+                <SwiperSlide key={`carousel-${index}-${item.image}`} className="!w-[280px] sm:!w-[380px] md:!w-[500px]">
                   {({ isActive }) => (
                     <div
                       className={`transition-all duration-500 ease-out h-[300px] sm:h-[350px] md:h-[420px] ${
