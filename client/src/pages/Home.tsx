@@ -52,7 +52,7 @@ export default function Home() {
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
 
         <div className="relative z-10 container mx-auto px-4 py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Side - Content */}
             <div className="space-y-8 text-white flex flex-col justify-center">
               {/* Logo */}
@@ -100,8 +100,8 @@ export default function Home() {
             </div>
 
             {/* Right Side - Form (Fixed on Desktop) */}
-            <div className="hidden lg:flex items-center justify-center bg-transparent">
-              <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl p-8 sticky top-1/2 transform -translate-y-1/2">
+            <div className="hidden lg:flex items-center justify-center h-fit overflow-visible">
+              <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl p-10 sticky top-20">
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     ✨ Responda rápido para liberar seu desconto de 15%
