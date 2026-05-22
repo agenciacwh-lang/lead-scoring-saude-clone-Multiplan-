@@ -103,7 +103,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col overflow-hidden bg-gradient-to-br from-white via-gray-50 to-white">
+    <div className="relative flex flex-col bg-gradient-to-br from-white via-gray-50 to-white">
       {/* Subtle background pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0 dot-pattern" />
@@ -124,12 +124,9 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
       </header>
 
       {/* Main content */}
-      <main className="relative z-10 flex-1 flex items-center justify-center px-4 py-8">
+      <main className="relative z-10 flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-md">
-          {/* Logo */}
-          <div className="flex justify-center mb-8">
-            <img src={hapvidaLogoUrl} alt="Hapvida" className="h-16 object-contain" />
-          </div>
+    
 
           {/* Card */}
           <div

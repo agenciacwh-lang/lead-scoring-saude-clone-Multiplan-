@@ -96,7 +96,7 @@ export default function Home() {
             {/* Right Side - Form (Fixed) */}
             <div className="hidden lg:block">
               {formVisible && (
-                <div className="bg-white rounded-2xl shadow-2xl p-8 sticky top-20 max-h-[calc(100vh-80px)] overflow-y-auto">
+                <div className="bg-white rounded-2xl shadow-2xl p-8 sticky top-20">
                   <div className="mb-6">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Responda rápido para liberar seu desconto de 15%</h2>
                     <p className="text-gray-600 text-sm">Leva menos de 2 minutos</p>
