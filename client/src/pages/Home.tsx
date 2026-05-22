@@ -19,15 +19,19 @@ export default function Home() {
   const carouselItems = [
     {
       title: "Hospital Gabriel Soares",
-      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&h=500&fit=crop",
+      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.01_d9818831.jpeg",
     },
     {
-      title: "Hapclínicas Aracaju",
-      image: "https://images.unsplash.com/photo-1631217b9201-d5ffd5433f13?w=800&h=500&fit=crop",
+      title: "Diagnóstico Centro",
+      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.01(2)_ffea51fd.jpeg",
     },
     {
-      title: "Pronto Atendimento 24h",
-      image: "https://images.unsplash.com/photo-1587854692152-cbe660dbde0b?w=800&h=500&fit=crop",
+      title: "Clínica Hermes Fontes",
+      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.00(2)_36291e1f.jpeg",
+    },
+    {
+      title: "Clínica São José",
+      image: "/manus-storage/WhatsAppImage2026-05-22at15.12.00(1)_3f7b2a9e.jpeg",
     },
   ];
 
