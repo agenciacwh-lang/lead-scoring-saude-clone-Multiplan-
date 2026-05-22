@@ -9,6 +9,9 @@ import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
 import Quiz from "@/components/Quiz";
 import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram, ChevronLeft, ChevronRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+import "swiper/css";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -327,64 +330,48 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Carousel */}
-          <div className="relative max-w-4xl mx-auto">
-            {/* Carousel Container */}
-            <div className="relative h-96 bg-gray-200 rounded-2xl overflow-hidden shadow-2xl">
-              {/* Slides */}
+          {/* Carousel with Swiper - Center Mode */}
+          <div className="w-full max-w-6xl mx-auto px-4">
+            <Swiper
+              modules={[Autoplay]}
+              centeredSlides={true}
+              slidesPerView="auto"
+              spaceBetween={30}
+              loop={true}
+              autoplay={{
+                delay: 3500,
+                disableOnInteraction: false,
+              }}
+              className="w-full"
+            >
               {carouselItems.map((item, index) => (
-                <div
-                  key={index}
-                  className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
-                    index === carouselIndex ? "opacity-100" : "opacity-0"
-                  }`}
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover"
-                  />
-                  {/* Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
-                    <div className="p-8 w-full">
-                      <h3 className="text-3xl font-bold text-white">{item.title}</h3>
+                <SwiperSlide key={index} className="w-auto">
+                  {({ isActive }) => (
+                    <div
+                      className={`transition-all duration-500 ease-out ${
+                        isActive ? "scale-110" : "scale-90 opacity-50"
+                      }`}
+                    >
+                      <div className="relative rounded-2xl overflow-hidden shadow-2xl bg-gray-200">
+                        <div className="aspect-video w-96 flex items-center justify-center">
+                          <img
+                            src={item.image}
+                            alt={item.title}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        {/* Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end">
+                          <div className="p-6 w-full">
+                            <h3 className="text-2xl font-bold text-white">{item.title}</h3>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  )}
+                </SwiperSlide>
               ))}
-            </div>
-
-            {/* Navigation Buttons */}
-            <button
-              onClick={prevSlide}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-900 p-3 rounded-full shadow-lg transition-all duration-200 z-10"
-              aria-label="Slide anterior"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white text-blue-900 p-3 rounded-full shadow-lg transition-all duration-200 z-10"
-              aria-label="Próximo slide"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Dots Indicator */}
-            <div className="flex justify-center gap-2 mt-6">
-              {carouselItems.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCarouselIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === carouselIndex
-                      ? "bg-blue-900 w-8"
-                      : "bg-gray-300 hover:bg-gray-400"
-                  }`}
-                  aria-label={`Ir para slide ${index + 1}`}
-                />
-              ))}
-            </div>
+            </Swiper>
           </div>
         </div>
       </section>
