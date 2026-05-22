@@ -333,11 +333,11 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 auto-rows-max">
               {/* Hospital Gabriel Soares - Destaque Principal (2x2) */}
               <div className="md:col-span-2 md:row-span-2">
-                <div className="relative h-96 md:h-full rounded-3xl overflow-hidden shadow-2xl group">
+                <div className="relative w-full aspect-square rounded-3xl overflow-hidden shadow-2xl group p-2">
                   <img
                     src={carouselItems[0].image}
                     alt={carouselItems[0].title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex items-end">
                     <div className="p-8 w-full">
@@ -350,11 +350,11 @@ export default function Home() {
 
               {/* Diagnóstico Centro */}
               <div className="md:col-span-2">
-                <div className="relative h-56 rounded-2xl overflow-hidden shadow-lg group">
+                <div className="relative w-full h-64 rounded-2xl overflow-hidden shadow-md group p-2">
                   <img
                     src={carouselItems[1].image}
                     alt={carouselItems[1].title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end">
                     <div className="p-4 w-full">
@@ -366,11 +366,11 @@ export default function Home() {
 
               {/* Clínica Hermes Fontes */}
               <div className="md:col-span-1">
-                <div className="relative h-56 rounded-2xl overflow-hidden shadow-lg group">
+                <div className="relative w-full h-64 rounded-2xl overflow-hidden shadow-md group p-2">
                   <img
                     src={carouselItems[2].image}
                     alt={carouselItems[2].title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end">
                     <div className="p-4 w-full">
@@ -382,11 +382,11 @@ export default function Home() {
 
               {/* Clínica São José */}
               <div className="md:col-span-1">
-                <div className="relative h-56 rounded-2xl overflow-hidden shadow-lg group">
+                <div className="relative w-full h-64 rounded-2xl overflow-hidden shadow-md group p-2">
                   <img
                     src={carouselItems[3].image}
                     alt={carouselItems[3].title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end">
                     <div className="p-4 w-full">
