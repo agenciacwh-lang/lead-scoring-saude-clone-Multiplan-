@@ -88,9 +88,11 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
     if (!validateForm()) return;
 
     setSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
+    
+    // Salvar dados imediatamente
     setLeadData(formData);
+    
+    // Chamar callback imediatamente (sem delay)
     onSubmit(formData);
 
     setSubmitting(false);

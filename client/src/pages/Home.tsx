@@ -45,10 +45,15 @@ export default function Home() {
   };
 
   useEffect(() => {
-    // Nunca renderizar Quiz automaticamente
-    // Quiz só é renderizado quando handleFormSubmit é chamado explicitamente
-    // Isso garante que o formulário de dados foi preenchido
-  }, []);
+    // Sincronizar showQuiz com leadData para garantir que o Quiz é renderizado
+    // assim que os dados são salvos no contexto
+    if (showQuiz && leadData && leadData.nome) {
+      // Quiz deve estar visível
+    } else if (showQuiz && (!leadData || !leadData.nome)) {
+      // Se showQuiz está true mas leadData não existe, resetar
+      setShowQuiz(false);
+    }
+  }, [leadData, showQuiz]);
 
   const handleFormSubmit = () => {
     // Validar que leadData foi salvo com sucesso
