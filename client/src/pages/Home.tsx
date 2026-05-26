@@ -55,9 +55,32 @@ export default function Home() {
     }
   }, [leadData, showQuiz]);
 
-  const handleFormSubmit = () => {
+  const handleFormSubmit = async () => {
     // Validar que leadData foi salvo com sucesso
     if (leadData && leadData.nome && leadData.telefone && leadData.email && leadData.cidade) {
+      // MOMENTO 1: Disparar webhook de captura inicial com status "Incompleto"
+      try {
+        const payload = {
+          telefone: leadData.telefone,
+          nome: leadData.nome,
+          email: leadData.email,
+          cidade: leadData.cidade,
+          status: "Incompleto",
+          timestamp: new Date().toISOString(),
+        };
+
+        // Enviar para webhook service (tRPC)
+        await fetch("/api/trpc/system.syncLeadStatus", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: payload }),
+        });
+
+        console.log("[Home] Webhook de captura inicial disparado");
+      } catch (error) {
+        console.error("[Home] Erro ao disparar webhook:", error);
+      }
+
       setShowQuiz(true);
     } else {
       // Se dados não foram salvos, não avançar
@@ -65,9 +88,34 @@ export default function Home() {
     }
   };
 
-  const handleQuizSubmit = () => {
+  const handleQuizSubmit = async (quizAnswers: Record<string, string>, temperature: string, score: number) => {
     // Verificar se leadData existe antes de ir para /obrigado
     if (leadData && leadData.nome) {
+      // MOMENTO 2: Disparar webhook de finalização com status "Concluído"
+      try {
+        const payload = {
+          telefone: leadData.telefone,
+          nome: leadData.nome,
+          email: leadData.email,
+          cidade: leadData.cidade,
+          status: "Concluído",
+          temperature: temperature,
+          totalScore: score,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Enviar para webhook service (tRPC)
+        await fetch("/api/trpc/system.syncLeadStatus", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: payload }),
+        });
+
+        console.log("[Home] Webhook de finalização disparado");
+      } catch (error) {
+        console.error("[Home] Erro ao disparar webhook:", error);
+      }
+
       setLocation("/obrigado");
     } else {
       // Redirecionar para início se dados foram perdidos
