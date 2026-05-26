@@ -61,7 +61,7 @@ export const QUIZ_QUESTIONS: QuizQuestion[] = [
     icon: "💰",
     options: [
       { id: "ate_1500", text: "Até R$ 1.500", points: 0 },
-      { id: "1500_3000", text: "R$ 1.500 a R$ 3.000", points: 1 },
+      { id: "1500_3000", text: "R$ 1.500 a R$ 3.000", points: 0 },
       { id: "3000_6000", text: "R$ 3.000 a R$ 6.000", points: 2 },
       { id: "acima_6000", text: "Acima de R$ 6.000", points: 3 },
     ],
