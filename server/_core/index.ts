@@ -1,4 +1,14 @@
 import "dotenv/config";
+
+// Polyfill de fetch para compatibilidade com Node.js < 22 (Hostinger/VPS)
+// Em Node 22+ o fetch já é nativo; em versões anteriores o cross-fetch
+// garante que a API fetch esteja disponível globalmente.
+import crossFetch from "cross-fetch";
+if (!globalThis.fetch) {
+  // @ts-ignore — polyfill intencional para ambientes sem fetch nativo
+  globalThis.fetch = crossFetch;
+}
+
 import express from "express";
 import { createServer } from "http";
 import net from "net";
@@ -56,14 +66,23 @@ async function startServer() {
 
 
   const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
 
-  if (port !== preferredPort) {
-    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
+  // Em produção, usar a porta exata definida pelo ambiente (Hostinger/VPS)
+  // e fazer binding em 0.0.0.0 para aceitar conexões externas.
+  // Em desenvolvimento, buscar porta disponível para evitar conflitos.
+  let port: number;
+  if (process.env.NODE_ENV === "production") {
+    port = preferredPort;
+  } else {
+    port = await findAvailablePort(preferredPort);
+    if (port !== preferredPort) {
+      console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
+    }
   }
 
-  server.listen(port, () => {
-    console.log(`Server running on http://localhost:${port}/`);
+  const host = "0.0.0.0";
+  server.listen(port, host, () => {
+    console.log(`Server running on http://${host}:${port}/`);
   });
 }
 
