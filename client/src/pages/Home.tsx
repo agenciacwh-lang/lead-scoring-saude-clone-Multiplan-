@@ -1,127 +1,115 @@
 /**
- * Home Page – Landing Page Premium Hapvida
- * Design: Hero Section sofisticado + Benefícios + Formulário fixo
+ * Home Page – Landing Page Premium Multiplan
+ * Fluxo de dois tempos (Carrinho Abandonado):
+ *   Passo 1 → leads.submitInitial  ao clicar "Responder perguntas" (status: Incompleto)
+ *   Passo 2 → leads.submitCompleted ao concluir o quiz              (status: Concluído)
+ * Sem timers no frontend — controle de tempo feito pelo BotConversa.
  */
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
 import Quiz from "@/components/Quiz";
 import FormCard from "@/components/FormCard";
+import { trpc } from "@/lib/trpc";
+import { calculateLeadScore } from "@/lib/quizData";
 import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
-  const { leadData } = useLeadContext();
+  const { leadData, setLeadData, quizAnswers } = useLeadContext();
   const [showQuiz, setShowQuiz] = useState(false);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
+  // ─── Mutations tRPC ───────────────────────────────────────────────────────
+  const submitInitial = trpc.leads.submitInitial.useMutation({
+    onSuccess: (data) => {
+      console.log("[Home] PASSO 1 — Lead inicial capturado:", data);
+    },
+    onError: (error) => {
+      // Não bloquear o usuário em caso de falha — o quiz ainda abre
+      console.error("[Home] PASSO 1 — Erro ao capturar lead inicial:", error);
+    },
+  });
+
+  const submitCompleted = trpc.leads.submitCompleted.useMutation({
+    onSuccess: (data) => {
+      console.log("[Home] PASSO 2 — Lead concluído:", data);
+    },
+    onError: (error) => {
+      console.error("[Home] PASSO 2 — Erro ao concluir lead:", error);
+    },
+  });
+
+  // ─── Carrossel ────────────────────────────────────────────────────────────
   const carouselItems = [
-    {
-      title: "Hospital Gabriel Soares",
-      image: "/gabriel-soares.jpg",
-    },
-    {
-      title: "Diagnóstico Centro",
-      image: "/diagnostico-centro.jpg",
-    },
-    {
-      title: "Clínica Hermes Fontes",
-      image: "/hermes-fontes.jpg",
-    },
-    {
-      title: "Clínica São José",
-      image: "/sao-jose.jpg",
-    },
+    { title: "Hospital Gabriel Soares", image: "/gabriel-soares.jpg" },
+    { title: "Diagnóstico Centro", image: "/diagnostico-centro.jpg" },
+    { title: "Clínica Hermes Fontes", image: "/hermes-fontes.jpg" },
+    { title: "Clínica São José", image: "/sao-jose.jpg" },
   ].filter((item) => item.image && item.title);
 
-  const nextSlide = () => {
-    setCarouselIndex((prev) => (prev + 1) % carouselItems.length);
+  const nextSlide = () => setCarouselIndex((prev) => (prev + 1) % carouselItems.length);
+  const prevSlide = () => setCarouselIndex((prev) => (prev - 1 + carouselItems.length) % carouselItems.length);
+
+  // ─── Passo 1: Formulário → Quiz ──────────────────────────────────────────
+  const handleFormSubmit = (data: { nome: string; telefone: string; email: string; cidade: string }) => {
+    // Salvar dados no contexto para uso posterior
+    setLeadData(data);
+
+    // Disparar captura imediata com status "Incompleto" (fire-and-forget)
+    // O quiz abre independentemente do resultado da mutation
+    const telefoneLimpo = data.telefone.replace(/\D/g, "");
+    submitInitial.mutate({
+      nome: data.nome,
+      telefone: telefoneLimpo,
+      email: data.email,
+      cidade: data.cidade,
+    });
+
+    // Abrir o quiz imediatamente
+    setShowQuiz(true);
   };
 
-  const prevSlide = () => {
-    setCarouselIndex((prev) => (prev - 1 + carouselItems.length) % carouselItems.length);
-  };
-
-  useEffect(() => {
-    // Sincronizar showQuiz com leadData para garantir que o Quiz é renderizado
-    // assim que os dados são salvos no contexto
-    if (showQuiz && leadData && leadData.nome) {
-      // Quiz deve estar visível
-    } else if (showQuiz && (!leadData || !leadData.nome)) {
-      // Se showQuiz está true mas leadData não existe, resetar
+  // ─── Passo 2: Conclusão do Quiz ──────────────────────────────────────────
+  const handleQuizSubmit = (
+    answers: Record<string, string>,
+    temperature: string,
+    score: number
+  ) => {
+    if (!leadData?.nome) {
+      console.warn("[Home] PASSO 2 — leadData ausente, redirecionando para formulário");
       setShowQuiz(false);
+      return;
     }
-  }, [leadData, showQuiz]);
 
-  const handleFormSubmit = async () => {
-    // Validar que leadData foi salvo com sucesso
-    if (leadData && leadData.nome && leadData.telefone && leadData.email && leadData.cidade) {
-      // MOMENTO 1: Disparar webhook de captura inicial com status "Incompleto"
-      try {
-        const payload = {
-          telefone: leadData.telefone,
-          nome: leadData.nome,
-          email: leadData.email,
-          cidade: leadData.cidade,
-          status: "Incompleto",
-          timestamp: new Date().toISOString(),
-        };
+    const telefoneLimpo = leadData.telefone.replace(/\D/g, "");
+    const prioridade =
+      answers.tempo_compra === "quanto_antes" || answers.situacao_atual === "quero_trocar"
+        ? "Sim"
+        : "Não";
 
-        // Enviar para webhook service (tRPC)
-        await fetch("/api/trpc/system.syncLeadStatus", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input: payload }),
-        });
+    // Disparar atualização com status "Concluído" (fire-and-forget)
+    submitCompleted.mutate({
+      nome: leadData.nome,
+      telefone: telefoneLimpo,
+      email: leadData.email,
+      cidade: leadData.cidade,
+      tempo_compra: answers.tempo_compra ?? "",
+      situacao_atual: answers.situacao_atual ?? "",
+      renda: answers.renda ?? "",
+      criterio_escolha: answers.criterio_escolha ?? "",
+      cnpj_mei: answers.cnpj_mei ?? "",
+      idades: answers.idades ?? "",
+      pontuacao: score,
+      temperatura: temperature as "frio" | "morno" | "quente",
+      prioridade,
+    });
 
-        console.log("[Home] Webhook de captura inicial disparado");
-      } catch (error) {
-        console.error("[Home] Erro ao disparar webhook:", error);
-      }
-
-      setShowQuiz(true);
-    } else {
-      // Se dados não foram salvos, não avançar
-      console.warn("Formulário incompleto - não avançando para Quiz");
-    }
-  };
-
-  const handleQuizSubmit = async (quizAnswers: Record<string, string>, temperature: string, score: number) => {
-    // Verificar se leadData existe antes de ir para /obrigado
-    if (leadData && leadData.nome) {
-      // MOMENTO 2: Disparar webhook de finalização com status "Concluído"
-      try {
-        const payload = {
-          telefone: leadData.telefone,
-          nome: leadData.nome,
-          email: leadData.email,
-          cidade: leadData.cidade,
-          status: "Concluído",
-          temperature: temperature,
-          totalScore: score,
-          timestamp: new Date().toISOString(),
-        };
-
-        // Enviar para webhook service (tRPC)
-        await fetch("/api/trpc/system.syncLeadStatus", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ input: payload }),
-        });
-
-        console.log("[Home] Webhook de finalização disparado");
-      } catch (error) {
-        console.error("[Home] Erro ao disparar webhook:", error);
-      }
-
-      setLocation("/obrigado");
-    } else {
-      // Redirecionar para início se dados foram perdidos
-      setShowQuiz(false);
-      console.warn("Dados do lead foram perdidos - retornando ao formulário");
-    }
+    // Navegar para a página de obrigado imediatamente
+    const targetRoute = temperature === "frio" ? "/confirmado" : "/obrigado";
+    setLocation(targetRoute);
   };
 
   const scrollToForm = () => {
@@ -131,9 +119,7 @@ export default function Home() {
     }
   };
 
-  // Renderizar apenas o formulário se Quiz não foi iniciado
-  // Quiz só é renderizado após handleFormSubmit validar os dados
-  const shouldShowQuiz = showQuiz && leadData && leadData.nome;
+  const shouldShowQuiz = showQuiz && leadData?.nome;
 
   return (
     <div className="min-h-screen bg-white" key="home-page">
@@ -149,58 +135,61 @@ export default function Home() {
             filter: "blur(2px)",
           }}
         />
-
-        {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/95 to-blue-800/90" />
-
-        {/* Decorative Elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" />
 
         <div className="relative z-10 container mx-auto px-4 py-20">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Side - Content */}
-            <div className="space-y-8 text-white flex flex-col justify-center">
-              {/* Logo */}
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-orange-500">
-                  <Heart className="w-6 h-6 text-white fill-white" />
-                </div>
-                <span className="text-2xl font-bold">Hapvida</span>
+            <div className="text-white">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 rounded-full px-4 py-2 mb-6">
+                <Heart className="w-4 h-4 text-orange-400" fill="currentColor" />
+                <span className="text-sm font-medium text-orange-300">Multiplan Seguros e Planos de Saúde</span>
               </div>
 
-              {/* Main Title */}
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-6xl font-bold leading-tight">
-                  Garanta <span className="text-orange-400">15% de Desconto</span> no Plano Hapvida Hoje Mesmo!
-                </h1>
-                <p className="text-xl text-blue-100 leading-relaxed">
-                  Proteção completa para você e sua família com a maior rede de saúde do Brasil. Responda rápido e desbloqueie seu desconto exclusivo nas 3 primeiras mensalidades.
-                </p>
+              <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-6">
+                Encontre o Plano de Saúde{" "}
+                <span className="text-orange-400">Ideal para Você</span>
+              </h1>
+
+              <p className="text-lg text-blue-200 mb-8 leading-relaxed">
+                Responda algumas perguntas rápidas e receba uma indicação personalizada do melhor plano de saúde para o seu perfil e orçamento.
+              </p>
+
+              {/* Features */}
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                {[
+                  { icon: Shield, text: "Cobertura completa" },
+                  { icon: Stethoscope, text: "Rede credenciada ampla" },
+                  { icon: Users, text: "Planos individuais e família" },
+                  { icon: Zap, text: "Atendimento rápido" },
+                ].map(({ icon: Icon, text }) => (
+                  <div key={text} className="flex items-center gap-2 text-blue-200">
+                    <Icon className="w-5 h-5 text-orange-400 flex-shrink-0" />
+                    <span className="text-sm">{text}</span>
+                  </div>
+                ))}
               </div>
 
-              {/* CTA Button */}
-              <div>
-                <button
-                  onClick={scrollToForm}
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl inline-flex items-center gap-2"
-                >
-                  Quero Aproveitar os 15% de Desconto
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                  </svg>
-                </button>
-              </div>
+              {/* CTA Mobile */}
+              <button
+                onClick={scrollToForm}
+                className="lg:hidden w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-105 shadow-lg mb-4"
+              >
+                Encontrar meu plano ideal →
+              </button>
 
-              {/* Trust Badges */}
-              <div className="flex items-center gap-6 pt-8 border-t border-blue-700">
+              {/* Trust Indicators */}
+              <div className="flex items-center gap-6 text-sm text-blue-300">
                 <div className="flex items-center gap-2">
-                  <Shield className="w-5 h-5 text-orange-400" />
-                  <span className="text-sm">100% Seguro</span>
+                  <Shield className="w-4 h-4 text-green-400" />
+                  <span>Dados protegidos</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-orange-400" />
-                  <span className="text-sm">Leva 2 minutos</span>
+                  <span>Leva 2 minutos</span>
                 </div>
               </div>
             </div>
@@ -212,7 +201,9 @@ export default function Home() {
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
                     ✨ Responda rápido para liberar seu desconto de 15%
                   </h2>
-                  <p className="text-gray-600 text-sm leading-relaxed">Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!</p>
+                  <p className="text-gray-600 text-sm leading-relaxed">
+                    Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!
+                  </p>
                 </div>
 
                 {!shouldShowQuiz ? (
@@ -231,7 +222,9 @@ export default function Home() {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
                   ✨ Responda rápido para liberar seu desconto de 15%
                 </h2>
-                <p className="text-gray-600 text-sm leading-relaxed">Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!</p>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal para você, com o melhor custo-benefício e cobertura para o que você realmente precisa!
+                </p>
               </div>
 
               {!shouldShowQuiz ? (
@@ -257,303 +250,80 @@ export default function Home() {
       {/* ========== BENEFÍCIOS SECTION ========== */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Por que escolher a <span className="text-orange-500">Hapvida?</span>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Por que escolher a Multiplan?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Proteção completa com os melhores benefícios e atendimento de qualidade
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Somos especialistas em planos de saúde em Aracaju e região. Encontramos a melhor opção para o seu perfil e orçamento.
             </p>
           </div>
 
-          {/* Benefits Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Benefit 1 */}
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="w-14 h-14 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
-                <Stethoscope className="w-7 h-7 text-orange-500" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Telemedicina 24h</h3>
-              <p className="text-gray-600">
-                Consulte médicos especialistas a qualquer hora, de qualquer lugar, com segurança e privacidade.
-              </p>
-            </div>
-
-            {/* Benefit 2 */}
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                <Users className="w-7 h-7 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Maior Rede Própria</h3>
-              <p className="text-gray-600">
-                Acesso a mais de 30 mil profissionais e 5 mil estabelecimentos em todo o Brasil.
-              </p>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center mb-6">
-                <Zap className="w-7 h-7 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Odontologia Inclusa</h3>
-              <p className="text-gray-600">
-                Cobertura completa em procedimentos odontológicos com profissionais qualificados.
-              </p>
-            </div>
-
-            {/* Benefit 4 */}
-            <div className="bg-white rounded-xl p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
-              <div className="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
-                <Heart className="w-7 h-7 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Carências Reduzidas</h3>
-              <p className="text-gray-600">
-                Prazos menores para ativar seus benefícios e começar a usar seu plano.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========== TIPOS DE PLANO ========== */}
-      <section className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Escolha o Plano Ideal para Você
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Soluções personalizadas com a melhor cobertura e preço justo
-            </p>
-          </div>
-
-          {/* Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Card 1 - Individual */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-blue-900 mb-2">INDIVIDUAL</h3>
-                <div className="h-1 w-16 bg-orange-500 rounded"></div>
-              </div>
-              <p className="text-gray-700 mb-8 leading-relaxed">
-                Sua saúde em primeiro lugar. Cobertura completa para consultas, exames e urgências com o melhor custo-benefício. Garanta sua tranquilidade pagando menos.
-              </p>
-              <button
-                onClick={scrollToForm}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
-              >
-                Simular com Desconto
-              </button>
-            </div>
-
-            {/* Card 2 - Familiar */}
-            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105 md:scale-105">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-orange-900 mb-2">FAMILIAR</h3>
-                <div className="h-1 w-16 bg-blue-900 rounded"></div>
-              </div>
-              <p className="text-gray-700 mb-8 leading-relaxed">
-                Proteção para quem você mais ama. Ampla rede pediátrica e estrutura completa para cuidar de toda a sua família com mensalidades que cabem no bolso.
-              </p>
-              <button
-                onClick={scrollToForm}
-                className="w-full bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
-              >
-                Simular com Desconto
-              </button>
-            </div>
-
-            {/* Card 3 - Empresarial */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-8 shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
-              <div className="mb-6">
-                <h3 className="text-2xl font-bold text-green-900 mb-2">EMPRESARIAL (MEI / PME)</h3>
-                <div className="h-1 w-16 bg-orange-500 rounded"></div>
-              </div>
-              <p className="text-gray-700 mb-8 leading-relaxed">
-                Saúde para o seu negócio crescer. Condições exclusivas a partir de 2 vidas (válido para MEI). Valorize sua equipe com a maior rede do Norte e Nordeste.
-              </p>
-              <button
-                onClick={scrollToForm}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 transform hover:scale-105"
-              >
-                Simular com Desconto
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========== REDE DE ATENDIMENTO ========== */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="container mx-auto px-4">
-          {/* Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-              Maior Rede Exclusiva de Sergipe
-            </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Atendimento de ponta e infraestrutura completa pertinho de você
-            </p>
-          </div>
-
-          {/* Bento Grid Premium - 3 Colunas com Alinhamento de Precisão */}
-          <div className="max-w-6xl mx-auto px-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 auto-rows-max">
-              {/* Hospital Gabriel Soares - Destaque Principal (1x2) */}
-              <div className="md:col-span-1 md:row-span-2">
-                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-2xl group">
-                  <img
-                    src={carouselItems[0].image}
-                    alt={carouselItems[0].title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end">
-                    <div className="p-6 w-full">
-                      <h3 className="text-2xl font-bold text-white drop-shadow-lg">{carouselItems[0].title}</h3>
-                      <p className="text-xs text-blue-100 mt-2 font-medium">Destaque Principal</p>
-                    </div>
-                  </div>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                icon: Shield,
+                title: "Cobertura Completa",
+                description: "Planos com ampla cobertura para consultas, exames, internações e cirurgias.",
+              },
+              {
+                icon: Users,
+                title: "Atendimento Personalizado",
+                description: "Nossa equipe analisa seu perfil e indica o plano mais adequado para você e sua família.",
+              },
+              {
+                icon: Zap,
+                title: "Processo Rápido",
+                description: "Em poucos minutos você recebe uma indicação personalizada e pode contratar online.",
+              },
+            ].map(({ icon: Icon, title, description }) => (
+              <div key={title} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+                <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Icon className="w-7 h-7 text-orange-500" />
                 </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
+                <p className="text-gray-600 leading-relaxed">{description}</p>
               </div>
-
-              {/* Diagnóstico Centro */}
-              <div className="md:col-span-1">
-                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl group">
-                  <img
-                    src={carouselItems[1].image}
-                    alt={carouselItems[1].title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent flex items-end">
-                    <div className="p-4 w-full">
-                      <h3 className="text-lg font-bold text-white drop-shadow-lg">{carouselItems[1].title}</h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Clínica Hermes Fontes */}
-              <div className="md:col-span-1">
-                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl group">
-                  <img
-                    src={carouselItems[2].image}
-                    alt={carouselItems[2].title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent flex items-end">
-                    <div className="p-4 w-full">
-                      <h3 className="text-lg font-bold text-white drop-shadow-lg">{carouselItems[2].title}</h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Clínica São José */}
-              <div className="md:col-span-1">
-                <div className="relative w-full h-full rounded-3xl overflow-hidden shadow-xl group">
-                  <img
-                    src={carouselItems[3].image}
-                    alt={carouselItems[3].title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent flex items-end">
-                    <div className="p-4 w-full">
-                      <h3 className="text-lg font-bold text-white drop-shadow-lg">{carouselItems[3].title}</h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-        </div>
-      </section>
-
-      {/* ========== CTA FINAL ========== */}
-      <section className="py-20 bg-gradient-to-r from-blue-900 to-blue-800">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Não deixe essa oportunidade passar!
-          </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Aproveite os 15% de desconto nas 3 primeiras mensalidades e comece sua jornada de saúde com a Multiplan.
-          </p>
-          <button
-            onClick={scrollToForm}
-            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-lg text-lg transition-all duration-200 transform hover:scale-105 shadow-2xl inline-flex items-center gap-2"
-          >
-            Quero Aproveitar os 15% de Desconto
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-            </svg>
-          </button>
         </div>
       </section>
 
       {/* ========== FOOTER ========== */}
-      <footer className="bg-gray-900 text-gray-400 py-12">
+      <footer className="bg-blue-900 text-white py-12">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-            {/* Company Info */}
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
             <div>
-              <div className="mb-6">
-                <h3 className="text-white font-bold text-lg mb-3">MULTIPLAN SEGUROS E PLANOS DE SAÚDE</h3>
-                <div className="space-y-2 text-sm">
-                  <p><strong>CNPJ:</strong> 26.200.497/0001-85</p>
-                  <p><strong>SUSEP:</strong> nº 251164987</p>
-                  <p><strong>Endereço:</strong> R. São Cristóvão, 431 - Centro, Aracaju - SE, 49055-620</p>
-                </div>
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-6 h-6 text-orange-400" fill="currentColor" />
+                <span className="font-bold text-lg">Multiplan</span>
+              </div>
+              <p className="text-blue-300 text-sm leading-relaxed">
+                Especialistas em planos de saúde em Aracaju e região. Encontramos a melhor opção para o seu perfil.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-bold mb-4">Contato</h4>
+              <div className="space-y-2 text-blue-300 text-sm">
+                <p>📍 Aracaju - SE</p>
+                <p>📱 WhatsApp disponível</p>
+                <p>✉️ Atendimento online</p>
               </div>
             </div>
-
-            {/* Contact & Social */}
             <div>
-              <h3 className="text-white font-bold mb-4">Contato</h3>
-              <div className="space-y-3 text-sm">
-                <p>
-                  <strong>Telefone/WhatsApp:</strong>
-                  <br />
-                  <a href="tel:+5579999232489" className="text-orange-400 hover:text-orange-300 transition">
-                    (79) 99923-2489
-                  </a>
-                </p>
-                <p>
-                  <strong>E-mail:</strong>
-                  <br />
-                  <a href="mailto:comercial@multiplanvendas.com.br" className="text-orange-400 hover:text-orange-300 transition">
-                    comercial@multiplanvendas.com.br
-                  </a>
-                </p>
-              </div>
-
-              {/* Social Media */}
-              <div className="flex items-center gap-4 mt-6">
-                <a
-                  href="https://facebook.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-orange-400 transition"
-                  title="Facebook"
-                >
-                  <Facebook className="w-6 h-6" />
+              <h4 className="font-bold mb-4">Redes Sociais</h4>
+              <div className="flex gap-4">
+                <a href="#" className="w-10 h-10 bg-blue-800 rounded-lg flex items-center justify-center hover:bg-orange-500 transition-colors">
+                  <Facebook className="w-5 h-5" />
                 </a>
-                <a
-                  href="https://instagram.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-orange-400 transition"
-                  title="Instagram"
-                >
-                  <Instagram className="w-6 h-6" />
+                <a href="#" className="w-10 h-10 bg-blue-800 rounded-lg flex items-center justify-center hover:bg-orange-500 transition-colors">
+                  <Instagram className="w-5 h-5" />
                 </a>
               </div>
             </div>
           </div>
-
-          <div className="border-t border-gray-800 pt-8 text-center text-xs">
-            <p>&copy; 2026 Multiplan Seguros e Planos de Saúde. Todos os direitos reservados.</p>
-            <p className="mt-2">Desenvolvido com ❤️ para sua saúde</p>
+          <div className="border-t border-blue-800 pt-8 text-center text-blue-400 text-sm">
+            <p>© {new Date().getFullYear()} Multiplan Seguros e Planos de Saúde. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>

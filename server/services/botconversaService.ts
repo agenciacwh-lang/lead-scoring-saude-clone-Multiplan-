@@ -14,6 +14,8 @@ export interface BotconversaLeadPayload {
   criterio_escolha: string;
   cnpj_mei: string;
   idades: string;
+  /** Status do lead: 'Lead Incompleto' no Passo 1, 'Lead Concluiu' no Passo 2 */
+  status?: string;
 }
 
 /**
@@ -64,6 +66,9 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
       criterio_escolha: nullToEmpty(lead.criterio_escolha),
       cnpj_mei: nullToEmpty(lead.cnpj_mei),
       idades: nullToEmpty(lead.idades),
+      // Campo status para controle de funil no BotConversa
+      // Passo 1 → 'Lead Incompleto' | Passo 2 → 'Lead Concluiu'
+      status: lead.status ?? "Lead Incompleto",
     };
     
     // Formatar valores "crus" em strings legíveis

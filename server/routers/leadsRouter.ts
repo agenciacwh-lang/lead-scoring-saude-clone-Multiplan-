@@ -1,5 +1,12 @@
 /**
  * Router tRPC para gerenciar leads
+ *
+ * Fluxo de dois tempos (Carrinho Abandonado):
+ *   Passo 1 — leads.submitInitial  → Salva lead com status "incompleto" + dispara BotConversa e Sheets
+ *   Passo 2 — leads.submitCompleted → Atualiza lead com respostas do quiz + status "completo" + dispara integrações
+ *
+ * O controle de tempo (5 min) é feito exclusivamente pelo BotConversa.
+ * O site apenas avisa em tempo real via esses dois endpoints.
  */
 
 import { publicProcedure, router } from "../_core/trpc";
@@ -13,8 +20,280 @@ import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
 
 
 export const leadsRouter = router({
+
   /**
-   * Submeter um novo lead
+   * PASSO 1 — Captura Imediata
+   * Disparado quando o usuário clica em "Responder perguntas".
+   * Salva o lead no banco com status "incompleto" e notifica as integrações.
+   * O BotConversa aguardará 5 minutos e checará se o status mudou para "completo".
+   */
+  submitInitial: publicProcedure
+    .input(
+      z.object({
+        nome: z.string(),
+        telefone: z.string(),
+        email: z.string(),
+        cidade: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      console.log("[Leads] PASSO 1 — Captura imediata:", input.nome, input.telefone);
+
+      // Telefone limpo para o banco e integrações
+      const telefoneLimpo = input.telefone.replace(/\D/g, "");
+
+      let leadId: number | null = null;
+
+      // Salvar no banco com status "incompleto"
+      try {
+        const db = await getDb();
+        if (db) {
+          const result = await db.insert(leads).values({
+            nome: input.nome,
+            telefone: telefoneLimpo,
+            email: input.email,
+            cidade: input.cidade,
+            tempo_compra: "",
+            situacao_atual: "",
+            renda: "",
+            criterio_escolha: "",
+            cnpj_mei: "",
+            idades: "",
+            pontuacao: 0,
+            temperatura: "frio",
+            prioridade: "Não",
+            status: "incompleto",
+          }).returning();
+          if (result && result.length > 0) {
+            leadId = result[0].id;
+            console.log("[Leads] PASSO 1 — Lead salvo no banco. ID:", leadId);
+          }
+        }
+      } catch (dbError) {
+        console.error("[Leads] PASSO 1 — Erro ao salvar no banco:", dbError);
+      }
+
+      // Enviar para BotConversa com status "Lead Incompleto"
+      let botconversaSent = false;
+      try {
+        botconversaSent = await sendLeadToBotConversa({
+          nome: input.nome,
+          email: input.email,
+          telefone: telefoneLimpo,
+          cidade: input.cidade,
+          pontuacao: 0,
+          temperatura: "Frio",
+          tempo_compra: "",
+          situacao_atual: "",
+          renda: "",
+          criterio_escolha: "",
+          cnpj_mei: "",
+          idades: "",
+          status: "Lead Incompleto",
+        });
+        console.log("[Leads] PASSO 1 — BotConversa:", botconversaSent ? "✅ Enviado" : "❌ Falhou");
+      } catch (botError) {
+        console.error("[Leads] PASSO 1 — Erro BotConversa:", botError);
+      }
+
+      // Enviar para Google Sheets com status "Incompleto"
+      let sheetsSent = false;
+      try {
+        sheetsSent = await sendLeadToSheets({
+          nome: input.nome,
+          telefone: telefoneLimpo,
+          email: input.email,
+          cidade: input.cidade,
+          tempo_compra: "",
+          situacao_atual: "",
+          renda: "",
+          criterio_escolha: "",
+          cnpj_mei: "",
+          idades: "",
+          pontuacao: 0,
+          temperatura: "frio",
+          prioridade: "Não",
+          status: "incompleto",
+          createdAt: new Date(),
+        });
+        console.log("[Leads] PASSO 1 — Google Sheets:", sheetsSent ? "✅ Enviado" : "❌ Falhou");
+      } catch (sheetsError) {
+        console.error("[Leads] PASSO 1 — Erro Google Sheets:", sheetsError);
+      }
+
+      return {
+        success: true,
+        leadId,
+        botconversaSent,
+        sheetsSent,
+        message: "Lead inicial capturado com sucesso",
+      };
+    }),
+
+  /**
+   * PASSO 2 — Atualização de Conclusão
+   * Disparado quando o usuário conclui todas as perguntas do quiz.
+   * Atualiza o registro existente (por telefone) com as respostas e status "completo".
+   * Dispara novos webhooks para BotConversa e Sheets com status "Lead Concluiu".
+   */
+  submitCompleted: publicProcedure
+    .input(
+      z.object({
+        nome: z.string(),
+        telefone: z.string(),
+        email: z.string(),
+        cidade: z.string(),
+        tempo_compra: z.string(),
+        situacao_atual: z.string(),
+        renda: z.string(),
+        criterio_escolha: z.string(),
+        cnpj_mei: z.string(),
+        idades: z.string(),
+        pontuacao: z.number(),
+        temperatura: z.enum(["frio", "morno", "quente"]),
+        prioridade: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      console.log("[Leads] PASSO 2 — Conclusão do quiz:", input.nome, input.telefone);
+
+      const telefoneLimpo = input.telefone.replace(/\D/g, "");
+      let leadFromDb: any = null;
+
+      // Atualizar registro existente no banco (busca por telefone)
+      try {
+        const db = await getDb();
+        if (db) {
+          // Tentar atualizar registro existente pelo telefone
+          const updated = await db
+            .update(leads)
+            .set({
+              tempo_compra: input.tempo_compra,
+              situacao_atual: input.situacao_atual,
+              renda: input.renda,
+              criterio_escolha: input.criterio_escolha,
+              cnpj_mei: input.cnpj_mei,
+              idades: input.idades,
+              pontuacao: input.pontuacao,
+              temperatura: input.temperatura,
+              prioridade: input.prioridade,
+              status: "completo",
+            })
+            .where(eq(leads.telefone, telefoneLimpo))
+            .returning();
+
+          if (updated && updated.length > 0) {
+            leadFromDb = updated[0];
+            console.log("[Leads] PASSO 2 — Lead atualizado no banco. ID:", leadFromDb.id);
+          } else {
+            // Fallback: inserir novo registro se não encontrou o existente
+            console.warn("[Leads] PASSO 2 — Lead não encontrado pelo telefone, inserindo novo registro");
+            const inserted = await db.insert(leads).values({
+              nome: input.nome,
+              telefone: telefoneLimpo,
+              email: input.email,
+              cidade: input.cidade,
+              tempo_compra: input.tempo_compra,
+              situacao_atual: input.situacao_atual,
+              renda: input.renda,
+              criterio_escolha: input.criterio_escolha,
+              cnpj_mei: input.cnpj_mei,
+              idades: input.idades,
+              pontuacao: input.pontuacao,
+              temperatura: input.temperatura,
+              prioridade: input.prioridade,
+              status: "completo",
+            }).returning();
+            if (inserted && inserted.length > 0) {
+              leadFromDb = inserted[0];
+            }
+          }
+        }
+      } catch (dbError) {
+        console.error("[Leads] PASSO 2 — Erro ao atualizar banco:", dbError);
+      }
+
+      const temperaturaDisplay =
+        input.temperatura === "quente" ? "Quente" :
+        input.temperatura === "morno" ? "Morno" : "Frio";
+
+      // Enviar para BotConversa com status "Lead Concluiu"
+      let botconversaSent = false;
+      try {
+        botconversaSent = await sendLeadToBotConversa({
+          nome: input.nome,
+          email: input.email,
+          telefone: telefoneLimpo,
+          cidade: input.cidade,
+          pontuacao: input.pontuacao,
+          temperatura: temperaturaDisplay as "Frio" | "Morno" | "Quente",
+          tempo_compra: input.tempo_compra,
+          situacao_atual: input.situacao_atual,
+          renda: input.renda,
+          criterio_escolha: input.criterio_escolha,
+          cnpj_mei: input.cnpj_mei,
+          idades: input.idades,
+          status: "Lead Concluiu",
+        });
+        console.log("[Leads] PASSO 2 — BotConversa:", botconversaSent ? "✅ Enviado" : "❌ Falhou");
+      } catch (botError) {
+        console.error("[Leads] PASSO 2 — Erro BotConversa:", botError);
+      }
+
+      // Enviar para Google Sheets com status "completo"
+      let sheetsSent = false;
+      try {
+        sheetsSent = await sendLeadToSheets({
+          nome: input.nome,
+          telefone: telefoneLimpo,
+          email: input.email,
+          cidade: input.cidade,
+          tempo_compra: input.tempo_compra,
+          situacao_atual: input.situacao_atual,
+          renda: input.renda,
+          criterio_escolha: input.criterio_escolha,
+          cnpj_mei: input.cnpj_mei,
+          idades: input.idades,
+          pontuacao: input.pontuacao,
+          temperatura: input.temperatura,
+          prioridade: input.prioridade,
+          status: "completo",
+          createdAt: leadFromDb?.createdAt ?? new Date(),
+        });
+        console.log("[Leads] PASSO 2 — Google Sheets:", sheetsSent ? "✅ Enviado" : "❌ Falhou");
+      } catch (sheetsError) {
+        console.error("[Leads] PASSO 2 — Erro Google Sheets:", sheetsError);
+      }
+
+      // Enviar para Facebook CAPI
+      let facebookCapiSent = false;
+      try {
+        if (leadFromDb?.id) {
+          facebookCapiSent = await sendLeadToFacebookCapi({
+            leadId: leadFromDb.id,
+            email: input.email,
+            telefone: telefoneLimpo,
+            pageUrl: undefined,
+          });
+          console.log("[Leads] PASSO 2 — Facebook CAPI:", facebookCapiSent ? "✅ Enviado" : "❌ Falhou");
+        }
+      } catch (fbError) {
+        console.error("[Leads] PASSO 2 — Erro Facebook CAPI:", fbError);
+      }
+
+      return {
+        success: true,
+        leadId: leadFromDb?.id ?? null,
+        botconversaSent,
+        sheetsSent,
+        facebookCapiSent,
+        message: "Lead concluído com sucesso",
+      };
+    }),
+
+  /**
+   * LEGADO — Submeter um lead completo (mantido para compatibilidade)
+   * @deprecated Use submitInitial + submitCompleted no lugar
    */
   submit: publicProcedure
     .input(
@@ -36,104 +315,57 @@ export const leadsRouter = router({
     )
     .mutation(async ({ input }) => {
       try {
-        // DEBUG LOG - Payload completo recebido
-        console.log('[DEBUG] ========================================');
-        console.log('[DEBUG] PAYLOAD RECEBIDO NO SERVIDOR');
-        console.log('[DEBUG] ========================================');
-        console.log('[DEBUG] Nome:', input.nome);
-        console.log('[DEBUG] Telefone:', input.telefone);
-        console.log('[DEBUG] Email:', input.email);
-        console.log('[DEBUG] Cidade:', input.cidade);
-        console.log('[DEBUG] Tempo Compra:', input.tempo_compra);
-        console.log('[DEBUG] Situacao Atual:', input.situacao_atual);
-        console.log('[DEBUG] Renda:', input.renda);
-        console.log('[DEBUG] Criterio Escolha:', input.criterio_escolha);
-        console.log('[DEBUG] CNPJ/MEI:', input.cnpj_mei);
-        console.log('[DEBUG] Idades:', input.idades);
-        console.log('[DEBUG] Pontuacao:', input.pontuacao);
-        console.log('[DEBUG] Temperatura:', input.temperatura);
-        console.log('[DEBUG] Prioridade:', input.prioridade);
-        console.log('[DEBUG] Payload completo:', JSON.stringify(input, null, 2));
-        console.log('[DEBUG] ========================================');
-        
-        console.log('[Leads Router] Recebido novo lead:', input.nome, input.email);
-        
-        // Salvar no banco de dados
+        console.log('[Leads] submit (legado) — Recebido:', input.nome, input.email);
         const result = await saveLead(input);
-        console.log('[Leads Router] Lead salvo no banco:', result);
 
-        // O lead já foi salvo e retornado pelo Postgres
         let leadFromDb = null;
-        try {
-          if (result && Array.isArray(result) && result.length > 0) {
-            leadFromDb = result[0];
-            console.log('[Leads Router] Lead recuperado do banco:', leadFromDb);
-          }
-        } catch (dbError) {
-          console.error('[Leads Router] Erro ao processar lead do banco:', dbError);
+        if (result && Array.isArray(result) && result.length > 0) {
+          leadFromDb = result[0];
         }
 
-        // Enviar para Google Sheets (usar o lead do banco se disponivel)
+        const temperaturaDisplay =
+          input.temperatura === "quente" ? "Quente" :
+          input.temperatura === "morno" ? "Morno" : "Frio";
+
+        const telefoneLimpo = input.telefone.replace(/\D/g, "");
+
         let sheetsSent = false;
         try {
-          console.log('[Leads Router] Enviando lead para Google Sheets:', input.email);
-          const leadToSend = leadFromDb || input;
-          sheetsSent = await sendLeadToSheets(leadToSend);
-          console.log('[Leads Router] Resultado Google Sheets:', sheetsSent ? 'Sucesso' : 'Falhou');
-        } catch (sheetsError) {
-          console.error('[Leads Router] Erro ao enviar para Google Sheets:', sheetsError);
-        }
+          sheetsSent = await sendLeadToSheets(leadFromDb || input);
+        } catch (e) { console.error('[Leads] submit — Sheets error:', e); }
 
-        // Enviar para BotConversa
         let botconversaSent = false;
         try {
-          console.log('[Leads Router] Enviando lead para BotConversa...');
           botconversaSent = await sendLeadToBotConversa({
             nome: input.nome,
             email: input.email,
-            telefone: input.telefone,
+            telefone: telefoneLimpo,
             cidade: input.cidade,
             pontuacao: input.pontuacao,
-            temperatura: input.temperatura === "quente" ? "Quente" : input.temperatura === "morno" ? "Morno" : "Frio",
+            temperatura: temperaturaDisplay as "Frio" | "Morno" | "Quente",
             tempo_compra: input.tempo_compra,
             situacao_atual: input.situacao_atual,
             renda: input.renda,
             criterio_escolha: input.criterio_escolha,
             cnpj_mei: input.cnpj_mei,
             idades: input.idades,
+            status: "Lead Concluiu",
           });
-          console.log('[Leads Router] Resultado BotConversa:', botconversaSent ? 'Sucesso' : 'Falhou');
-        } catch (botError) {
-          console.error('[Leads Router] Erro ao enviar para BotConversa:', botError);
-        }
+        } catch (e) { console.error('[Leads] submit — BotConversa error:', e); }
 
-        // Enviar para Facebook CAPI (Conversions API)
         let facebookCapiSent = false;
         try {
-          if (leadFromDb && leadFromDb.id) {
-            console.log('[Leads Router] Enviando evento Lead para Facebook CAPI...');
+          if (leadFromDb?.id) {
             facebookCapiSent = await sendLeadToFacebookCapi({
               leadId: leadFromDb.id,
               email: input.email,
-              telefone: input.telefone,
-              pageUrl: undefined, // Usa SITE_URL do env automaticamente
+              telefone: telefoneLimpo,
+              pageUrl: undefined,
             });
-            console.log('[Leads Router] Resultado Facebook CAPI:', facebookCapiSent ? 'Sucesso' : 'Falhou');
-          } else {
-            console.warn('[Leads Router] Lead ID não disponível para Facebook CAPI');
           }
-        } catch (facebookError) {
-          console.error('[Leads Router] Erro ao enviar para Facebook CAPI:', facebookError);
-        }
+        } catch (e) { console.error('[Leads] submit — FB CAPI error:', e); }
 
-        return {
-          success: true,
-          message: "Lead salvo com sucesso",
-          result,
-          sheetsSent,
-          botconversaSent,
-          facebookCapiSent,
-        };
+        return { success: true, message: "Lead salvo com sucesso", result, sheetsSent, botconversaSent, facebookCapiSent };
       } catch (error) {
         console.error("Erro ao salvar lead:", error);
         return { success: false, message: "Erro ao salvar lead" };
@@ -145,13 +377,9 @@ export const leadsRouter = router({
    */
   getAll: publicProcedure.query(async () => {
     const db = await getDb();
-    if (!db) {
-      return [];
-    }
-
+    if (!db) return [];
     try {
-      const allLeads = await db.select().from(leads);
-      return allLeads;
+      return await db.select().from(leads);
     } catch (error) {
       console.error("Erro ao buscar leads:", error);
       return [];
@@ -166,7 +394,8 @@ export const leadsRouter = router({
   }),
 
   /**
-   * Submeter um lead incompleto (após timeout de inatividade)
+   * LEGADO — submitIncomplete (mantido para compatibilidade com InactivityContext)
+   * @deprecated O controle de inatividade agora é feito pelo BotConversa
    */
   submitIncomplete: publicProcedure
     .input(
@@ -184,76 +413,9 @@ export const leadsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      try {
-        // Salvar no banco com status "incompleto"
-        const result = await getDb().then((db) => {
-          if (!db) throw new Error("Database não disponível");
-          return db.insert(leads).values({
-            nome: input.nome,
-            telefone: input.telefone,
-            email: input.email,
-            cidade: input.cidade,
-            tempo_compra: input.tempo_compra || "",
-            situacao_atual: input.situacao_atual || "",
-            renda: input.renda || "",
-            criterio_escolha: input.criterio_escolha || "",
-            cnpj_mei: input.cnpj_mei || "",
-            idades: input.idades || "",
-            pontuacao: 0,
-            temperatura: "frio",
-            prioridade: "Não",
-            status: "incompleto",
-          });
-        });
-
-        // Enviar para BotConversa com status "incompleto"
-        const botconversaSent = await sendLeadToBotConversa({
-          nome: input.nome,
-          email: input.email,
-          telefone: input.telefone,
-          cidade: input.cidade,
-          pontuacao: 0,
-          temperatura: "Frio",
-          tempo_compra: input.tempo_compra || "",
-          situacao_atual: input.situacao_atual || "",
-          renda: input.renda || "",
-          criterio_escolha: input.criterio_escolha || "",
-          cnpj_mei: input.cnpj_mei || "",
-          idades: input.idades || "",
-        });
-
-        // Enviar para Google Sheets
-        const sheetsSent = await sendLeadToSheets({
-          nome: input.nome,
-          telefone: input.telefone,
-          email: input.email,
-          cidade: input.cidade,
-          tempo_compra: input.tempo_compra || "",
-          situacao_atual: input.situacao_atual || "",
-          renda: input.renda || "",
-          criterio_escolha: input.criterio_escolha || "",
-          cnpj_mei: input.cnpj_mei || "",
-          idades: input.idades || "",
-          pontuacao: 0,
-          temperatura: "frio",
-          prioridade: "Não",
-          status: "incompleto",
-          createdAt: new Date(),
-        });
-
-        console.log("[Lead Incompleto] Lead incompleto enviado com sucesso");
-
-        return {
-          success: true,
-          message: "Lead incompleto salvo com sucesso",
-          result,
-          sheetsSent,
-          botconversaSent,
-        };
-      } catch (error) {
-        console.error("[Lead Incompleto] Erro ao salvar lead incompleto:", error);
-        return { success: false, message: "Erro ao salvar lead incompleto" };
-      }
+      // Rota mantida para não quebrar código legado, mas o novo fluxo usa submitInitial
+      console.log("[Leads] submitIncomplete (legado) chamado — use submitInitial no lugar");
+      return { success: true, message: "Lead incompleto registrado (legado)" };
     }),
 
   /**
@@ -283,8 +445,8 @@ export const leadsRouter = router({
           criterio_escolha: "teste",
           cnpj_mei: "teste",
           idades: "teste",
+          status: "Lead Concluiu",
         });
-
         return {
           success: result,
           message: result
@@ -293,10 +455,7 @@ export const leadsRouter = router({
         };
       } catch (error) {
         console.error("Erro ao testar BotConversa:", error);
-        return {
-          success: false,
-          message: `Erro ao testar integração: ${error instanceof Error ? error.message : "Erro desconhecido"}`,
-        };
+        return { success: false, message: `Erro: ${error instanceof Error ? error.message : "Desconhecido"}` };
       }
     }),
 
@@ -307,25 +466,12 @@ export const leadsRouter = router({
     .input(z.object({ leadId: z.number() }))
     .mutation(async ({ input }) => {
       const db = await getDb();
-      if (!db) {
-        return { success: false, message: "Database não disponível" };
-      }
-
+      if (!db) return { success: false, message: "Database não disponível" };
       try {
-        // Buscar o lead
         const leadData = await db.select().from(leads).where(eq(leads.id, input.leadId));
-
-        if (leadData.length === 0) {
-          return { success: false, message: "Lead não encontrado" };
-        }
-
-        // Enviar para Google Sheets
+        if (leadData.length === 0) return { success: false, message: "Lead não encontrado" };
         const success = await sendLeadToSheets(leadData[0]);
-
-        return {
-          success,
-          message: success ? "Lead sincronizado com sucesso" : "Erro ao sincronizar",
-        };
+        return { success, message: success ? "Lead sincronizado com sucesso" : "Erro ao sincronizar" };
       } catch (error) {
         console.error("Erro ao sincronizar lead:", error);
         return { success: false, message: "Erro ao sincronizar" };

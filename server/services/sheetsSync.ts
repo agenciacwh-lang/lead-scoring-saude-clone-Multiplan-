@@ -25,12 +25,16 @@ function formatLeadForSheets(lead: any) {
     "Quais são as idades?": lead.idades || "",
   };
   
+  // Normalizar status para exibição amigável
+  const statusDisplay = lead.status === "completo" ? "Concluído" : "Incompleto";
+
   return {
     "Data/Hora": createdAt.toLocaleString("pt-BR"),
     "Nome": lead.nome || "",
     "Telefone": lead.telefone || "",
     "Email": lead.email || "",
     "Cidade": lead.cidade || "",
+    "Status": statusDisplay,
     "Respostas": JSON.stringify(respostasFormatadas, null, 2),
     "Pontuação": lead.pontuacao || 0,
     "Temperatura": temperatura,
