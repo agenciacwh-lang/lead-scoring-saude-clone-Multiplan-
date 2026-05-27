@@ -19,13 +19,35 @@ export interface BotconversaLeadPayload {
 }
 
 /**
- * Sanitiza o número de telefone removendo caracteres especiais
- * Exemplo: +55 (85) 98765-4321 → 5585987654321
+ * Formata o telefone para o padrão exigido pelo BotConversa:
+ * - Remove todos os caracteres não numéricos
+ * - Garante o prefixo 55 (DDI Brasil)
+ * - Resultado: 5511999999999 (13 dígitos)
+ *
+ * Exemplos:
+ *   (79) 99999-9999  → 5579999999999
+ *   79999999999      → 5579999999999
+ *   5579999999999    → 5579999999999 (idempotente)
+ *   +55 (79) 9 9999-9999 → 5579999999999
  */
-function sanitizePhone(phone: string | null | undefined): string {
+function formatPhoneWithDDI(phone: string | null | undefined): string {
   if (!phone) return "";
-  // Remove tudo que não é dígito
-  return phone.replace(/\D/g, "");
+
+  // 1. Remover tudo que não é dígito
+  let digits = phone.replace(/\D/g, "");
+
+  // 2. Se já começa com 55 e tem 12-13 dígitos, está correto
+  if (digits.startsWith("55") && digits.length >= 12) {
+    return digits;
+  }
+
+  // 3. Se começa com 0 (discagem nacional antiga), remover o 0
+  if (digits.startsWith("0")) {
+    digits = digits.slice(1);
+  }
+
+  // 4. Adicionar DDI 55
+  return `55${digits}`;
 }
 
 /**
@@ -49,8 +71,15 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
   console.log("[BotConversa] Iniciando envio para URL:", ENV.botconversaWebhookUrl);
 
   try {
-    // Sanitizar telefone: remover +, espaços, parênteses
-    const telefoneLimpo = sanitizePhone(lead.telefone);
+    // Formatar telefone: remover caracteres especiais e adicionar DDI +55
+    // BotConversa exige formato: 5579999999999 (13 dígitos)
+    const telefoneLimpo = formatPhoneWithDDI(lead.telefone);
+
+    // Validar que o telefone tem pelo menos 12 dígitos após formatação
+    if (telefoneLimpo.length < 12) {
+      console.error(`[BotConversa] ❌ Telefone inválido após formatação: '${lead.telefone}' → '${telefoneLimpo}' (${telefoneLimpo.length} dígitos). Mínimo: 12.`);
+      return false;
+    }
     
     // Payload com campos na RAIZ (estrutura esperada pelo BotConversa)
     let payload: Record<string, any> = {

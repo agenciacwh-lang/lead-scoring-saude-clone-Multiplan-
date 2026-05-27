@@ -33,8 +33,8 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
 
     if (!formData.telefone.trim()) {
       newErrors.telefone = "Telefone é obrigatório";
-    } else if (!/^\d{10,11}$/.test(formData.telefone.replace(/\D/g, ""))) {
-      newErrors.telefone = "Telefone inválido (10 ou 11 dígitos)";
+    } else if (formData.telefone.replace(/\D/g, "").length !== 11) {
+      newErrors.telefone = "Digite um celular com DDD + 9 dígitos. Ex: (79) 99999-9999";
     }
 
     if (!formData.email.trim()) {
@@ -60,24 +60,28 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
   };
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, "");
+    // Manter apenas dígitos e limitar a 11 (DDD 2 + 9 dígitos)
+    let digits = e.target.value.replace(/\D/g, "").slice(0, 11);
 
-    if (value.length > 11) {
-      value = value.slice(0, 11);
+    // Aplicar máscara progressiva: (XX) XXXXX-XXXX
+    let masked = "";
+    if (digits.length === 0) {
+      masked = "";
+    } else if (digits.length <= 2) {
+      masked = `(${digits}`;
+    } else if (digits.length <= 6) {
+      masked = `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    } else if (digits.length <= 10) {
+      masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+    } else {
+      // 11 dígitos: (XX) XXXXX-XXXX
+      masked = `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`;
     }
 
-    if (value.length > 0) {
-      if (value.length <= 2) {
-        value = `(${value}`;
-      } else if (value.length <= 7) {
-        value = `(${value.slice(0, 2)}) ${value.slice(2)}`;
-      } else {
-        value = `(${value.slice(0, 2)}) ${value.slice(2, 7)}-${value.slice(7)}`;
-      }
-    }
+    setFormData((prev) => ({ ...prev, telefone: masked }));
 
-    setFormData((prev) => ({ ...prev, telefone: value }));
-    if (errors.telefone) {
+    // Limpar erro ao atingir 11 dígitos
+    if (digits.length === 11 && errors.telefone) {
       setErrors((prev) => ({ ...prev, telefone: "" }));
     }
   };
