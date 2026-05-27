@@ -1,43 +1,45 @@
 /**
  * Mapeamento de valores de respostas do quiz para formato legível
  * Converte valores em snake_case para português formatado
+ *
+ * ⚠️ IMPORTANTE: As chaves DEVEM ser idênticas aos `id` das opções em quizData.ts
  */
 
 export const valueMapper = {
-  // Tempo de compra
+  // Tempo de compra — IDs: pesquisando | proximos_meses | esse_mes | quanto_antes
   tempo_compra: {
-    "so_pesquisando": "Só estou pesquisando",
+    "pesquisando": "Só estou pesquisando",
     "proximos_meses": "Nos próximos meses",
-    "ainda_esse_mes": "Ainda esse mês",
+    "esse_mes": "Ainda esse mês",
     "quanto_antes": "O quanto antes",
   },
-  
-  // Situação atual
+
+  // Situação atual — IDs: nunca_tive | ja_tive | quero_trocar
   situacao_atual: {
     "nunca_tive": "Nunca tive plano",
-    "tive_nao_tenho": "Já tive, mas não tenho mais",
-    "tenho_quero_trocar": "Tenho e quero trocar",
+    "ja_tive": "Já tive, mas não tenho mais",
+    "quero_trocar": "Tenho e quero trocar",
   },
-  
-  // Renda
+
+  // Renda — IDs: ate_1500 | 1500_3000 | 3000_6000 | acima_6000
   renda: {
     "ate_1500": "Até R$ 1.500",
     "1500_3000": "R$ 1.500 a R$ 3.000",
     "3000_6000": "R$ 3.000 a R$ 6.000",
     "acima_6000": "Acima de R$ 6.000",
   },
-  
-  // Critério de escolha
+
+  // Critério de escolha — IDs: preco | custo_beneficio | qualidade
   criterio_escolha: {
     "preco": "Preço (o mais barato possível)",
     "custo_beneficio": "Custo-benefício",
-    "qualidade_atendimento": "Qualidade e atendimento",
+    "qualidade": "Qualidade e atendimento",
   },
-  
-  // CNPJ/MEI
+
+  // CNPJ/MEI — IDs: sim_cnpj | nao_cnpj
   cnpj_mei: {
     "sim_cnpj": "Sim, tenho CNPJ/MEI",
-    "nao_pessoa_fisica": "Não, sou pessoa física",
+    "nao_cnpj": "Não, sou pessoa física",
   },
 };
 

@@ -15,7 +15,11 @@ import FormCard from "@/components/FormCard";
 const HERO_BG =
   "https://d2xsxph8kpxj0f.cloudfront.net/310519663616331473/CDTyNfiJxsVHYYAJrVSjSS/hero-health-bg-igbSPaoZJKBqYM9KqjBYjP.webp";
 
-export default function Quiz() {
+export interface QuizProps {
+  onSubmit?: (quizAnswers: Record<string, string>, temperature: string, score: number) => Promise<void> | void;
+}
+
+export default function Quiz({ onSubmit }: QuizProps = {}) {
   const [, navigate] = useLocation();
   const { quizAnswers, addAnswer } = useLeadContext();
   const [currentStep, setCurrentStep] = useState(1); // 1-6 = questions
@@ -62,6 +66,11 @@ export default function Quiz() {
 
           const score = calculateLeadScore(finalAnswers);
 
+          // Chamar callback externo se fornecido
+          if (onSubmit) {
+            onSubmit(finalAnswers, score.temperature, score.total);
+          }
+
           // Leads frios vão para /confirmado, outros para /obrigado
           const targetRoute = score.temperature === "frio" ? "/confirmado" : "/obrigado";
           navigate(targetRoute);
@@ -73,7 +82,7 @@ export default function Quiz() {
         setAnimating(false);
       }, 280);
     },
-    [animating, currentQuestion, currentStep, totalSteps, quizAnswers, textInput, navigate, addAnswer]
+    [animating, currentQuestion, currentStep, totalSteps, quizAnswers, textInput, navigate, addAnswer, onSubmit]
   );
 
   const goBack = useCallback(() => {

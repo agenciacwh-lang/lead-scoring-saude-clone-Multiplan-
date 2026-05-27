@@ -15,6 +15,7 @@ export interface QuizOption {
   text: string;
   points: number;
   emoji?: string;
+  label?: string; // Alias opcional para text, usado em alguns componentes
 }
 
 export interface QuizQuestion {
@@ -25,6 +26,8 @@ export interface QuizQuestion {
   icon: string;
   options: QuizOption[];
   isTextInput?: boolean; // For question 6 (ages)
+  question?: string;    // Alias opcional para title, usado em QuizModal
+  placeholder?: string; // Placeholder para campos de texto livre
 }
 
 export const QUIZ_QUESTIONS: QuizQuestion[] = [

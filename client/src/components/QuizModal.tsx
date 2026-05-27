@@ -167,7 +167,7 @@ export default function QuizModal({ isOpen, onClose }: QuizModalProps) {
               >
                 {/* Pergunta */}
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                  {currentQuestion.question}
+                  {currentQuestion.question ?? currentQuestion.title}
                 </h2>
 
                 {/* Opções */}
@@ -175,7 +175,7 @@ export default function QuizModal({ isOpen, onClose }: QuizModalProps) {
                   <div className="space-y-4">
                     <input
                       type="text"
-                      placeholder={currentQuestion.placeholder || "Digite sua resposta"}
+                      placeholder={currentQuestion.placeholder ?? "Digite sua resposta"}
                       value={textInput}
                       onChange={(e) => setTextInput(e.target.value)}
                       className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-orange-500 transition-colors"
@@ -197,7 +197,7 @@ export default function QuizModal({ isOpen, onClose }: QuizModalProps) {
                             : "border-gray-200 hover:border-orange-300 hover:bg-gray-50"
                         }`}
                       >
-                        <p className="font-medium text-gray-900">{option.label}</p>
+                        <p className="font-medium text-gray-900">{option.label ?? option.text}</p>
                       </button>
                     ))}
                   </div>

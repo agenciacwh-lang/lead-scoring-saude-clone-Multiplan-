@@ -1,9 +1,8 @@
 /**
  * WEBHOOK SERVICE - Sincronização de Status em Tempo Real
  * Sincroniza status do lead com Botconversa, Google Sheets e Supabase
+ * Utiliza a API fetch nativa do Node.js 22+ (sem dependência de node-fetch)
  */
-
-import fetch from "node-fetch";
 
 export type LeadStatus = "Incompleto" | "Concluído";
 
