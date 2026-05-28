@@ -104,17 +104,12 @@ export default function Home() {
             {/* Conteúdo esquerdo */}
             <div className="text-white">
               {/* Logo Hapvida */}
-              <div className="mb-6">
+              <div className="mb-8">
                 <img
                   src="/hapvida-logo.jpg"
                   alt="Hapvida"
-                  className="h-14 lg:h-16 w-auto object-contain rounded-xl"
+                  className="h-20 lg:h-28 w-auto object-contain rounded-xl"
                 />
-              </div>
-
-              <div className="inline-flex items-center gap-2 bg-orange-500/20 border border-orange-500/30 rounded-full px-4 py-2 mb-6">
-                <Heart className="w-4 h-4 text-orange-400" fill="currentColor" />
-                <span className="text-sm font-medium text-orange-300">Multiplan Seguros e Planos de Saúde</span>
               </div>
 
               <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-6">
