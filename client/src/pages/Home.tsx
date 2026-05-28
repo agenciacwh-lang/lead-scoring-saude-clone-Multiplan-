@@ -265,6 +265,18 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          {/* CTA 1 — abaixo dos benefícios Hapvida */}
+          <div className="mt-12 text-center">
+            <button
+              onClick={scrollToForm}
+              className="inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold text-lg py-5 px-10 rounded-xl shadow-lg shadow-orange-500/30 transition-all duration-200 transform hover:scale-105"
+            >
+              <span>🎁</span>
+              <span>Quero aproveitar os 15% de desconto</span>
+            </button>
+            <p className="mt-3 text-sm text-gray-400">Oferta exclusiva para novos clientes • Sem compromisso</p>
+          </div>
         </div>
       </section>
 
@@ -325,6 +337,23 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* CTA 2 — abaixo da seção Por que escolher a Multiplan */}
+      <div className="py-12 bg-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-gray-500 text-base mb-5 max-w-xl mx-auto">
+            Pronto para garantir o melhor plano de saúde para você e sua família?
+          </p>
+          <button
+            onClick={scrollToForm}
+            className="inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold text-lg py-5 px-10 rounded-xl shadow-lg shadow-orange-500/30 transition-all duration-200 transform hover:scale-105"
+          >
+            <span>🎁</span>
+            <span>Quero aproveitar os 15% de desconto</span>
+          </button>
+          <p className="mt-3 text-sm text-gray-400">Oferta exclusiva para novos clientes • Sem compromisso</p>
+        </div>
+      </div>
 
       {/* ========== FOOTER OFICIAL MULTIPLAN ========== */}
       <footer className="bg-gray-950 text-white">
