@@ -15,7 +15,7 @@ import FormCard from "@/components/FormCard";
 import DiscountPopup from "@/components/DiscountPopup";
 import RedeAtendimento from "@/components/RedeAtendimento";
 import { trpc } from "@/lib/trpc";
-import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram, MapPin, Phone, Mail, FileText } from "lucide-react";
+import { Heart, Stethoscope, Users, Zap, Shield, Clock, Facebook, Instagram, MapPin, Phone, Mail, FileText, Building2 } from "lucide-react";
 
 export default function Home() {
   const [, setLocation] = useLocation();
@@ -205,43 +205,63 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ========== BENEFÍCIOS SECTION ========== */}
+      {/* ========== BENEFÍCIOS HAPVIDA ========== */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Por que escolher a Multiplan?</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Somos especialistas em planos de saúde em Aracaju e região. Encontramos a melhor
-              opção para o seu perfil e orçamento.
+          <div className="text-center mb-14">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
+              O plano de saúde ideal com um preço que{" "}
+              <span className="text-orange-500">cabe no seu orçamento</span>
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto text-lg">
+              Conheça os diferenciais que fazem do Hapvida a operadora líder no Norte e Nordeste.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
-                icon: Shield,
-                title: "Cobertura Completa",
+                icon: Building2,
+                title: "Rede Própria Gigante",
                 description:
-                  "Planos com ampla cobertura para consultas, exames, internações e cirurgias.",
+                  "Mais de 86 hospitais próprios, 80 prontos atendimentos e 365 clínicas integradas — uma estrutura imbatível à sua disposição.",
+              },
+              {
+                icon: Stethoscope,
+                title: "Odontologia Completa Inclusa",
+                description:
+                  "Saúde integral: seu plano já vem com cobertura odontológica, incluindo prevenção, diagnóstico e urgências 24h.",
               },
               {
                 icon: Users,
-                title: "Atendimento Personalizado",
+                title: "Maior Rede Exclusiva Pediátrica",
                 description:
-                  "Nossa equipe analisa seu perfil e indica o plano mais adequado para você e sua família.",
+                  "O cuidado que seu filho merece. A maior e mais moderna rede de atendimento infantil, com UTI neonatal e acompanhamento de ponta.",
               },
               {
                 icon: Zap,
-                title: "Processo Rápido",
+                title: "Contact Center e Telemedicina 24h",
                 description:
-                  "Em poucos minutos você recebe uma indicação personalizada e pode contratar online.",
+                  "Sua saúde não pode esperar. Acesse consultas, exames e atendimento médico direto pelo celular, a qualquer hora do dia.",
+              },
+              {
+                icon: MapPin,
+                title: "Líder no Norte e Nordeste",
+                description:
+                  "Presença maciça nos 11 estados das regiões Norte e Nordeste. Atendimento de alta qualidade sem pagar nada a mais por isso.",
+              },
+              {
+                icon: Shield,
+                title: "Agendamento 100% Digital",
+                description:
+                  "Fuja das filas e da burocracia. Todo o controle do seu plano na palma da mão pelo site ou aplicativo.",
               },
             ].map(({ icon: Icon, title, description }) => (
-              <div key={title} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
-                <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <div key={title} className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-md hover:border-orange-100 transition-all duration-200">
+                <div className="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center mb-5">
                   <Icon className="w-7 h-7 text-orange-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
-                <p className="text-gray-600 leading-relaxed">{description}</p>
+                <h3 className="text-lg font-bold text-gray-900 mb-3">{title}</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">{description}</p>
               </div>
             ))}
           </div>
@@ -250,6 +270,55 @@ export default function Home() {
 
       {/* ========== REDE DE ATENDIMENTO EM SERGIPE ========== */}
       <RedeAtendimento />
+
+      {/* ========== POR QUE ESCOLHER A MULTIPLAN ========== */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Por que escolher a{" "}
+              <span className="text-orange-500">Multiplan?</span>
+            </h2>
+            <p className="text-gray-500 max-w-2xl mx-auto text-lg leading-relaxed">
+              Somos a sua corretora especialista em planos de saúde em Aracaju e região.
+              Encontramos a melhor opção para o seu perfil e orçamento.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {[
+              {
+                icon: Shield,
+                title: "Cobertura Completa",
+                description:
+                  "Planos com ampla rede médica para consultas, exames de rotina ou alta complexidade, internações e cirurgias.",
+              },
+              {
+                icon: Users,
+                title: "Atendimento Personalizado",
+                description:
+                  "Nossa equipe humana analisa o seu perfil e indica o plano ideal com o melhor custo-benefício do mercado.",
+              },
+              {
+                icon: Zap,
+                title: "Processo Rápido e Seguro",
+                description:
+                  "Em poucos minutos você recebe sua cotação personalizada e pode assinar seu contrato 100% online, sem burocracia.",
+              },
+            ].map(({ icon: Icon, title, description }) => (
+              <div
+                key={title}
+                className="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg hover:border-orange-100 transition-all duration-200 text-center"
+              >
+                <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg shadow-orange-500/20">
+                  <Icon className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{title}</h3>
+                <p className="text-gray-600 leading-relaxed">{description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* ========== FOOTER OFICIAL MULTIPLAN ========== */}
       <footer className="bg-gray-950 text-white">
