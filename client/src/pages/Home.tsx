@@ -218,7 +218,7 @@ export default function Home() {
               <span className="text-orange-500">cabe no seu orçamento</span>
             </h2>
             <p className="text-gray-500 max-w-2xl mx-auto text-lg">
-              Conheça os diferenciais que fazem do Hapvida a operadora líder no Norte e Nordeste.
+              Conheça os diferenciais que fazem do Hapvida ser a maior operadora de planos de saúde do Brasil
             </p>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
