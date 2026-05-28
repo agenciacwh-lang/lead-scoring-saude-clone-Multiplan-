@@ -7,36 +7,41 @@ import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 
 interface DiscountPopupProps {
-  onClose: () => void;
-  onConfirm: () => void;
+  onAccept: () => void;
 }
 
-export default function DiscountPopup({ onClose, onConfirm }: DiscountPopupProps) {
-  const [isVisible, setIsVisible] = useState(true);
+export default function DiscountPopup({ onAccept }: DiscountPopupProps) {
+  const [isVisible, setIsVisible] = useState(false);
   const [animate, setAnimate] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
-    // Trigger animation after mount
-    const timer = setTimeout(() => {
-      setAnimate(true);
-    }, 50);
-    return () => clearTimeout(timer);
+    // Não exibir novamente se o usuário já fechou nesta sessão
+    const dismissed = sessionStorage.getItem("discount_popup_dismissed");
+    if (dismissed) return;
+
+    // Delay de 2 segundos após o carregamento da página
+    const showTimer = setTimeout(() => {
+      setIsVisible(true);
+      setTimeout(() => setAnimate(true), 50);
+    }, 2000);
+    return () => clearTimeout(showTimer);
   }, []);
 
   const handleConfirm = () => {
+    sessionStorage.setItem("discount_popup_dismissed", "1");
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
-      onConfirm();
+      onAccept();
     }, 400);
   };
 
   const handleClose = () => {
+    sessionStorage.setItem("discount_popup_dismissed", "1");
     setIsClosing(true);
     setTimeout(() => {
       setIsVisible(false);
-      onClose();
     }, 400);
   };
 

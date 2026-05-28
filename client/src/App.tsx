@@ -35,33 +35,16 @@ function Router() {
 }
 
 function App() {
-  const [showPopup, setShowPopup] = useState(false);
   const [location] = useLocation();
 
-  useEffect(() => {
-    // Mostrar pop-up apenas na página inicial e se não tiver sido fechado
-    if (location === "/") {
-      const hasClosedPopup = localStorage.getItem("discountPopupClosed");
-      if (!hasClosedPopup) {
-        // Mostrar pop-up após 1 segundo
-        const timer = setTimeout(() => {
-          setShowPopup(true);
-        }, 1000);
-        return () => clearTimeout(timer);
-      }
-    } else {
-      setShowPopup(false);
-    }
-  }, [location]);
+  // O DiscountPopup gerencia seu próprio estado interno via sessionStorage
+  // e o delay de 2s. Só renderiza na página inicial.
+  const isHome = location === "/";
 
-  const handleClosePopup = () => {
-    setShowPopup(false);
-    localStorage.setItem("discountPopupClosed", "true");
-  };
-
-  const handleConfirmPopup = () => {
-    setShowPopup(false);
-    // Pop-up fecha e o usuário continua no formulário
+  const handlePopupAccept = () => {
+    // Rola até o formulário na página inicial
+    const el = document.getElementById("formulario-lead") ?? document.getElementById("formulario-lead-mobile");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
   };
 
   return (
@@ -69,9 +52,7 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          {showPopup && (
-            <DiscountPopup onClose={handleClosePopup} onConfirm={handleConfirmPopup} />
-          )}
+          {isHome && <DiscountPopup onAccept={handlePopupAccept} />}
           <Router />
         </TooltipProvider>
       </ThemeProvider>
