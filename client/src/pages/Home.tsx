@@ -284,14 +284,8 @@ export default function Home() {
               Encontramos a melhor opção para o seu perfil e orçamento.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {[
-              {
-                icon: Shield,
-                title: "Cobertura Completa",
-                description:
-                  "Planos com ampla rede médica para consultas, exames de rotina ou alta complexidade, internações e cirurgias.",
-              },
               {
                 icon: Users,
                 title: "Atendimento Personalizado",
@@ -303,6 +297,18 @@ export default function Home() {
                 title: "Processo Rápido e Seguro",
                 description:
                   "Em poucos minutos você recebe sua cotação personalizada e pode assinar seu contrato 100% online, sem burocracia.",
+              },
+              {
+                icon: Shield,
+                title: "A maior corretora de planos de saúde de Sergipe",
+                description:
+                  "Somos a única corretora Nível Ouro do estado, reconhecimento que reforça nossa credibilidade, experiência e compromisso em oferecer o melhor atendimento para cada cliente.",
+              },
+              {
+                icon: Heart,
+                title: "Pós-venda de verdade",
+                description:
+                  "Aqui, você não contrata seu plano e fica sem suporte. Nosso acompanhamento começa no primeiro atendimento e continua mesmo após a contratação, garantindo suporte, orientação e atendimento de qualidade sempre que precisar.",
               },
             ].map(({ icon: Icon, title, description }) => (
               <div

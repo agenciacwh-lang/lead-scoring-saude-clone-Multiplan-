@@ -58,8 +58,7 @@ export default function RedeAtendimento() {
             <span className="block text-orange-400">em Sergipe</span>
           </h2>
           <p className="text-gray-400 max-w-2xl mx-auto text-lg leading-relaxed">
-            Hospitais, clínicas e centros de diagnóstico credenciados Hapvida em toda Aracaju e
-            região — cobertura completa para você e sua família.
+            Hospitais, clínicas e centros de diagnóstico credenciados Hapvida em toda Aracaju — cobertura completa para você e sua família.
           </p>
         </div>
 
@@ -117,13 +116,6 @@ export default function RedeAtendimento() {
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Rodapé da seção */}
-        <div className="mt-10 text-center">
-          <p className="text-gray-500 text-sm">
-            E muito mais unidades credenciadas em todo o estado de Sergipe.
-          </p>
         </div>
 
       </div>

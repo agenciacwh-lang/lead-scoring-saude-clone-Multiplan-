@@ -1,17 +1,20 @@
 /**
  * DiscountPopup – Pop-up de desconto exclusivo
  *
- * Correções aplicadas:
- * 1. useRef hasShown garante que o setTimeout dispara UMA única vez,
- *    mesmo que o componente sofra re-renders pelo React.
- * 2. Botão X removido completamente.
- * 3. Clique no overlay NÃO fecha o modal (e.stopPropagation removido do modal,
- *    overlay sem onClick).
- * 4. Tecla ESC bloqueada via keydown listener.
- * 5. Única forma de fechar: botões "OK, QUERO MEU DESCONTO" ou "Talvez depois".
+ * Correção definitiva do popup duplicado:
+ * - Variável de módulo `_hasTriggered` (fora do componente) persiste entre
+ *   re-renders e re-montagens causadas pelo React Strict Mode (que monta,
+ *   desmonta e remonta o componente em desenvolvimento).
+ * - useRef `hasShown` garante proteção adicional em nível de instância.
+ * - sessionStorage impede reabertura após fechar na mesma sessão.
+ * - Sem botão X, sem fechamento por overlay ou ESC.
  */
 
 import { useEffect, useRef, useState } from "react";
+
+// ─── Singleton de módulo ──────────────────────────────────────────────────────
+// Persiste entre re-montagens do Strict Mode porque vive fora do componente.
+let _hasTriggered = false;
 
 interface DiscountPopupProps {
   onAccept: () => void;
@@ -22,34 +25,37 @@ export default function DiscountPopup({ onAccept }: DiscountPopupProps) {
   const [animate, setAnimate] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
 
-  // Flag de instância: garante que o timer só dispara uma vez por montagem,
-  // independentemente de quantos re-renders ocorram
+  // Proteção de instância — complementa o singleton de módulo
   const hasShown = useRef(false);
 
   useEffect(() => {
     // Não exibir se já foi dispensado nesta sessão
     if (sessionStorage.getItem("discount_popup_dismissed")) return;
 
-    // Não disparar novamente se já foi agendado nesta montagem
+    // Bloquear segunda abertura via singleton de módulo
+    if (_hasTriggered) return;
+    // Bloquear segunda abertura via ref de instância
     if (hasShown.current) return;
+
+    _hasTriggered = true;
     hasShown.current = true;
 
-    const showTimer = setTimeout(() => {
+    const timer = setTimeout(() => {
       setIsVisible(true);
-      // Pequeno delay para o browser pintar o DOM antes de animar
+      // Dois frames para garantir que o DOM foi pintado antes de animar
       requestAnimationFrame(() => {
         requestAnimationFrame(() => setAnimate(true));
       });
     }, 2000);
 
-    // Bloquear tecla ESC enquanto o popup estiver visível
+    // Bloquear tecla ESC (fase de captura para interceptar antes de qualquer handler)
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") e.preventDefault();
     };
     document.addEventListener("keydown", handleKeyDown, true);
 
     return () => {
-      clearTimeout(showTimer);
+      clearTimeout(timer);
       document.removeEventListener("keydown", handleKeyDown, true);
     };
   }, []); // array vazio: roda apenas na montagem
@@ -96,9 +102,7 @@ export default function DiscountPopup({ onAccept }: DiscountPopupProps) {
 
           {/* Header com gradiente — sem botão X */}
           <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-red-500 px-6 py-8">
-            {/* Emoji de celebração */}
             <div className="text-5xl mb-4 animate-bounce">🎉</div>
-
             <div className="animate-float-in" style={{ animationDelay: "0.1s" }}>
               <h2 className="text-2xl font-bold text-white mb-2">
                 Você está a um passo de garantir
