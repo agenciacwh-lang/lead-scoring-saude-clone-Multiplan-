@@ -249,9 +249,9 @@ export default function Home() {
               },
               {
                 icon: MapPin,
-                title: "Líder no Norte e Nordeste",
+                title: "Líder da América Latina",
                 description:
-                  "Presença maciça nos 11 estados das regiões Norte e Nordeste. Atendimento de alta qualidade sem pagar nada a mais por isso.",
+                  "A maior operadora de saúde da América Latina. Você conta com a solidez, a estrutura e a qualidade de uma verdadeira gigante do mercado, garantindo segurança total para você e sua família.",
               },
               {
                 icon: Shield,
