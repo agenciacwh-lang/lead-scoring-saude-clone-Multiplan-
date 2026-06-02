@@ -45,8 +45,10 @@ function formatLeadForSheets(lead: any) {
 
 /**
  * Envia um lead para o Google Sheets
+ * @param lead - dados do lead
+ * @param acao - "inserir" (Passo 1, linha nova) ou "atualizar" (Passo 2, atualiza linha existente pelo ID LEAD)
  */
-export async function sendLeadToSheets(lead: any): Promise<boolean> {
+export async function sendLeadToSheets(lead: any, acao: "inserir" | "atualizar" = "inserir"): Promise<boolean> {
   const webhookUrl = ENV.googleSheetsWebhookUrl;
   if (!webhookUrl) {
     console.warn("[Sheets Sync] GOOGLE_SHEETS_WEBHOOK_URL não configurada");
@@ -55,7 +57,9 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
 
   try {
     const formattedLead = formatLeadForSheets(lead);
-    console.log("[Sheets Sync] Payload formatado a enviar:", JSON.stringify(formattedLead, null, 2));
+    // Adicionar campo acao para o Google Apps Script saber se deve inserir ou atualizar
+    const payload = { ...formattedLead, acao };
+    console.log("[Sheets Sync] Payload formatado a enviar:", JSON.stringify(payload, null, 2));
     console.log("[Sheets Sync] Webhook URL:", webhookUrl);
 
     const response = await fetch(webhookUrl, {
@@ -63,7 +67,7 @@ export async function sendLeadToSheets(lead: any): Promise<boolean> {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(formattedLead),
+      body: JSON.stringify(payload),
     });
 
     console.log("[Sheets Sync] Response status:", response.status);

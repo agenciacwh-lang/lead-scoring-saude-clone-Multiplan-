@@ -77,13 +77,63 @@ export const leadsRouter = router({
         console.error("[Leads] PASSO 1 — Erro ao salvar no banco:", dbError);
       }
 
-      // PASSO 1: apenas salva no banco — nenhum webhook disparado aqui.
-      // O disparo único e agregado acontece exclusivamente no submitCompleted (Passo 2).
+      // Enviar para BotConversa com status "Lead Incompleto"
+      let botconversaSent = false;
+      try {
+        botconversaSent = await sendLeadToBotConversa({
+          nome: input.nome,
+          email: input.email,
+          telefone: telefoneLimpo,
+          cidade: input.cidade,
+          pontuacao: 0,
+          temperatura: "Frio",
+          tempo_compra: "",
+          situacao_atual: "",
+          renda: "",
+          criterio_escolha: "",
+          cnpj_mei: "",
+          idades: "",
+          status: "Lead Incompleto",
+          lead_id: leadCode,
+        });
+        console.log("[Leads] PASSO 1 — BotConversa:", botconversaSent ? "✅ Enviado" : "❌ Falhou");
+      } catch (botError) {
+        console.error("[Leads] PASSO 1 — Erro BotConversa:", botError);
+      }
+
+      // Enviar para Google Sheets com acao "inserir" (cria linha nova)
+      let sheetsSent = false;
+      try {
+        sheetsSent = await sendLeadToSheets({
+          nome: input.nome,
+          telefone: telefoneLimpo,
+          email: input.email,
+          cidade: input.cidade,
+          tempo_compra: "",
+          situacao_atual: "",
+          renda: "",
+          criterio_escolha: "",
+          cnpj_mei: "",
+          idades: "",
+          pontuacao: 0,
+          temperatura: "frio",
+          prioridade: "Não",
+          status: "incompleto",
+          createdAt: new Date(),
+          leadCode,
+        }, "inserir");
+        console.log("[Leads] PASSO 1 — Google Sheets:", sheetsSent ? "✅ Enviado" : "❌ Falhou");
+      } catch (sheetsError) {
+        console.error("[Leads] PASSO 1 — Erro Google Sheets:", sheetsError);
+      }
+
       return {
         success: true,
         leadId,
         leadCode,
-        message: "Lead inicial salvo no banco com sucesso",
+        botconversaSent,
+        sheetsSent,
+        message: "Lead inicial capturado e integões notificadas",
       };
     }),
 
@@ -220,7 +270,7 @@ export const leadsRouter = router({
         console.error("[Leads] PASSO 2 — Erro BotConversa:", botError);
       }
 
-      // Enviar para Google Sheets com status "completo"
+      // Enviar para Google Sheets com acao "atualizar" (atualiza linha existente pelo ID LEAD)
       let sheetsSent = false;
       try {
         sheetsSent = await sendLeadToSheets({
@@ -240,7 +290,7 @@ export const leadsRouter = router({
           status: "completo",
           createdAt: leadFromDb?.createdAt ?? new Date(),
           leadCode,
-        });
+        }, "atualizar");
         console.log("[Leads] PASSO 2 — Google Sheets:", sheetsSent ? "✅ Enviado" : "❌ Falhou");
       } catch (sheetsError) {
         console.error("[Leads] PASSO 2 — Erro Google Sheets:", sheetsError);
