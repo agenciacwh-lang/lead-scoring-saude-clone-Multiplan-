@@ -17,9 +17,11 @@ const HERO_BG =
 
 export interface QuizProps {
   onSubmit?: (quizAnswers: Record<string, string>, temperature: string, score: number) => Promise<void> | void;
+  /** Bloqueia o botão final enquanto a mutation de conclusão está em andamento */
+  isSubmitting?: boolean;
 }
 
-export default function Quiz({ onSubmit }: QuizProps = {}) {
+export default function Quiz({ onSubmit, isSubmitting = false }: QuizProps = {}) {
   const [, navigate] = useLocation();
   const { quizAnswers, addAnswer } = useLeadContext();
   const [currentStep, setCurrentStep] = useState(1); // 1-6 = questions
@@ -42,7 +44,7 @@ export default function Quiz({ onSubmit }: QuizProps = {}) {
 
   const goNext = useCallback(
     (answerId?: string) => {
-      if (animating) return;
+      if (animating || isSubmitting) return;
 
       // Save answer
       if (currentQuestion && answerId) {
@@ -97,7 +99,7 @@ export default function Quiz({ onSubmit }: QuizProps = {}) {
   }, [animating, currentStep]);
 
   const handleOptionClick = (optionId: string) => {
-    if (animating) return;
+    if (animating || isSubmitting) return;
     setSelectedOption(optionId);
     // Small delay for visual feedback before advancing
     setTimeout(() => {
@@ -204,6 +206,7 @@ export default function Quiz({ onSubmit }: QuizProps = {}) {
                 onOptionClick={handleOptionClick}
                 onTextSubmit={() => goNext()}
                 isLast={currentStep === totalSteps}
+                isSubmitting={isSubmitting}
               />
             ) : null}
           </div>
@@ -229,6 +232,7 @@ interface QuestionContentProps {
   onOptionClick: (id: string) => void;
   onTextSubmit: () => void;
   isLast: boolean;
+  isSubmitting?: boolean;
 }
 
 function QuestionContent({
@@ -239,6 +243,7 @@ function QuestionContent({
   onOptionClick,
   onTextSubmit,
   isLast,
+  isSubmitting = false,
 }: QuestionContentProps) {
   return (
     <div className="space-y-5">
@@ -290,7 +295,7 @@ function QuestionContent({
           />
           <button
             onClick={onTextSubmit}
-            disabled={!textInput.trim()}
+            disabled={!textInput.trim() || isSubmitting}
             className="w-full py-3.5 rounded-xl font-semibold text-sm transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed hover:scale-[1.01] active:scale-[0.99]"
             style={{
               fontFamily: "Space Grotesk, sans-serif",
@@ -303,7 +308,7 @@ function QuestionContent({
                 : "none",
             }}
           >
-            {isLast ? "Ver meu resultado →" : "Continuar →"}
+            {isSubmitting ? "Enviando..." : isLast ? "Ver meu resultado →" : "Continuar →"}
           </button>
         </div>
       ) : (

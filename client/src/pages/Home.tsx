@@ -33,6 +33,9 @@ export default function Home() {
     onError: (error) => console.error("[Home] PASSO 2 — Erro ao concluir lead:", error),
   });
 
+  // Flag de bloqueio: impede duplo clique no botão final do quiz
+  const isSubmitting = submitCompleted.isPending;
+
   // ─── Scroll para o formulário ─────────────────────────────────────────────
   const scrollToForm = () => {
     const el = document.getElementById("formulario-lead") ?? document.getElementById("formulario-lead-mobile");
@@ -171,7 +174,7 @@ export default function Home() {
                 {!shouldShowQuiz ? (
                   <LeadForm onSubmit={handleFormSubmit} />
                 ) : (
-                  <Quiz onSubmit={handleQuizSubmit} />
+                  <Quiz onSubmit={handleQuizSubmit} isSubmitting={isSubmitting} />
                 )}
               </FormCard>
             </div>
@@ -193,7 +196,7 @@ export default function Home() {
               {!shouldShowQuiz ? (
                 <LeadForm onSubmit={handleFormSubmit} />
               ) : (
-                <Quiz onSubmit={handleQuizSubmit} />
+                <Quiz onSubmit={handleQuizSubmit} isSubmitting={isSubmitting} />
               )}
             </FormCard>
           </div>
