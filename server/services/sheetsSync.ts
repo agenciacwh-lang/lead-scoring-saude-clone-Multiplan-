@@ -37,7 +37,8 @@ function formatLeadForSheets(lead: any) {
     "Cidade": lead.cidade || "",
     "Status": statusDisplay,
     "Respostas": JSON.stringify(respostasFormatadas, null, 2),
-    "Pontução": lead.pontuacao || 0,
+    "pontuacao": lead.pontuacao ?? 0,       // chave explícita para a Coluna G da planilha
+    "Pontuação": lead.pontuacao ?? 0,       // alias amigável para o cabeçalho
     "Temperatura": temperatura,
     "Prioridade": lead.prioridade || "Não",
   };

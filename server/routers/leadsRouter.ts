@@ -320,6 +320,11 @@ export const leadsRouter = router({
         temperatura === "quente" ? "Quente" :
         temperatura === "morno" ? "Morno" : "Frio";
 
+      // Delay de 3 segundos para evitar race condition com o Passo 1
+      // (garante que o webhook de inserção chegue ANTES do de atualização)
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      console.log("[Leads] PASSO 2 — Delay de 3s concluído. Disparando webhooks finais...");
+
       // Disparo final: BotConversa com status "Lead Concluiu" + scoring
       let botconversaSent = false;
       try {
