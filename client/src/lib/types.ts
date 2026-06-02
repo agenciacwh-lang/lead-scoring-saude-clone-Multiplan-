@@ -8,6 +8,7 @@ export interface LeadData {
   telefone: string;
   email: string;
   cidade: string;
+  leadCode?: string;  // ID LEAD gerado no Passo 1, trafegado para o Passo 2
 }
 
 export interface QuizState {

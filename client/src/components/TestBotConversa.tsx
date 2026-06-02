@@ -18,7 +18,7 @@ export default function TestBotConversa() {
     cidade: "São Paulo",
   });
 
-  const testMutation = trpc.leads.testBotConversa.useMutation();
+  const testMutation = trpc.leads.submitInitial.useMutation();
 
   const handleTest = async () => {
     await testMutation.mutateAsync(formData);

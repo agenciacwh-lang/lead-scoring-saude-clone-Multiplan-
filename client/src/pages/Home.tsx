@@ -24,7 +24,13 @@ export default function Home() {
 
   // ─── Mutations tRPC ───────────────────────────────────────────────────────
   const submitInitial = trpc.leads.submitInitial.useMutation({
-    onSuccess: (data) => console.log("[Home] PASSO 1 — Lead inicial capturado:", data),
+    onSuccess: (data) => {
+      console.log("[Home] PASSO 1 — Lead inicial capturado:", data);
+      // Armazenar leadCode no contexto para usar no Passo 2
+      if (data.leadCode && leadData) {
+        setLeadData({ ...leadData, leadCode: data.leadCode });
+      }
+    },
     onError: (error) => console.error("[Home] PASSO 1 — Erro ao capturar lead inicial:", error),
   });
 
@@ -57,10 +63,11 @@ export default function Home() {
       return;
     }
     const telefoneLimpo = leadData.telefone.replace(/\D/g, "");
-    const prioridade =
-      answers.tempo_compra === "quanto_antes" || answers.situacao_atual === "quero_trocar" ? "Sim" : "Não";
+    // leadCode gerado no Passo 1 e armazenado no LeadContext
+    const leadCode = leadData.leadCode ?? "0000";
 
     submitCompleted.mutate({
+      leadCode,                                     // ID LEAD do Passo 1
       nome: leadData.nome,
       telefone: telefoneLimpo,
       email: leadData.email,
@@ -71,9 +78,7 @@ export default function Home() {
       criterio_escolha: answers.criterio_escolha ?? "",
       cnpj_mei: answers.cnpj_mei ?? "",
       idades: answers.idades ?? "",
-      pontuacao: score,
-      temperatura: temperature as "frio" | "morno" | "quente",
-      prioridade,
+      // Scoring calculado no backend — não enviamos pontuacao/temperatura/prioridade
     });
 
     setLocation(temperature === "frio" ? "/confirmado" : "/obrigado");

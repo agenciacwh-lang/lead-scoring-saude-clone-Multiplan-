@@ -4,11 +4,9 @@
  * Consistente com a paleta de cores do formulário
  */
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { Heart, MessageCircle, CheckCircle, Star } from "lucide-react";
-import { useLeadContext, useClearLeadDataAfterSubmit } from "@/contexts/LeadContext";
-import { calculateLeadScore } from "@/lib/quizData";
-import { trpc } from "@/lib/trpc";
+import { useLeadContext } from "@/contexts/LeadContext";
 
 // ⚠️ Número de WhatsApp da Hapvida
 const WHATSAPP_NUMBER = "5579888218359"; // +55 79 8821-8359
@@ -18,66 +16,16 @@ const WHATSAPP_MESSAGE = encodeURIComponent(
 const WHATSAPP_URL = `https://wa.me/${WHATSAPP_NUMBER}?text=${WHATSAPP_MESSAGE}`;
 
 export default function Obrigado() {
-  const { leadData, quizAnswers } = useLeadContext();
-  const clearLeadData = useClearLeadDataAfterSubmit();
+  const { leadData } = useLeadContext();
   const [visible, setVisible] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
-  
-  // Flag para garantir que o envio acontece apenas uma vez
-  const sentRef = useRef(false);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
     return () => clearTimeout(t);
   }, []);
 
-  // Enviar dados para o backend
-  const submitLead = trpc.leads.submit.useMutation({
-    onSuccess: () => {
-      console.log("[Lead] Lead enviado com sucesso para automação");
-      clearLeadData();
-      // Não redirecionar - manter na página de Obrigado
-    },
-    onError: (error) => {
-      console.error("[Lead] Erro ao enviar lead:", error);
-      setSubmitError(true);
-    },
-  });
-
-  useEffect(() => {
-    // Evitar múltiplos submits
-    if (sentRef.current) return;
-    if (!leadData || !quizAnswers) return;
-
-    sentRef.current = true;
-    const score = calculateLeadScore(quizAnswers);
-    
-    // Sanitizar telefone: remover caracteres não-numéricos
-    const telefoneLimpo = leadData.telefone.replace(/\D/g, "");
-    
-    const leadPayload = {
-      nome: leadData.nome,
-      telefone: telefoneLimpo,
-      email: leadData.email,
-      cidade: leadData.cidade,
-      tempo_compra: quizAnswers.tempo_compra || "",
-      situacao_atual: quizAnswers.situacao_atual || "",
-      renda: quizAnswers.renda || "",
-      criterio_escolha: quizAnswers.criterio_escolha || "",
-      cnpj_mei: quizAnswers.cnpj_mei || "",
-      idades: quizAnswers.idades || "",
-      pontuacao: score.total,
-      temperatura: score.temperature as "frio" | "morno" | "quente",
-      prioridade: score.isPriority ? "Sim" : "Não",
-    };
-    
-    console.log("[Lead] Enviando lead para automação:", leadPayload);
-    submitLead.mutate(leadPayload);
-  }, [leadData, quizAnswers]);
-
   // Exibir nome do lead se disponível
   const leadName = leadData?.nome?.split(" ")[0] || "Cliente";
-  const isSending = submitLead.isPending;
 
   return (
     <div
@@ -116,22 +64,7 @@ export default function Obrigado() {
           {/* Conteúdo Principal */}
           <div className="px-8 pb-8">
             {/* Status Message */}
-            {isSending && (
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4 mb-8 flex items-center gap-3">
-                <div className="animate-spin">
-                  <Heart className="w-5 h-5 text-blue-600" />
-                </div>
-                <p className="text-blue-700 font-semibold">Enviando seus dados para análise...</p>
-              </div>
-            )}
 
-            {submitError && (
-              <div className="bg-amber-50 border-2 border-amber-200 rounded-2xl p-4 mb-8">
-                <p className="text-amber-800 font-semibold">
-                  ⚠️ Houve um pequeno problema ao enviar seus dados, mas não se preocupe! Você pode tentar novamente ou entrar em contato conosco.
-                </p>
-              </div>
-            )}
 
             {/* Info Boxes */}
             <div className="grid md:grid-cols-2 gap-4 mb-8">
@@ -180,11 +113,9 @@ export default function Obrigado() {
             </div>
 
             {/* Footer Message */}
-            {!isSending && !submitError && (
-              <p className="text-center text-sm text-slate-500">
-                Você pode fechar esta página ou entrar em contato conosco pelo WhatsApp. Estamos aqui para ajudar! 💙
-              </p>
-            )}
+            <p className="text-center text-sm text-slate-500">
+              Você pode fechar esta página ou entrar em contato conosco pelo WhatsApp. Estamos aqui para ajudar! 💙
+            </p>
 
             {/* Security Message */}
             <p className="text-center text-xs text-slate-400 mt-6">
