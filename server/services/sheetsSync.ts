@@ -29,6 +29,7 @@ function formatLeadForSheets(lead: any) {
   const statusDisplay = lead.status === "completo" ? "Concluído" : "Incompleto";
 
   return {
+    "ID LEAD": lead.leadCode ?? "",
     "Data/Hora": createdAt.toLocaleString("pt-BR"),
     "Nome": lead.nome || "",
     "Telefone": lead.telefone || "",
@@ -36,7 +37,7 @@ function formatLeadForSheets(lead: any) {
     "Cidade": lead.cidade || "",
     "Status": statusDisplay,
     "Respostas": JSON.stringify(respostasFormatadas, null, 2),
-    "Pontuação": lead.pontuacao || 0,
+    "Pontução": lead.pontuacao || 0,
     "Temperatura": temperatura,
     "Prioridade": lead.prioridade || "Não",
   };

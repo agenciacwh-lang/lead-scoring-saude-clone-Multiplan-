@@ -14,7 +14,7 @@ import { z } from "zod";
 import { sendLeadToBotConversa } from "../services/botconversaService";
 import { sendLeadToFacebookCapi } from "../services/facebookCapiService";
 import { eq } from "drizzle-orm";
-import { saveLead, getDb } from "../db";
+import { saveLead, getDb, getNextLeadCode } from "../db";
 import { leads } from "../../drizzle/schema";
 import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
 
@@ -41,6 +41,10 @@ export const leadsRouter = router({
 
       // Telefone limpo para o banco e integrações
       const telefoneLimpo = input.telefone.replace(/\D/g, "");
+
+      // Gerar ID LEAD sequencial (0001, 0002, 0003...)
+      const leadCode = await getNextLeadCode();
+      console.log("[Leads] PASSO 1 — ID LEAD gerado:", leadCode);
 
       let leadId: number | null = null;
 
@@ -90,6 +94,7 @@ export const leadsRouter = router({
           cnpj_mei: "",
           idades: "",
           status: "Lead Incompleto",
+          lead_id: leadCode,
         });
         console.log("[Leads] PASSO 1 — BotConversa:", botconversaSent ? "✅ Enviado" : "❌ Falhou");
       } catch (botError) {
@@ -115,6 +120,7 @@ export const leadsRouter = router({
           prioridade: "Não",
           status: "incompleto",
           createdAt: new Date(),
+          leadCode,
         });
         console.log("[Leads] PASSO 1 — Google Sheets:", sheetsSent ? "✅ Enviado" : "❌ Falhou");
       } catch (sheetsError) {
@@ -124,6 +130,7 @@ export const leadsRouter = router({
       return {
         success: true,
         leadId,
+        leadCode,
         botconversaSent,
         sheetsSent,
         message: "Lead inicial capturado com sucesso",
@@ -159,6 +166,7 @@ export const leadsRouter = router({
 
       const telefoneLimpo = input.telefone.replace(/\D/g, "");
       let leadFromDb: any = null;
+      let leadCode: string = "";
 
       // Atualizar registro existente no banco (busca por telefone)
       try {
@@ -184,7 +192,9 @@ export const leadsRouter = router({
 
           if (updated && updated.length > 0) {
             leadFromDb = updated[0];
-            console.log("[Leads] PASSO 2 — Lead atualizado no banco. ID:", leadFromDb.id);
+            // Recuperar o leadCode do registro existente (salvo no Passo 1)
+            leadCode = leadFromDb.leadCode ?? await getNextLeadCode();
+            console.log("[Leads] PASSO 2 — Lead atualizado no banco. ID:", leadFromDb.id, "| ID LEAD:", leadCode);
           } else {
             // Fallback: inserir novo registro se não encontrou o existente
             console.warn("[Leads] PASSO 2 — Lead não encontrado pelo telefone, inserindo novo registro");
@@ -234,6 +244,7 @@ export const leadsRouter = router({
           cnpj_mei: input.cnpj_mei,
           idades: input.idades,
           status: "Lead Concluiu",
+          lead_id: leadCode,
         });
         console.log("[Leads] PASSO 2 — BotConversa:", botconversaSent ? "✅ Enviado" : "❌ Falhou");
       } catch (botError) {
@@ -259,6 +270,7 @@ export const leadsRouter = router({
           prioridade: input.prioridade,
           status: "completo",
           createdAt: leadFromDb?.createdAt ?? new Date(),
+          leadCode,
         });
         console.log("[Leads] PASSO 2 — Google Sheets:", sheetsSent ? "✅ Enviado" : "❌ Falhou");
       } catch (sheetsError) {

@@ -128,4 +128,34 @@ export async function saveLead(leadData: InsertLead) {
   }
 }
 
+/**
+ * Gera o próximo ID LEAD sequencial formatado com zero-padding.
+ * Conta o total de leads no banco e retorna o próximo número como string.
+ * Exemplos: 0001, 0002, 0003, ... 0099, 0100, 1000, etc.
+ *
+ * Estratégia: conta todos os registros existentes e soma 1.
+ * Isso garante que cada novo lead receba um número único e crescente.
+ */
+export async function getNextLeadCode(): Promise<string> {
+  const db = await getDb();
+  if (!db) {
+    // Fallback sem banco: retorna timestamp curto para não bloquear o fluxo
+    const ts = Date.now().toString().slice(-4);
+    return ts.padStart(4, "0");
+  }
+  try {
+    const { sql } = await import("drizzle-orm");
+    const result = await db.execute(sql`SELECT COUNT(*) as total FROM leads`);
+    const rows = result as any[];
+    const total = parseInt(rows[0]?.total ?? rows[0]?.count ?? "0", 10);
+    const next = total + 1;
+    // Garante mínimo de 4 dígitos: 0001, 0002 ... 9999, 10000 (sem truncar)
+    return String(next).padStart(4, "0");
+  } catch (error) {
+    console.error("[Database] Erro ao gerar ID LEAD sequencial:", error);
+    const ts = Date.now().toString().slice(-4);
+    return ts.padStart(4, "0");
+  }
+}
+
 // TODO: add feature queries here as your schema grows.

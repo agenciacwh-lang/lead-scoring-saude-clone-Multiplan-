@@ -16,6 +16,8 @@ export interface BotconversaLeadPayload {
   idades: string;
   /** Status do lead: 'Lead Incompleto' no Passo 1, 'Lead Concluiu' no Passo 2 */
   status?: string;
+  /** ID LEAD sequencial formatado: 0001, 0002, 0003... */
+  lead_id?: string;
 }
 
 /**
@@ -83,6 +85,7 @@ export async function sendLeadToBotConversa(lead: BotconversaLeadPayload): Promi
     
     // Payload com campos na RAIZ (estrutura esperada pelo BotConversa)
     let payload: Record<string, any> = {
+      lead_id: lead.lead_id ?? "",
       nome: nullToEmpty(lead.nome),
       email: nullToEmpty(lead.email),
       telefone: telefoneLimpo,
