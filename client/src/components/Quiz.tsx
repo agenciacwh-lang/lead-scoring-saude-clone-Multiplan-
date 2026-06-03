@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { useLocation } from "wouter";
+
 import { QUIZ_QUESTIONS, calculateLeadScore } from "@/lib/quizData";
 import { useLeadContext } from "@/contexts/LeadContext";
 import { ChevronLeft, Heart } from "lucide-react";
@@ -22,7 +22,7 @@ export interface QuizProps {
 }
 
 export default function Quiz({ onSubmit, isSubmitting = false }: QuizProps = {}) {
-  const [, navigate] = useLocation();
+
   const { quizAnswers, addAnswer } = useLeadContext();
   const [currentStep, setCurrentStep] = useState(1); // 1-6 = questions
   const [textInput, setTextInput] = useState("");
@@ -59,7 +59,7 @@ export default function Quiz({ onSubmit, isSubmitting = false }: QuizProps = {})
 
       setTimeout(() => {
         if (currentStep >= totalSteps) {
-          // Calculate score and navigate
+          // Calculate score and submit
           const finalAnswers = currentQuestion?.isTextInput && currentQuestion
             ? { ...quizAnswers, [currentQuestion.key]: textInput }
             : answerId && currentQuestion
@@ -68,14 +68,11 @@ export default function Quiz({ onSubmit, isSubmitting = false }: QuizProps = {})
 
           const score = calculateLeadScore(finalAnswers);
 
-          // Chamar callback externo se fornecido
+          // Chamar callback externo (Home.tsx controla a navegação via onSuccess)
           if (onSubmit) {
             onSubmit(finalAnswers, score.temperature, score.total);
           }
-
-          // Leads frios vão para /confirmado, outros para /obrigado
-          const targetRoute = score.temperature === "frio" ? "/confirmado" : "/obrigado";
-          navigate(targetRoute);
+          // Navegação removida daqui — acontece no onSuccess do submitCompleted
           return;
         }
 
@@ -84,7 +81,7 @@ export default function Quiz({ onSubmit, isSubmitting = false }: QuizProps = {})
         setAnimating(false);
       }, 280);
     },
-    [animating, currentQuestion, currentStep, totalSteps, quizAnswers, textInput, navigate, addAnswer, onSubmit]
+    [animating, currentQuestion, currentStep, totalSteps, quizAnswers, textInput, addAnswer, onSubmit]
   );
 
   const goBack = useCallback(() => {

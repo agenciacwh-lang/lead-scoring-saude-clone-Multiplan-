@@ -23,27 +23,26 @@ import { sendLeadToSheets, getLeadsStats } from "../services/sheetsSync";
 
 // ─── Lógica de Lead Scoring (espelho do frontend) ────────────────────────────
 const SCORE_MAP: Record<string, number> = {
-  // tempo_compra
-  quanto_antes: 3,
-  esse_mes: 2,
-  proximo_mes: 1,
+  // tempo_compra (IDs reais do quizData.ts)
   pesquisando: 0,
+  proximos_meses: 1,
+  esse_mes: 2,
+  quanto_antes: 3,
   // situacao_atual
-  nunca_tive: 2,
-  ja_tive: 1,
+  nunca_tive: 1,
+  ja_tive: 2,
   quero_trocar: 3,
-  tenho_mantenho: 0,
   // renda
-  acima_5000: 2,
-  entre_3000_5000: 1,
-  ate_3000: 0,
+  ate_1500: 0,
+  "1500_3000": 0,
+  "3000_6000": 2,
+  acima_6000: 3,
   // criterio_escolha
+  preco: 0,
+  custo_beneficio: 1,
   qualidade: 2,
-  preco: 1,
-  rede: 1,
-  cobertura: 2,
   // cnpj_mei
-  sim_cnpj: 2,
+  sim_cnpj: 1,
   nao_cnpj: 0,
 };
 

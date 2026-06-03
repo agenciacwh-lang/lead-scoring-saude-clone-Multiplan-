@@ -6,7 +6,7 @@
  * Sem timers no frontend — controle de tempo feito pelo BotConversa.
  */
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useLeadContext } from "@/contexts/LeadContext";
 import LeadForm from "@/components/LeadForm";
@@ -22,20 +22,31 @@ export default function Home() {
   const { leadData, setLeadData } = useLeadContext();
   const [showQuiz, setShowQuiz] = useState(false);
 
+  // Ref para armazenar leadCode de forma síncrona (não depende de re-render)
+  const leadCodeRef = React.useRef<string>("0000");
+
   // ─── Mutations tRPC ───────────────────────────────────────────────────────
   const submitInitial = trpc.leads.submitInitial.useMutation({
     onSuccess: (data) => {
       console.log("[Home] PASSO 1 — Lead inicial capturado:", data);
-      // Armazenar leadCode no contexto para usar no Passo 2
-      if (data.leadCode && leadData) {
-        setLeadData({ ...leadData, leadCode: data.leadCode });
+      // Armazenar leadCode no ref E no contexto
+      if (data.leadCode) {
+        leadCodeRef.current = data.leadCode;
+        if (leadData) {
+          setLeadData({ ...leadData, leadCode: data.leadCode });
+        }
       }
     },
     onError: (error) => console.error("[Home] PASSO 1 — Erro ao capturar lead inicial:", error),
   });
 
   const submitCompleted = trpc.leads.submitCompleted.useMutation({
-    onSuccess: (data) => console.log("[Home] PASSO 2 — Lead concluído:", data),
+    onSuccess: (data) => {
+      console.log("[Home] PASSO 2 — Lead concluído:", data);
+      // Navegar SOMENTE após sucesso da mutation
+      const temp = data.temperatura ?? "morno";
+      setLocation(temp === "frio" ? "/confirmado" : "/obrigado");
+    },
     onError: (error) => console.error("[Home] PASSO 2 — Erro ao concluir lead:", error),
   });
 
@@ -57,17 +68,21 @@ export default function Home() {
   };
 
   // ─── Passo 2: Conclusão do Quiz ──────────────────────────────────────────
-  const handleQuizSubmit = (answers: Record<string, string>, temperature: string, score: number) => {
+  const handleQuizSubmit = (answers: Record<string, string>, _temperature: string, _score: number) => {
     if (!leadData?.nome) {
       setShowQuiz(false);
       return;
     }
     const telefoneLimpo = leadData.telefone.replace(/\D/g, "");
-    // leadCode gerado no Passo 1 e armazenado no LeadContext
-    const leadCode = leadData.leadCode ?? "0000";
+    // leadCode: prioriza ref (síncrono), depois contexto, depois fallback
+    const leadCode = leadCodeRef.current !== "0000"
+      ? leadCodeRef.current
+      : (leadData.leadCode ?? "0000");
+
+    console.log("[Home] PASSO 2 — Enviando com leadCode:", leadCode, "respostas:", answers);
 
     submitCompleted.mutate({
-      leadCode,                                     // ID LEAD do Passo 1
+      leadCode,
       nome: leadData.nome,
       telefone: telefoneLimpo,
       email: leadData.email,
@@ -78,10 +93,8 @@ export default function Home() {
       criterio_escolha: answers.criterio_escolha ?? "",
       cnpj_mei: answers.cnpj_mei ?? "",
       idades: answers.idades ?? "",
-      // Scoring calculado no backend — não enviamos pontuacao/temperatura/prioridade
     });
-
-    setLocation(temperature === "frio" ? "/confirmado" : "/obrigado");
+    // NÃO navegar aqui! A navegação acontece no onSuccess do submitCompleted
   };
 
   const shouldShowQuiz = showQuiz && leadData?.nome;
