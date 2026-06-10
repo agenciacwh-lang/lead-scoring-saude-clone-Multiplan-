@@ -243,30 +243,10 @@ export const leadsRouter = router({
       try {
         const db = await getDb();
         if (db) {
-          // Guard de idempotência: buscar pelo leadCode (telefone como fallback)
-          let existing = await db
-            .select()
-            .from(leads)
-            .where(eq(leads.telefone, telefoneLimpo))
-            .limit(1);
+          // REMOVIDA TRAVA DE SEGURANÇA (Falso Positivo)
+          // Agora o Passo 2 SEMPRE processa e dispara webhooks, garantindo a entrega.
 
-          // Guard: se já está completo, abortar silenciosamente
-          if (existing.length > 0 && existing[0].status === "completo") {
-            console.warn("[Leads] PASSO 2 — Lead já concluído. Ignorando disparo duplicado. ID:", existing[0].id);
-            return {
-              success: true,
-              leadId: existing[0].id,
-              leadCode: input.leadCode,
-              pontuacao,
-              temperatura,
-              botconversaSent: false,
-              sheetsSent: false,
-              facebookCapiSent: false,
-              message: "Lead já concluído — disparo duplicado ignorado",
-            };
-          }
-
-          // Atualizar registro existente
+          // Atualizar registro existente (pelo telefone)
           const updated = await db
             .update(leads)
             .set({
