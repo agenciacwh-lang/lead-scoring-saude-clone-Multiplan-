@@ -35,8 +35,12 @@ export default function Obrigado() {
     >
       <div className="w-full max-w-2xl">
         {/* Logo Hapvida no topo */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-orange-600">Hapvida</h2>
+        <div className="flex justify-center mb-8">
+          <img 
+            src="/logo-hapvida.png" 
+            alt="Hapvida" 
+            className="h-16 md:h-20 w-auto object-contain"
+          />
         </div>
 
         {/* Card Principal */}
