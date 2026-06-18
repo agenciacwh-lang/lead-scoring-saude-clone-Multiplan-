@@ -44,8 +44,13 @@ export default function Home() {
     onSuccess: (data) => {
       console.log("[Home] PASSO 2 — Lead concluído:", data);
       // Navegar SOMENTE após sucesso da mutation
-      const temp = data.temperatura ?? "morno";
-      setLocation(temp === "frio" ? "/confirmado" : "/obrigado");
+      // Quente -> /obrigado | Morno/Frio -> /confirmado
+      const temp = (data.temperatura ?? "morno").toLowerCase();
+      if (temp === "quente") {
+        setLocation("/obrigado");
+      } else {
+        setLocation("/confirmado");
+      }
     },
     onError: (error) => console.error("[Home] PASSO 2 — Erro ao concluir lead:", error),
   });
