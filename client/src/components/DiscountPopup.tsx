@@ -104,35 +104,39 @@ export default function DiscountPopup({ onAccept }: DiscountPopupProps) {
           <div className="bg-gradient-to-r from-orange-500 via-orange-400 to-red-500 px-6 py-8">
             <div className="text-5xl mb-4 animate-bounce">🎉</div>
             <div className="animate-float-in" style={{ animationDelay: "0.1s" }}>
-              <h2 className="text-2xl font-bold text-white mb-2">
+              <h2 className="text-xl font-bold text-white mb-2 leading-tight">
                 Você está a um passo de garantir
               </h2>
-              <div className="text-4xl font-black text-white drop-shadow-lg">15% OFF</div>
-              <p className="text-white/90 text-sm mt-2">nas suas 3 primeiras mensalidades!</p>
+              <div className="text-3xl font-black text-white drop-shadow-lg uppercase tracking-tight">
+                CARÊNCIA ZERO
+              </div>
+              <p className="text-white/95 text-sm mt-2 font-medium">
+                para consultas e exames simples!
+              </p>
             </div>
           </div>
 
           {/* Corpo */}
           <div className="px-6 py-6 animate-float-in" style={{ animationDelay: "0.2s" }}>
-            <p className="text-gray-700 text-center mb-8 leading-relaxed">
-              Preencha os próximos dados para liberar seu desconto exclusivo e receber as melhores
+            <p className="text-gray-700 text-center mb-8 leading-relaxed font-medium">
+              Preencha os próximos dados para liberar sua promoção exclusiva e receber as melhores
               opções de plano de saúde para você.
             </p>
 
             {/* Botão primário */}
             <button
               onClick={handleConfirm}
-              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg"
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg uppercase text-sm"
             >
-              ✓ OK, QUERO MEU DESCONTO
+              [ OK, QUERO GARANTIR MINHA PROMOÇÃO ]
             </button>
 
             {/* Botão ghost */}
             <button
               onClick={handleDismiss}
-              className="w-full mt-3 text-gray-500 hover:text-gray-700 font-medium py-2 transition-all duration-200"
+              className="w-full mt-3 text-gray-500 hover:text-gray-700 font-bold py-2 transition-all duration-200 uppercase text-xs tracking-widest"
             >
-              Talvez depois
+              [ TALVEZ DEPOIS ]
             </button>
           </div>
 
@@ -141,8 +145,8 @@ export default function DiscountPopup({ onAccept }: DiscountPopupProps) {
             className="bg-gray-50 px-6 py-3 text-center border-t border-gray-200 animate-float-in"
             style={{ animationDelay: "0.3s" }}
           >
-            <p className="text-xs text-gray-600">
-              ✨ Oferta exclusiva limitada • Válida apenas para novos clientes
+            <p className="text-xs text-gray-600 font-medium">
+              ✨ Promoção exclusiva • Válida para novas adesões Hapvida
             </p>
           </div>
 
