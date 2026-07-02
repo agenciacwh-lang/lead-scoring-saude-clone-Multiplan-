@@ -186,7 +186,7 @@ export default function Home() {
               <FormCard className="sticky top-20 h-fit">
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    ✨ Responda rápido para liberar seu desconto de 15%
+                    Garanta sua promoção!
                   </h2>
                   <p className="text-gray-600 text-sm leading-relaxed">
                     Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal
@@ -208,7 +208,7 @@ export default function Home() {
             <FormCard className="!rounded-2xl !p-6">
               <div className="mb-6">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">
-                  ✨ Responda rápido para liberar seu desconto de 15%
+                  Garanta sua promoção!
                 </h2>
                 <p className="text-gray-600 text-sm leading-relaxed">
                   Vamos fazer algumas perguntinhas rápidas para encontrar o plano de saúde ideal
@@ -303,7 +303,7 @@ export default function Home() {
               className="inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold text-lg py-5 px-10 rounded-xl shadow-lg shadow-orange-500/30 transition-all duration-200 transform hover:scale-105"
             >
               <span>🎁</span>
-              <span>Quero aproveitar os 15% de desconto</span>
+              <span>QUERO GARANTIR A PROMOÇÃO EXCLUSIVA</span>
             </button>
             <p className="mt-3 text-sm text-gray-400">Oferta exclusiva para novos clientes • Sem compromisso</p>
           </div>
@@ -379,7 +379,7 @@ export default function Home() {
             className="inline-flex items-center gap-3 bg-orange-500 hover:bg-orange-600 active:scale-95 text-white font-bold text-lg py-5 px-10 rounded-xl shadow-lg shadow-orange-500/30 transition-all duration-200 transform hover:scale-105"
           >
             <span>🎁</span>
-            <span>Quero aproveitar os 15% de desconto</span>
+            <span>QUERO GARANTIR A PROMOÇÃO EXCLUSIVA</span>
           </button>
           <p className="mt-3 text-sm text-gray-400">Oferta exclusiva para novos clientes • Sem compromisso</p>
         </div>

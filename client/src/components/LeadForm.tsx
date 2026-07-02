@@ -185,7 +185,7 @@ export default function LeadForm({ onSubmit }: LeadFormProps) {
           </>
         ) : (
           <>
-            Responder perguntas
+            QUERO MINHA PROMOÇÃO EXCLUSIVA
             <ArrowRight className="w-5 h-5" />
           </>
         )}
