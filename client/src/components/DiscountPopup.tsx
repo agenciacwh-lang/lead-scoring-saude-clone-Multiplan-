@@ -128,7 +128,7 @@ export default function DiscountPopup({ onAccept }: DiscountPopupProps) {
               onClick={handleConfirm}
               className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg uppercase text-sm"
             >
-              [ OK, QUERO GARANTIR MINHA PROMOÇÃO ]
+              OK, QUERO GARANTIR MINHA PROMOÇÃO
             </button>
 
             {/* Botão ghost */}
@@ -136,7 +136,7 @@ export default function DiscountPopup({ onAccept }: DiscountPopupProps) {
               onClick={handleDismiss}
               className="w-full mt-3 text-gray-500 hover:text-gray-700 font-bold py-2 transition-all duration-200 uppercase text-xs tracking-widest"
             >
-              [ TALVEZ DEPOIS ]
+              TALVEZ DEPOIS
             </button>
           </div>
 
