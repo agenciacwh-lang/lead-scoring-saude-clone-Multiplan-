@@ -98,6 +98,10 @@ export default function Quiz({ onSubmit, isSubmitting = false }: QuizProps = {})
   const handleOptionClick = (optionId: string) => {
     if (animating || isSubmitting) return;
     setSelectedOption(optionId);
+    
+    // Se for o último passo, desabilitar imediatamente para evitar duplo clique
+    // goNext cuidará de chamar o onSubmit que ativa o isSubmitting global
+    
     // Small delay for visual feedback before advancing
     setTimeout(() => {
       goNext(optionId);
@@ -304,19 +308,25 @@ function QuestionContent({
                 ? "0 4px 16px rgba(231, 76, 60, 0.3)"
                 : "none",
             }}
-          >
-            {isSubmitting ? "Enviando..." : isLast ? "Ver meu resultado →" : "Continuar →"}
-          </button>
+            >
+              {isSubmitting ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Enviando...
+                </span>
+              ) : isLast ? "Ver meu resultado →" : "Continuar →"}
+            </button>
         </div>
       ) : (
         <div className="space-y-2.5">
           {question.options.map((option) => (
             <button
               key={option.id}
+              disabled={isSubmitting}
               onClick={() => onOptionClick(option.id)}
               className={`option-card w-full text-left flex items-center gap-3 ${
                 selectedOption === option.id ? "selected" : ""
-              }`}
+              } ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               {option.emoji && (
                 <span className="text-xl flex-shrink-0">{option.emoji}</span>
